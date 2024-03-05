@@ -98,6 +98,9 @@ def _load_ts_and_data(rec_dir: pathlib.Path, stream_name: str):
 
 
 def _load_video(rec_dir: pathlib.Path, video_name: str, start_ts: float):
+    if not (rec_dir / (video_name + '.mp4')).exists():
+        raise FileNotFoundError(f"File not found: {rec_dir / (video_name + '.mp4')}. Please double check the recording download.")
+
     container = plv.open(rec_dir / (video_name + '.mp4'))
 
     # use hardware ts
