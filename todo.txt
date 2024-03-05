@@ -1,0 +1,5 @@
+- scene camera stream
+- fixation stream
+- pupillometry stream
+- interpolation methods when sampling streams
+- clarify how to deal with TsNs in imu stream

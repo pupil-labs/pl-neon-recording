@@ -19,3 +19,12 @@
 
 .. image:: https://img.shields.io/badge/skeleton-2022-informational
    :target: https://blog.jaraco.com/skeleton
+
+
+*******************************
+Neon Recording API
+*******************************
+
+- TODO: fill in README, still testing code
+- needs error checking & some better formatting
+- see `initial discussion/design <https://www.notion.so/pupillabs/Neon-Recording-Python-Lib-5b247c33e1c74f638af2964fa78018ff?pvs=4>`_

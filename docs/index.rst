@@ -1,4 +1,4 @@
-Welcome to |project| documentation!
+Welcome to the |Neon Recording API| documentation!
 ===================================
 
 .. toctree::
@@ -7,7 +7,7 @@ Welcome to |project| documentation!
    history
 
 
-.. automodule:: skeleton
+.. automodule:: neon_recording
     :members:
     :undoc-members:
     :show-inheritance:
