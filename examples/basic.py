@@ -122,8 +122,12 @@ for f in scene.sample(between_two_events):
     if f:
         all_frames.append(f.rgb)
 
-all_frames = np.dstack(all_frames)
-print('all_frames', all_frames.shape)
+
+print('all_frames', len(all_frames))
+# all_frames_np = np.dstack(all_frames)
+# print('all_frames', all_frames_np.shape)
+        
+# need to implement nicely
 # all_frames_ts = scene.sample(between_two_events).ts 
 
 # gets me the closest sample within -+0.01s 
