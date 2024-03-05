@@ -3,7 +3,9 @@ import pathlib
 
 import numpy as np
 
-from .stream import Stream
+import pupil_labs.video as plv
+
+from .stream import Stream, VideoStream
 from .data_utils import load_raw_data, convert_gaze_data_to_recarray
 from .time_utils import ns_to_s, rewrite_times, load_timestamps_data, neon_raw_time_load
 from .load_imu_data import IMURecording
@@ -22,7 +24,8 @@ class NeonRecording:
         self.streams = {
             'gaze': Stream('gaze'),
             'imu': Stream('imu'),
-            'scene': Stream('scene')
+            'scene': VideoStream('scene'),
+            'eye': VideoStream('eye')
         }
 
         self.events = []
@@ -63,6 +66,11 @@ class NeonRecording:
         return self.streams['scene']
     
 
+    @property
+    def eye(self):
+        return self.streams['eye']
+    
+
 def _load_with_error_check(func, fpath: pathlib.Path, err_msg_supp: str):
     try:
         res = func(fpath)
@@ -87,6 +95,22 @@ def _load_ts_and_data(rec_dir: pathlib.Path, stream_name: str):
         raw = _load_with_error_check(load_raw_data, raw_path, "Please double check the recording download.")
 
         return ts, raw
+
+
+def _load_video(rec_dir: pathlib.Path, video_name: str, start_ts: float):
+    container = plv.open(rec_dir / (video_name + '.mp4'))
+
+    # use hardware ts
+    _load_with_error_check(rewrite_times, rec_dir / (video_name + '.time'), "Please double check the recording download.")
+    # _load_with_error_check(rewrite_times, rec_dir / (video_name + '.time_aux'), "Please double check the recording download.")
+
+    ts = _load_with_error_check(load_timestamps_data, rec_dir / (video_name + '_timestamps.npy'), "Possible error when converting timestamps.")
+    
+    return {
+        'av_container': container,
+        'ts': ts,
+        'ts_rel': ts - start_ts
+    }
 
 
 def _parse_calib_bin(rec: NeonRecording, rec_dir: pathlib.Path):
@@ -200,6 +224,16 @@ def load(rec_dir_str: str) -> NeonRecording:
     _load_with_error_check(rewrite_times, rec_dir / 'extimu ps1.time', "Please double check the recording download.")
     imu_rec = IMURecording(rec_dir / 'extimu ps1.raw', rec.start_ts)
     rec.streams['imu'].load(imu_rec.raw)
+
+
+    print("NeonRecording: Loading scene camera video")
+    scene_data = _load_video(rec_dir, 'Neon Scene Camera v1 ps1', rec.start_ts)
+    rec.streams['scene'].load(scene_data)
+
+
+    print("NeonRecording: Loading eye camera video")
+    eye_data = _load_video(rec_dir, 'Neon Sensor Module v1 ps1', rec.start_ts)
+    rec.streams['eye'].load(eye_data)
 
 
     print("NeonRecording: Loading events")

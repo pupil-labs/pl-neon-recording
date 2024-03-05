@@ -1,4 +1,4 @@
-- scene camera stream
+- double-check timestamp alignment between gaze + eye + scene + imu
 - fixation stream
 - pupillometry stream
 - interpolation methods when sampling streams
