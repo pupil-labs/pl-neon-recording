@@ -57,7 +57,7 @@ gaze = rec.streams['gaze']
 # best guess was that we should take successive pairs of ts to be sampled as
 # little windows and find the ts that is closest to "current",
 # which is the right side of the window
-gaze.sample([gaze_ts[0], gaze_ts[1], gaze_ts[2]])
+gaze.sample_rob([gaze_ts[0], gaze_ts[1], gaze_ts[2]])
 
 print('iterating over some gaze samples:')
 for g in gaze:
@@ -67,7 +67,7 @@ for g in gaze:
 print()
 print('iterating over some "zip"-ed gaze & imu samples:')
 sample_ts = gaze_ts[:15]
-for gz, imu, scene_frame, eye in zip(rec.gaze.sample(sample_ts), rec.imu.sample(sample_ts), rec.scene.sample(sample_ts), rec.eye.sample(sample_ts)):
+for gz, imu, scene_frame, eye in zip(rec.gaze.sample_rob(sample_ts), rec.imu.sample_rob(sample_ts), rec.scene.sample_rob(sample_ts), rec.eye.sample_rob(sample_ts)):
     if gz:
         x = gz.x
         y = gz.y
@@ -110,7 +110,7 @@ print('between the two events:')
 print(between_two_events)
 print()
 
-gaze_np = gaze.sample(between_two_events).to_numpy()
+gaze_np = gaze.sample_rob(between_two_events).to_numpy()
 print('n samples between 2 events: ' + str(len(gaze_np)))
 print()
 
@@ -118,7 +118,7 @@ print()
 # TODO(rob) - we hit end-of-file on last 7 tses, which causes the comprehension to hang?
 # all_frames = [f.rgb for f in scene.sample(between_two_events) if f]
 all_frames = []
-for f in scene.sample(between_two_events):
+for f in scene.sample_rob(between_two_events):
     if f:
         all_frames.append(f.rgb)
 

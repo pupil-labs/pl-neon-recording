@@ -1,5 +1,12 @@
 - double-check timestamp alignment between gaze + eye + scene + imu
-- fixation stream
-- pupillometry stream
+
+- get from cloud or run offline on file load?
+	- fixation stream
+	- eyestate/pupillometry stream
+
 - interpolation methods when sampling streams
 - clarify how to deal with TsNs in imu stream
+
+- file to notify that it has been checked
+
+- for video, concatenate raw then convert to np array

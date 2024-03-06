@@ -3,12 +3,15 @@ import pathlib
 
 import numpy as np
 
-import pupil_labs.video as plv
+from .stream.gaze_stream import GazeStream
+from .stream.imu import IMUStream
+from .stream.video_stream import VideoStream
 
-from .stream import Stream, VideoStream
-from .data_utils import load_raw_data, convert_gaze_data_to_recarray
-from .time_utils import ns_to_s, rewrite_times, load_timestamps_data, neon_raw_time_load
-from .load_imu_data import IMURecording
+from .calib import parse_calib_bin
+from .time_utils import ns_to_s
+
+from . import structlog
+log = structlog.get_logger(__name__)
 
 class NeonRecording:
     def __init__(self):
@@ -22,8 +25,8 @@ class NeonRecording:
         self.eye2_camera = {}
 
         self.streams = {
-            'gaze': Stream('gaze'),
-            'imu': Stream('imu'),
+            'gaze': GazeStream('gaze'),
+            'imu': IMUStream('imu'),
             'scene': VideoStream('scene'),
             'eye': VideoStream('eye')
         }
@@ -35,9 +38,9 @@ class NeonRecording:
         self._version = ''
         self._serial = 0
 
-        self._gaze_ps1_raw_time = []
-        self._gaze_200hz_raw_time = []
-        self._gaze_right_ps1_raw_time = []
+        self._gaze_ps1_raw_time_ns = []
+        self._gaze_200hz_raw_time_ns = []
+        self._gaze_right_ps1_raw_time_ns = []
         self._gaze_ps1_ts = []
         self._gaze_ps1_raw = []
         self._gaze_right_ps1_ts = []
@@ -52,105 +55,50 @@ class NeonRecording:
 
 
     @property
-    def gaze(self):
+    def gaze(self) -> GazeStream:
         return self.streams['gaze']
 
 
     @property
-    def imu(self):
+    def imu(self) -> IMUStream:
         return self.streams['imu']
 
 
     @property
-    def scene(self):
+    def scene(self) -> VideoStream:
         return self.streams['scene']
     
 
     @property
-    def eye(self):
+    def eye(self) -> VideoStream:
         return self.streams['eye']
-    
 
-def _load_with_error_check(func, fpath: pathlib.Path, err_msg_supp: str):
+
+def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
+    log.info(f"NeonRecording: Loading recording from: {rec_dir_str}")
+    rec_dir = pathlib.Path(rec_dir_str)
+
+    rec = NeonRecording()
+
+
+    log.info("NeonRecording: Loading recording info")
     try:
-        res = func(fpath)
-        if res is not None:
-            return res
+        with open(rec_dir / 'info.json') as f:
+            rec.info = json.load(f)
     except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {fpath}. {err_msg_supp}")
+        raise FileNotFoundError(f"File not found: {rec_dir / 'info.json'}. Please double check the recording download.")
     except OSError:
-        raise OSError(f"Error opening file: {fpath}.")
+        raise OSError(f"Error opening file: {rec_dir / 'info.json'}")
     except Exception as e:
-        print(f"Unexpected error loading {fpath}: {e}")
+        log.exception(f"Unexpected error loading info.json: {e}")
         raise
+    else:
+        rec._start_ts_ns = rec.info['start_time']
+        rec.start_ts = ns_to_s(rec.info['start_time'])
 
 
-def _load_ts_and_data(rec_dir: pathlib.Path, stream_name: str):
-        time_path = rec_dir / (stream_name + '.time')
-        ts_path = rec_dir / (stream_name + '_timestamps.npy')
-        raw_path = rec_dir / (stream_name + '.raw')
-
-        _load_with_error_check(rewrite_times, time_path, "Please double check the recording download.")
-        ts = _load_with_error_check(load_timestamps_data, ts_path, "Possible error when converting timestamps.")
-        raw = _load_with_error_check(load_raw_data, raw_path, "Please double check the recording download.")
-
-        return ts, raw
-
-
-def _load_video(rec_dir: pathlib.Path, video_name: str, start_ts: float):
-    if not (rec_dir / (video_name + '.mp4')).exists():
-        raise FileNotFoundError(f"File not found: {rec_dir / (video_name + '.mp4')}. Please double check the recording download.")
-
-    container = plv.open(rec_dir / (video_name + '.mp4'))
-
-    # use hardware ts
-    _load_with_error_check(rewrite_times, rec_dir / (video_name + '.time'), "Please double check the recording download.")
-    # _load_with_error_check(rewrite_times, rec_dir / (video_name + '.time_aux'), "Please double check the recording download.")
-
-    ts = _load_with_error_check(load_timestamps_data, rec_dir / (video_name + '_timestamps.npy'), "Possible error when converting timestamps.")
-    
-    return {
-        'av_container': container,
-        'ts': ts,
-        'ts_rel': ts - start_ts
-    }
-
-
-def _parse_calib_bin(rec: NeonRecording, rec_dir: pathlib.Path):
-    calib_raw_data: bytes = b''
-    try:
-        with open(rec_dir / 'calibration.bin', 'rb') as f:
-            calib_raw_data = f.read()
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {rec_dir / 'calibration.bin'}. Please double check the recording download.")
-    except OSError:
-        raise OSError(f"Error opening file: {rec_dir / 'calibration.bin'}")
-    except Exception as e:
-        print(f"Unexpected error loading calibration.bin: {e}")
-        raise
-
-
-    # obtained from @dom: 
-    # https://github.com/pupil-labs/realtime-python-api/blob/main/src/pupil_labs/realtime_api/device.py#L178
-    rec._calib = np.frombuffer(
-        calib_raw_data,
-        np.dtype(
-            [
-                ("version", "u1"),
-                ("serial", "6a"),
-                ("scene_camera_matrix", "(3,3)d"),
-                ("scene_distortion_coefficients", "8d"),
-                ("scene_extrinsics_affine_matrix", "(4,4)d"),
-                ("right_camera_matrix", "(3,3)d"),
-                ("right_distortion_coefficients", "8d"),
-                ("right_extrinsics_affine_matrix", "(4,4)d"),
-                ("left_camera_matrix", "(3,3)d"),
-                ("left_distortion_coefficients", "8d"),
-                ("left_extrinsics_affine_matrix", "(4,4)d"),
-                ("crc", "u4"),
-            ]
-        ),
-    )
+    log.info("NeonRecording: Loading calibration data")
+    rec._calib = parse_calib_bin(rec_dir)
 
     rec._version = str(rec._calib['version'])
     rec._serial = int(rec._calib['serial'])
@@ -171,90 +119,46 @@ def _parse_calib_bin(rec: NeonRecording, rec_dir: pathlib.Path):
     }
 
 
-def load(rec_dir_str: str) -> NeonRecording:
-    rec_dir = pathlib.Path(rec_dir_str)
-    print(f"NeonRecording: Loading recording from: {rec_dir}")
-
-
-    rec = NeonRecording()
-
-
-    print("NeonRecording: Loading recording info and calibration data")
-    try:    
-        with open(rec_dir / 'info.json') as f:
-            rec.info = json.load(f)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {rec_dir / 'info.json'}. Please double check the recording download.")
-    except OSError:
-        raise OSError(f"Error opening file: {rec_dir / 'info.json'}")
-    except Exception as e:
-        print(f"Unexpected error loading info.json: {e}")
-        raise
-    else:
-        rec._start_ts_ns = rec.info['start_time']
-        rec.start_ts = ns_to_s(rec.info['start_time'])
-
-
-    _parse_calib_bin(rec, rec_dir)
-
-
     # load up raw times, in case useful at some point
-    print("NeonRecording: Loading raw time files")
-    rec._gaze_ps1_raw_time = neon_raw_time_load(rec_dir / 'gaze ps1.time')
-    rec._gaze_200hz_raw_time = neon_raw_time_load(rec_dir / 'gaze_200hz.time')
-    rec._gaze_right_ps1_raw_time = neon_raw_time_load(rec_dir / 'gaze_right ps1.time')
+    log.info("NeonRecording: Loading raw time (ns) files")
+    rec._gaze_ps1_raw_time_ns = np.fromfile(str(rec_dir / 'gaze ps1.time'), dtype="<u8")
+    rec._gaze_200hz_raw_time_ns = np.fromfile(str(rec_dir / 'gaze_200hz.time'), dtype="<u8")
+    rec._gaze_right_ps1_raw_time_ns = np.fromfile(str(rec_dir / 'gaze_right ps1.time'), dtype="<u8")
 
 
-    print("NeonRecording: Loading 'gaze ps1' data")
-    rec._gaze_ps1_ts, rec._gaze_ps1_raw = _load_ts_and_data(rec_dir, 'gaze ps1')
-
-
-    print("NeonRecording: Loading 'gaze_200hz' data")
-    gaze_200hz_ts, gaze_200hz_raw = _load_ts_and_data(rec_dir, 'gaze_200hz')
-
-
-    # we use gaze_200hz from cloud for the rec gaze stream
-    gaze_200hz_ts_rel = gaze_200hz_ts - rec.start_ts
-    rec.streams['gaze'].load(convert_gaze_data_to_recarray(gaze_200hz_raw, gaze_200hz_ts, gaze_200hz_ts_rel))
+    log.info("NeonRecording: Loading gaze data")
+    rec.streams['gaze'].load(rec_dir, rec.start_ts)
 
 
     # still not sure what gaze_right is...
-    print("NeonRecording: Loading 'gaze_right_ps1' data")
-    rec._gaze_right_ps1_ts, rec._gaze_right_ps1_raw = _load_ts_and_data(rec_dir, 'gaze ps1')
+    # log.info("NeonRecording: Loading 'gaze_right_ps1' data")
+    # rec._gaze_right_ps1_ts, rec._gaze_right_ps1_raw = _load_ts_and_data(rec_dir, 'gaze ps1')
 
 
-    print("NeonRecording: Loading IMU data")
-    _load_with_error_check(rewrite_times, rec_dir / 'extimu ps1.time', "Please double check the recording download.")
-    imu_rec = IMURecording(rec_dir / 'extimu ps1.raw', rec.start_ts)
-    rec.streams['imu'].load(imu_rec.raw)
+    log.info("NeonRecording: Loading IMU data")
+    rec.streams['imu'].load(rec_dir, rec.start_ts)
 
 
-    print("NeonRecording: Loading scene camera video")
-    scene_data = _load_video(rec_dir, 'Neon Scene Camera v1 ps1', rec.start_ts)
-    rec.streams['scene'].load(scene_data)
+    log.info("NeonRecording: Loading scene camera video")
+    rec.streams['scene'].load(rec_dir, 'Neon Scene Camera v1 ps1', rec.start_ts)
 
 
-    print("NeonRecording: Loading eye camera video")
-    eye_data = _load_video(rec_dir, 'Neon Sensor Module v1 ps1', rec.start_ts)
-    rec.streams['eye'].load(eye_data)
+    log.info("NeonRecording: Loading eye camera video")
+    rec.streams['eye'].load(rec_dir, 'Neon Sensor Module v1 ps1', rec.start_ts)
 
 
-    print("NeonRecording: Loading events")
+    log.info("NeonRecording: Loading events")
     try:
         labels = (rec_dir / 'event.txt').read_text().strip().split('\n')
     except Exception as e:
-        print(f"Unexpected error loading 'event.text': {e}")
+        log.exception(f"Unexpected error loading 'event.text': {e}")
         raise
 
-    
-    _load_with_error_check(rewrite_times, rec_dir / 'event.time', "Please double check the recording download.")
-    events_ts = np.load(rec_dir / 'event_timestamps.npy')
-    rec._events_ts_ns = np.load(rec_dir / 'event_timestamps_unix.npy')
+    events_ts = np.fromfile(str(rec_dir / 'event.time'), dtype="<u8") # interesting, this is already in seconds?
     rec.events = [evt for evt in zip(labels, events_ts)]
 
 
-    print("NeonRecording: Parsing unique events")
-
+    log.info("NeonRecording: Parsing unique events")
     # when converting a list of tuples to dict, if elements repeat, then the last one
     # is what ends up in the dict.
     # but mpk would prefer that the first occurence of each repeated event is what
@@ -272,7 +176,6 @@ def load(rec_dir_str: str) -> NeonRecording:
     # could not find function/docs on format of worn_200hz.raw
     # worn_ps1_raw = load_worn_data(pathlib.Path(rec_dir + '/worn_200hz.raw'))
 
-    print("NeonRecording: Finished loading recording.")
-    print()
+    log.info("NeonRecording: Finished loading recording.")
 
     return rec
