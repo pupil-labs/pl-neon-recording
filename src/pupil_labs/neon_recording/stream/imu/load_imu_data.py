@@ -4,7 +4,8 @@
 import pathlib
 # import warnings
 
-import tqdm
+# import tqdm
+from progress.spinner import LineSpinner
 import numpy as np
 from scipy.spatial.transform import Rotation
 
@@ -87,7 +88,10 @@ class IMURecording:
 
             log.debug("NeonRecording: Iterating and converting IMU packets.")
 
-            for packet in tqdm.tqdm(imu_packets):
+            spinner = LineSpinner('Loading IMU data... ')
+
+            # for packet in tqdm.tqdm(imu_packets):
+            for packet in imu_packets:
                 rotation = Rotation.from_quat([packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z, packet.rotVecData.w])
                 euler = rotation.as_euler(seq='XZY', degrees=True)
 
@@ -103,6 +107,10 @@ class IMURecording:
                     ts,
                     ts_rel
                 ))
+
+                spinner.next()
+
+            spinner.finish()
 
             self.raw = np.array(imu_data, dtype=IMURecording.DTYPE_RAW).view(
                 np.recarray
