@@ -8,7 +8,7 @@ from .stream.imu import IMUStream
 from .stream.video_stream import VideoStream
 
 from .calib import parse_calib_bin
-from .time_utils import ns_to_s
+from .time_utils import ns_to_s, load_and_convert_tstamps
 
 from . import structlog
 log = structlog.get_logger(__name__)
@@ -154,7 +154,8 @@ def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
         log.exception(f"Unexpected error loading 'event.text': {e}")
         raise
 
-    events_ts = np.fromfile(str(rec_dir / 'event.time'), dtype="<u8") # interesting, this is already in seconds?
+    events_ts = load_and_convert_tstamps(rec_dir / 'event.time')
+    # events_ts = np.fromfile(str(rec_dir / 'event.time'), dtype="<u8") # interesting, this is already in seconds?
     rec.events = [evt for evt in zip(labels, events_ts)]
 
 

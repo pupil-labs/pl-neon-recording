@@ -1,5 +1,6 @@
 import pprint
 
+import cv2
 import numpy as np
 import pupil_labs.neon_recording as nr
 
@@ -145,3 +146,24 @@ print(gaze_one_idx)
 print()
 
 print(gaze[42:45])
+
+
+scene_video = rec.scene
+gaze = rec.gaze
+
+between_two_events = scene_video.ts[(scene_video.ts >= event1_ts) & (scene_video.ts <= event2_ts)]
+
+video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1600, 1200))
+
+try:
+    for gaze, world in zip(gaze.sample_rob(between_two_events), scene_video.sample_rob(between_two_events)):
+        img = world.cv2
+
+        if gaze:
+            cv2.circle(img, (int(gaze.x), int(gaze.y)), 50, (0, 0, 255), 10)
+            # cv2.imshow('gaze', img)
+            # cv2.imwrite('gaze.png', img)
+            video.write(img)
+except:
+    video.release()
+    raise
