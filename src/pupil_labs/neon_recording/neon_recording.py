@@ -78,6 +78,7 @@ def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
     log.info(f"NeonRecording: Loading recording from: {rec_dir_str}")
     rec_dir = pathlib.Path(rec_dir_str)
 
+
     rec = NeonRecording()
 
 
@@ -140,11 +141,11 @@ def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
 
 
     log.info("NeonRecording: Loading scene camera video")
-    rec.streams['scene'].load(rec_dir, 'Neon Scene Camera v1 ps1', rec.start_ts)
+    rec.streams['scene'].load(rec_dir, rec.start_ts, 'Neon Scene Camera v1 ps1')
 
 
     log.info("NeonRecording: Loading eye camera video")
-    rec.streams['eye'].load(rec_dir, 'Neon Sensor Module v1 ps1', rec.start_ts)
+    rec.streams['eye'].load(rec_dir, rec.start_ts, 'Neon Sensor Module v1 ps1')
 
 
     log.info("NeonRecording: Loading events")

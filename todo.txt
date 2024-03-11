@@ -10,3 +10,8 @@
 - file to notify that it has been checked
 
 - for video, concatenate raw then convert to np array
+
+specify default option for agg, and stream specific
+
+see here:
+https://www.notion.so/pupillabs/Neon-Recording-Python-Lib-5b247c33e1c74f638af2964fa78018ff?pvs=4#6bf3848ff3ad435aa6ea8fe37e72ee9c

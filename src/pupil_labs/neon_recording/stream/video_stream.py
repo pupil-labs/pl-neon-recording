@@ -1,4 +1,4 @@
-import typing
+from typing import Tuple, Optional
 import pathlib
 import numpy as np
 
@@ -12,7 +12,7 @@ from ..time_utils import load_and_convert_tstamps
 from .. import structlog
 log = structlog.get_logger(__name__)
 
-def _load_video(rec_dir: pathlib.Path, video_name: str, start_ts: float) -> typing.Tuple:
+def _load_video(rec_dir: pathlib.Path, start_ts: float, video_name: str) -> Tuple:
     log.debug(f"NeonRecording: Loading video and associated timestamps: {video_name}.")
     
     if not (rec_dir / (video_name + '.mp4')).exists():
@@ -26,24 +26,33 @@ def _load_video(rec_dir: pathlib.Path, video_name: str, start_ts: float) -> typi
     
     ts_rel = ts - start_ts
 
-    return  container, ts, ts_rel
+    return container, ts, ts_rel
 
 
 class VideoStream(Stream):
-    def load(self, rec_dir: pathlib.Path, video_name: str, start_ts: float) -> None:
-        container, ts, ts_rel = _load_video(rec_dir, video_name, start_ts)
+    def interp_data(self, sorted_ts, method="nearest"):
+        if method != "nearest":
+            raise ValueError("NeonRecording: Video streams only support nearest neighbor interpolation.")
+        elif method == "nearest":
+            log.warning("NeonRecording: Video streams only use nearest neighbor interpolation.")
 
-        self._data = container.streams.video[0]
-        self.data = self._data.frames
-        self.ts = ts
-        self.ts_rel = ts_rel
+            idxs = np.searchsorted(self.ts, sorted_ts)
+            return (self._data.frames[int(i)] for i in idxs)
+            # return self.data[idxs]
+    
+    
+    def load(self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None) -> None:
+        if file_name is not None:
+            container, ts, ts_rel = _load_video(rec_dir, start_ts, file_name)
 
-        # because if they use to_numpy without calling sample,
-        # then they still get a sensible result: all the data
-        self.closest_idxs = np.arange(len(self.ts))
+            self._data = container.streams.video[0]
+            self.data = self._data.frames
+            self.ts = ts
+            self.ts_rel = ts_rel
+        else:
+            raise ValueError("Filename must be provided when loading a VideoStream.")
+        
 
-
-    # TODO(rob) - probably need a different way here
-    # def to_numpy(self):
-    #     cid = self.data[self.closest_idxs]
-    #     return pd.DataFrame(cid).to_numpy()
+    # TODO
+    def to_numpy(self):
+        pass

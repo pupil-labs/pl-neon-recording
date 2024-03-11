@@ -2,7 +2,6 @@ import pathlib
 import numpy as np
 
 from . import structlog
-
 log = structlog.get_logger(__name__)
 
 def parse_calib_bin(rec_dir: pathlib.Path):

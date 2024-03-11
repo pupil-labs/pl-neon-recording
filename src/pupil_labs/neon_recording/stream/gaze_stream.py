@@ -1,4 +1,5 @@
 import pathlib
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -30,6 +31,23 @@ def _convert_gaze_data_to_recarray(gaze_data, ts, ts_rel):
 
 
 class GazeStream(Stream):
+    def interp_data(self, sorted_ts, method='nearest'):
+        if method == 'nearest':
+            return self.data[np.searchsorted(self.ts, sorted_ts)]
+        elif method == 'linear':
+            xs = self.data.x
+            ys = self.data.y
+            ts_rel = self.data.ts_rel
+
+            interp_data = np.zeros(len(sorted_ts), dtype=[('x', '<f8'), ('y', '<f8'), ('ts', '<f8'), ('ts_rel', '<f8')]).view(np.recarray)
+            interp_data.x = np.interp(sorted_ts, self.ts, xs)
+            interp_data.y = np.interp(sorted_ts, self.ts, ys)
+            interp_data.ts = sorted_ts
+            interp_data.ts_rel = np.interp(sorted_ts, self.ts, ts_rel)
+
+            return interp_data
+
+
     def to_numpy(self):
         log.debug("NeonRecording: Converting sampled gaze data to numpy array.")
 
@@ -37,7 +55,7 @@ class GazeStream(Stream):
         return pd.DataFrame(cid).to_numpy()
 
 
-    def load(self, rec_dir: pathlib.Path, start_ts: float) -> None:
+    def load(self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None) -> None:
         # we use gaze_200hz from cloud for the rec gaze stream
         # ts, raw = self._load_ts_and_data(rec_dir, 'gaze ps1')
         gaze_200hz_ts, gaze_200hz_raw = self._load_ts_and_data(rec_dir, 'gaze_200hz')
@@ -49,10 +67,6 @@ class GazeStream(Stream):
         self.data = self._data[:]
         self.ts = self._data[:].ts
         self.ts_rel = self._data[:].ts_rel
-
-        # because if they use to_numpy without calling sample,
-        # then they still get a sensible result: all the data
-        self.closest_idxs = np.arange(len(self.data))
 
         
     def _load_ts_and_data(self, rec_dir: pathlib.Path, stream_name: str):

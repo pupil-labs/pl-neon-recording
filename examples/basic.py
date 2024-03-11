@@ -153,7 +153,7 @@ gaze = rec.gaze
 
 between_two_events = scene_video.ts[(scene_video.ts >= event1_ts) & (scene_video.ts <= event2_ts)]
 
-video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1600, 1200))
+video = cv2.VideoWriter('video.avi', cv2.VideoWriter.fourcc('M','J','P','G'), 30, (1600, 1200))
 
 try:
     for gaze, world in zip(gaze.sample_rob(between_two_events), scene_video.sample_rob(between_two_events)):

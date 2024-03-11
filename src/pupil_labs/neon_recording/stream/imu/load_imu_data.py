@@ -2,9 +2,7 @@
 # https://github.com/pupil-labs/neon-player/blob/master/pupil_src/shared_modules/imu_timeline/imu_timeline.py#L72
 
 import pathlib
-# import warnings
 
-# import tqdm
 from progress.spinner import LineSpinner
 import numpy as np
 from scipy.spatial.transform import Rotation
