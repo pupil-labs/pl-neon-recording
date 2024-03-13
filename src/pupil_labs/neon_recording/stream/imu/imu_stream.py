@@ -14,13 +14,15 @@ class IMUStream(Stream):
     def interp_data(self, sorted_ts, method="nearest"):
         if method == "nearest":
             return self.data[np.searchsorted(self.ts, sorted_ts)]
+        elif method == "nearest_rob":
+            return self.sample_rob(sorted_ts)
         elif method == "linear":
             interp_data = np.zeros(len(sorted_ts), dtype=IMURecording.DTYPE_RAW).view(np.recarray)
             for field in IMURecording.DTYPE_RAW.names:
                 if field == "ts":
                     interp_data[field] = sorted_ts
                     
-                interp_data[field] = np.interp(sorted_ts, self.ts, self.data[field])
+                interp_data[field] = np.interp(sorted_ts, self.ts, self.data[field], left=np.nan, right=np.nan)
 
             return interp_data
 

@@ -1,5 +1,7 @@
-from typing import Tuple, Optional
 import pathlib
+from typing import Tuple, Optional
+from enum import Enum
+
 import numpy as np
 
 import pupil_labs.video as plv
@@ -29,16 +31,28 @@ def _load_video(rec_dir: pathlib.Path, start_ts: float, video_name: str) -> Tupl
     return container, ts, ts_rel
 
 
+class VideoType(Enum):
+    EYE = 1
+    SCENE = 2
+
+
 class VideoStream(Stream):
+    def __init__(self, name, type):
+        super().__init__(name)
+        self.type = type
+    
+
     def interp_data(self, sorted_ts, method="nearest"):
+        log.warning("NeonRecording: Video streams only use nearest neighbor interpolation.")
+        
         if method != "nearest":
             raise ValueError("NeonRecording: Video streams only support nearest neighbor interpolation.")
+        elif method == "nearest_rob":
+            idxs = np.argmin(np.abs(self.ts - sorted_ts))
         elif method == "nearest":
-            log.warning("NeonRecording: Video streams only use nearest neighbor interpolation.")
-
             idxs = np.searchsorted(self.ts, sorted_ts)
-            return (self._data.frames[int(i)] for i in idxs)
-            # return self.data[idxs]
+            
+        return (self._data.frames[int(i)] for i in idxs)
     
     
     def load(self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None) -> None:

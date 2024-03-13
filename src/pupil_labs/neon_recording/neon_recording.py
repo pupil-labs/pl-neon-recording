@@ -5,7 +5,7 @@ import numpy as np
 
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
-from .stream.video_stream import VideoStream
+from .stream.video_stream import VideoStream, VideoType
 
 from .calib import parse_calib_bin
 from .time_utils import ns_to_s, load_and_convert_tstamps
@@ -27,8 +27,8 @@ class NeonRecording:
         self.streams = {
             'gaze': GazeStream('gaze'),
             'imu': IMUStream('imu'),
-            'scene': VideoStream('scene'),
-            'eye': VideoStream('eye')
+            'scene': VideoStream('scene', VideoType.SCENE),
+            'eye': VideoStream('eye', VideoType.EYE)
         }
 
         self.events = []

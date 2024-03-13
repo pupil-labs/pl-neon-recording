@@ -34,16 +34,18 @@ class GazeStream(Stream):
     def interp_data(self, sorted_ts, method='nearest'):
         if method == 'nearest':
             return self.data[np.searchsorted(self.ts, sorted_ts)]
+        elif method == 'nearest_rob':
+            return self.sample_rob(sorted_ts)
         elif method == 'linear':
             xs = self.data.x
             ys = self.data.y
             ts_rel = self.data.ts_rel
 
             interp_data = np.zeros(len(sorted_ts), dtype=[('x', '<f8'), ('y', '<f8'), ('ts', '<f8'), ('ts_rel', '<f8')]).view(np.recarray)
-            interp_data.x = np.interp(sorted_ts, self.ts, xs)
-            interp_data.y = np.interp(sorted_ts, self.ts, ys)
+            interp_data.x = np.interp(sorted_ts, self.ts, xs, left=np.nan, right=np.nan)
+            interp_data.y = np.interp(sorted_ts, self.ts, ys, left=np.nan, right=np.nan)
             interp_data.ts = sorted_ts
-            interp_data.ts_rel = np.interp(sorted_ts, self.ts, ts_rel)
+            interp_data.ts_rel = np.interp(sorted_ts, self.ts, ts_rel, left=np.nan, right=np.nan)
 
             return interp_data
 
