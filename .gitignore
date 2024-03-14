@@ -1,6 +1,10 @@
 version.py
 
 test_data/
+guide
+.python-version
+.vscode/
+*.mp4
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,windows,linux,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,macos,windows,linux,pycharm

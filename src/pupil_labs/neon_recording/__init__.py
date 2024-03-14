@@ -6,7 +6,7 @@ except ImportError:
     from importlib_metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("pupil_labs.neon_recording")
+    __version__ = version("pupil_labs.neon_recording.neon_recording")
 except PackageNotFoundError:
     # package is not installed
     pass

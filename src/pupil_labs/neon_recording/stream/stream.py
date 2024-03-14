@@ -32,7 +32,7 @@ class Stream(abc.ABC):
 
     def __getitem__(self, idxs):
         return self.data[idxs]
-    
+
 
     def _ts_oob(self, ts: float):
         return ts < self.ts[0] or ts > self.ts[-1]
@@ -45,7 +45,7 @@ class Stream(abc.ABC):
         # see note at https://numpy.org/doc/stable/reference/generated/numpy.isscalar.html
         if not np.ndim(ts_wanted) == 0:
             raise ValueError("This function can only sample a single timestamp. Use 'sample' for multiple timestamps.")
-        
+
         if self._ts_oob(ts_wanted):
             return None
 
@@ -69,7 +69,7 @@ class Stream(abc.ABC):
                 return datum
             else:
                 return None
-        
+
 
     @abc.abstractmethod
     def interp_data(self, sorted_ts, method="nearest"):
@@ -99,12 +99,12 @@ class Stream(abc.ABC):
         if len(tstamps) == 1:
             if self._ts_oob(tstamps):
                 return None
-            
+
             sorted_ts = [tstamps]
         else:
             # for that perculiar user who does not send in the timestamps in order ;-)
             sorted_ts = np.sort(tstamps)
-        
+
         ds = self.ts - sorted_ts[:, np.newaxis]
         closest_idxs = np.argmin(np.abs(ds), axis=1)
 
@@ -154,12 +154,12 @@ class Stream(abc.ABC):
         if len(tstamps) == 1:
             if self._ts_oob(tstamps):
                 return None
-            
+
             sorted_tses = [tstamps]
         else:
             # for that perculiar user who does not send in the timestamps in order ;-)
             sorted_tses = np.sort(tstamps)
-    
+
         ds = self.ts - sorted_tses[:, np.newaxis]
         closest_idxs = np.argmin(np.abs(ds), axis=1)
 

@@ -67,7 +67,7 @@ class NeonRecording:
     @property
     def scene(self) -> VideoStream:
         return self.streams['scene']
-    
+
 
     @property
     def eye(self) -> VideoStream:
@@ -102,7 +102,7 @@ def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
     rec._calib = parse_calib_bin(rec_dir)
 
     rec._version = str(rec._calib['version'])
-    rec._serial = int(rec._calib['serial'])
+    rec._serial = int(rec._calib['serial'][0])
     rec.scene_camera = {
         'matrix': rec._calib['scene_camera_matrix'],
         'distortion': rec._calib['scene_distortion_coefficients'],

@@ -16,6 +16,10 @@ tstamps = gaze.ts
 test_tstamps = [tstamps[0], tstamps[1], tstamps[2], tstamps[len(tstamps)//2], tstamps[-3], tstamps[-2], tstamps[-1]]
 shuffled_test_tstamps = random.sample(test_tstamps, len(test_tstamps))
 
+tstamps = imus.ts
+imu_test_tstamps = [tstamps[0], tstamps[1], tstamps[2], tstamps[len(tstamps)//2], tstamps[-3], tstamps[-2], tstamps[-1]]
+shuffled_imu_test_tstamps = random.sample(imu_test_tstamps, len(imu_test_tstamps))
+
 gaze_samps = {
     'searchsorted': [],
     'searchsorted_shuffled': [],
@@ -30,24 +34,20 @@ imu_samps = gaze_samps.copy()
 # np.searchsorted approach
 gaze_samps['searchsorted'] = gaze.sample(test_tstamps)
 gaze_samps['searchsorted_shuffled'] = gaze.sample(shuffled_test_tstamps)
-imu_samps['searchsorted'] = imus.sample(test_tstamps)
-imu_samps['searchsorted_shuffled'] = imus.sample(shuffled_test_tstamps)
+imu_samps['searchsorted'] = imus.sample(imu_test_tstamps)
+imu_samps['searchsorted_shuffled'] = imus.sample(shuffled_imu_test_tstamps)
 
 # np broadcasting approach
 gaze_samps['broadcast'] = gaze.sample_rob_broadcast(test_tstamps)
 gaze_samps['broadcast_shuffled'] = gaze.sample_rob_broadcast(shuffled_test_tstamps)
-imu_samps['broadcast'] = imus.sample_rob_broadcast(test_tstamps)
-imu_samps['broadcast_shuffled'] = imus.sample_rob_broadcast(shuffled_test_tstamps)
+imu_samps['broadcast'] = imus.sample_rob_broadcast(imu_test_tstamps)
+imu_samps['broadcast_shuffled'] = imus.sample_rob_broadcast(shuffled_imu_test_tstamps)
 
 # rob min diff approach
 gaze_samps['rob_min'] = gaze.sample_rob(test_tstamps)
 gaze_samps['rob_min_shuffled'] = gaze.sample_rob(shuffled_test_tstamps)
-imu_samps['rob_min'] = imus.sample_rob(test_tstamps)
-imu_samps['rob_min_shuffled'] = imus.sample_rob(shuffled_test_tstamps)
-
-print()
-print("imu methods are divergent because the test ts land between samples and nearest and insert order interp disagree")
-print()
+imu_samps['rob_min'] = imus.sample_rob(imu_test_tstamps)
+imu_samps['rob_min_shuffled'] = imus.sample_rob(shuffled_imu_test_tstamps)
 
 # basic test is that all of these methods should return the same result for each stream
 all_equal = {

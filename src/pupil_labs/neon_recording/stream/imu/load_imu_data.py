@@ -23,7 +23,9 @@ def parse_neon_imu_raw_packets(buffer):
         # DeprecationWarning: The truth value of an empty array is ambiguous.
         # Returning False, but in future this will result in an error.
         # Use `array.size > 0` to check that an array is not empty.
-        if not nums:
+        # if not nums:
+        #     break
+        if nums.size <= 0:
             break
 
         index += 2
