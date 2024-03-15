@@ -11,20 +11,22 @@ from ... import structlog
 log = structlog.get_logger(__name__)
 
 class IMUStream(Stream):
-    def interp_data(self, sorted_ts, method="nearest"):
-        if method == "nearest":
-            return self.data[np.searchsorted(self.ts, sorted_ts)]
-        elif method == "nearest_rob":
-            return self.sample_rob(sorted_ts)
-        elif method == "linear":
-            interp_data = np.zeros(len(sorted_ts), dtype=IMURecording.DTYPE_RAW).view(np.recarray)
-            for field in IMURecording.DTYPE_RAW.names:
-                if field == "ts":
-                    interp_data[field] = sorted_ts
-                    
-                interp_data[field] = np.interp(sorted_ts, self.ts, self.data[field], left=np.nan, right=np.nan)
+    def linear_interp(self, sorted_ts):
+        interp_data = np.zeros(len(sorted_ts), dtype=IMURecording.DTYPE_RAW).view(np.recarray)
+        for field in IMURecording.DTYPE_RAW.names:
+            if field == "ts":
+                interp_data[field] = sorted_ts
 
-            return interp_data
+            interp_data[field] = np.interp(sorted_ts, self.ts, self.data[field], left=np.nan, right=np.nan)
+
+        def sample_gen():
+            for d in interp_data:
+                if not np.isnan(d.gyro_x):
+                    yield self.data[idx]
+                else:
+                    yield None
+
+            return sample_gen()
 
 
     def load(self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None) -> None:
@@ -41,4 +43,3 @@ class IMUStream(Stream):
 
         cid = self.data[self.closest_idxs]
         return pd.DataFrame(cid).to_numpy()
-    

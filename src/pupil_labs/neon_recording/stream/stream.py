@@ -49,13 +49,13 @@ class Stream(abc.ABC):
         if self._ts_oob(ts_wanted):
             return None
 
-        if method == "nearest":
+        if method == "insert_order":
             datum = self.data[np.searchsorted(self.ts, ts_wanted)]
             if np.abs(datum.ts - ts_wanted) < dt:
                 return datum
             else:
                 return None
-        elif method == "nearest_rob":
+        elif method == "nearest":
             diffs = np.abs(self.ts - ts_wanted)
 
             if np.any(diffs < dt):
@@ -72,111 +72,49 @@ class Stream(abc.ABC):
 
 
     @abc.abstractmethod
-    def interp_data(self, sorted_ts, method="nearest"):
+    def linear_interp(self, sorted_ts):
         pass
 
 
     def sample(self, tstamps, method="nearest"):
         log.debug("NeonRecording: Sampling timestamps.")
 
-        if len(tstamps) == 1:
-            if self._ts_oob(tstamps):
-                return None
-
-            if method == "nearest" or method == "linear":
-                return self.interp_data([tstamps], method)
-            elif method == "nearest_rob":
-                return self.sample_rob(tstamps)
-        else:
-            sorted_ts = np.sort(tstamps)
-            return self.interp_data(sorted_ts, method)
-
-
-    # rob testing linear interpolation by hand
-    def sample_rob_interp(self, tstamps):
-        log.debug("NeonRecording: Sampling with (rob) linear interpolation.")
+        # in case they pass one float
+        # see note at https://numpy.org/doc/stable/reference/generated/numpy.isscalar.html
+        if np.ndim(tstamps) == 0:
+            tstamps = [tstamps]
 
         if len(tstamps) == 1:
-            if self._ts_oob(tstamps):
+            if self._ts_oob(tstamps[0]):
                 return None
 
-            sorted_ts = [tstamps]
-        else:
-            # for that perculiar user who does not send in the timestamps in order ;-)
-            sorted_ts = np.sort(tstamps)
+        sorted_ts = np.sort(tstamps)
 
-        ds = self.ts - sorted_ts[:, np.newaxis]
-        closest_idxs = np.argmin(np.abs(ds), axis=1)
+        if method == "linear":
+            return self.linear_interp(sorted_ts)
+        elif method == "insert_order" or method == "nearest":
+            return self.sample_nearest(sorted_ts, method)
 
-        interp_data = np.zeros(len(sorted_ts), dtype=[('x', '<f8'), ('y', '<f8'), ('ts', '<f8'), ('ts_rel', '<f8')]).view(np.recarray)
-        for ic, ix in enumerate(closest_idxs):
-            ts = sorted_ts[ic]
-            d = ts - self.ts[ix]
 
-            if np.sign(d) == +1:
-                if ix == len(self.ts) - 1:
-                    interp_data[ic] = self.data[ix]
-                    continue
+    # this works for all the different streams, so define it here, rather than in multiple different places
+    def sample_nearest(self, sorted_tses, method):
+        log.debug("NeonRecording: Sampling nearest timestamps.")
+
+        if method == "nearest":
+            closest_idxs = [np.argmin(np.abs(self.ts - curr_ts)) if not self._ts_oob(curr_ts) else None for curr_ts in sorted_tses]
+        elif method == "insert_order":
+            # uggcf://jjj.lbhghor.pbz/jngpu?i=FRKKRF5i59b
+
+            closest_idxs = np.searchsorted(self.ts, sorted_ts)
+            for i, ts in enumerate(sorted_ts):
+                if self._ts_oob(ts):
+                    closest_idxs[i] = np.nan
+
+        def sample_gen():
+            for idx in closest_idxs:
+                if idx is not None and not np.isnan(idx):
+                    yield self.data[int(idx)]
                 else:
-                    left_ts = self.ts[ix]
-                    right_ts = self.ts[ix+1]
+                    yield None
 
-                    left_data = self.data[ix]
-                    right_data = self.data[ix+1]
-            else:
-                if ix == 0:
-                    interp_data[ic] = self.data[ix]
-                    continue
-                else:
-                    left_ts = self.ts[ix-1]
-                    right_ts = self.ts[ix]
-
-                    left_data = self.data[ix-1]
-                    right_data = self.data[ix]
-
-            A = (ts - left_ts)/(right_ts - left_ts)
-
-            if self.name == 'gaze':
-                interp_data.x[ic] = left_data.x + A * (right_data.x - left_data.x)
-                interp_data.y[ic] = left_data.y + A * (right_data.y - left_data.y)
-                interp_data.ts[ic] = left_data.ts + A * (right_data.ts - left_data.ts)
-                interp_data.ts_rel[ic] = left_data.ts_rel + A * (right_data.ts_rel - left_data.ts_rel)
-            elif self.name == 'imu':
-                # just testing gaze is enough
-                continue
-
-        return interp_data
-
-
-    def sample_rob_broadcast(self, tstamps):
-        log.debug("NeonRecording: Sampling (rob - broadcast) nearest timestamps.")
-
-        if len(tstamps) == 1:
-            if self._ts_oob(tstamps):
-                return None
-
-            sorted_tses = [tstamps]
-        else:
-            # for that perculiar user who does not send in the timestamps in order ;-)
-            sorted_tses = np.sort(tstamps)
-
-        ds = self.ts - sorted_tses[:, np.newaxis]
-        closest_idxs = np.argmin(np.abs(ds), axis=1)
-
-        return self.data[closest_idxs]
-
-
-    def sample_rob(self, tstamps):
-        log.debug("NeonRecording: Sampling (rob) nearest timestamps.")
-
-        if len(tstamps) == 1:
-            if self._ts_oob(tstamps):
-                return None
-
-            sorted_tses = [tstamps]
-        else:
-            # for that perculiar user who does not send in the timestamps in order ;-)
-            sorted_tses = np.sort(tstamps)
-
-        closest_idxs = [np.argmin(np.abs(self.ts - curr_ts)) for curr_ts in sorted_tses]
-        return self.data[closest_idxs]
+        return sample_gen()

@@ -16,7 +16,7 @@ log = structlog.get_logger(__name__)
 
 def _load_video(rec_dir: pathlib.Path, start_ts: float, video_name: str) -> Tuple:
     log.debug(f"NeonRecording: Loading video and associated timestamps: {video_name}.")
-    
+
     if not (rec_dir / (video_name + '.mp4')).exists():
         raise FileNotFoundError(f"File not found: {rec_dir / (video_name + '.mp4')}. Please double check the recording download.")
 
@@ -25,7 +25,7 @@ def _load_video(rec_dir: pathlib.Path, start_ts: float, video_name: str) -> Tupl
     # use hardware ts
     ts = load_with_error_check(load_and_convert_tstamps, rec_dir / (video_name + '.time'), "Possible error when converting timestamps.")
     # ts = load_with_error_check(load_and_convert_tstamps, rec_dir / (video_name + '.time_aux'), "Possible error when converting timestamps.")
-    
+
     ts_rel = ts - start_ts
 
     return container, ts, ts_rel
@@ -40,21 +40,12 @@ class VideoStream(Stream):
     def __init__(self, name, type):
         super().__init__(name)
         self.type = type
-    
 
-    def interp_data(self, sorted_ts, method="nearest"):
-        log.warning("NeonRecording: Video streams only use nearest neighbor interpolation.")
-        
-        if method != "nearest":
-            raise ValueError("NeonRecording: Video streams only support nearest neighbor interpolation.")
-        elif method == "nearest_rob":
-            idxs = np.argmin(np.abs(self.ts - sorted_ts))
-        elif method == "nearest":
-            idxs = np.searchsorted(self.ts, sorted_ts)
-            
-        return (self._data.frames[int(i)] for i in idxs)
-    
-    
+
+    def linear_interp(self, sorted_ts):
+        raise ValueError("NeonRecording: Video streams only support nearest neighbor interpolation.")
+
+
     def load(self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None) -> None:
         if file_name is not None:
             container, ts, ts_rel = _load_video(rec_dir, start_ts, file_name)
@@ -65,7 +56,7 @@ class VideoStream(Stream):
             self.ts_rel = ts_rel
         else:
             raise ValueError("Filename must be provided when loading a VideoStream.")
-        
+
 
     # TODO
     def to_numpy(self):
