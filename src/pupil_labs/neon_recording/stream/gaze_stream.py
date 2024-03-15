@@ -26,26 +26,30 @@ def _convert_gaze_data_to_recarray(gaze_data, ts, ts_rel):
         out.y = gaze_data[:, 1]
         out.ts = ts.astype(np.float64)
         out.ts_rel = ts_rel.astype(np.float64)
-        
+
         return out
 
 
 class GazeStream(Stream):
-    def interp_data(self, sorted_ts, method='nearest'):
-        if method == 'nearest':
-            return self.data[np.searchsorted(self.ts, sorted_ts)]
-        elif method == 'linear':
-            xs = self.data.x
-            ys = self.data.y
-            ts_rel = self.data.ts_rel
+    def linear_interp(self, sorted_ts):
+        xs = self.data.x
+        ys = self.data.y
+        ts_rel = self.data.ts_rel
 
-            interp_data = np.zeros(len(sorted_ts), dtype=[('x', '<f8'), ('y', '<f8'), ('ts', '<f8'), ('ts_rel', '<f8')]).view(np.recarray)
-            interp_data.x = np.interp(sorted_ts, self.ts, xs)
-            interp_data.y = np.interp(sorted_ts, self.ts, ys)
-            interp_data.ts = sorted_ts
-            interp_data.ts_rel = np.interp(sorted_ts, self.ts, ts_rel)
+        interp_data = np.zeros(len(sorted_ts), dtype=[('x', '<f8'), ('y', '<f8'), ('ts', '<f8'), ('ts_rel', '<f8')]).view(np.recarray)
+        interp_data.x = np.interp(sorted_ts, self.ts, xs, left=np.nan, right=np.nan)
+        interp_data.y = np.interp(sorted_ts, self.ts, ys, left=np.nan, right=np.nan)
+        interp_data.ts = sorted_ts
+        interp_data.ts_rel = np.interp(sorted_ts, self.ts, ts_rel, left=np.nan, right=np.nan)
 
-            return interp_data
+        def sample_gen():
+            for d in interp_data:
+                if not np.isnan(d.x):
+                    yield d
+                else:
+                    yield None
+
+        return sample_gen()
 
 
     def to_numpy(self):
@@ -68,7 +72,7 @@ class GazeStream(Stream):
         self.ts = self._data[:].ts
         self.ts_rel = self._data[:].ts_rel
 
-        
+
     def _load_ts_and_data(self, rec_dir: pathlib.Path, stream_name: str):
         log.debug("NeonRecording: Loading gaze data and timestamps.")
 

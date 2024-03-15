@@ -58,17 +58,18 @@ gaze = rec.streams['gaze']
 # best guess was that we should take successive pairs of ts to be sampled as
 # little windows and find the ts that is closest to "current",
 # which is the right side of the window
-gaze.sample_rob([gaze_ts[0], gaze_ts[1], gaze_ts[2]])
+gzs = gaze.sample([gaze_ts[0], gaze_ts[1], gaze_ts[2]])
 
 print('iterating over some gaze samples:')
-for g in gaze:
+# gaze itself can also be iterated: for g in gaze
+for g in gzs:
     print(g)
 
 
 print()
 print('iterating over some "zip"-ed gaze & imu samples:')
 sample_ts = gaze_ts[:15]
-for gz, imu, scene_frame, eye in zip(rec.gaze.sample_rob(sample_ts), rec.imu.sample_rob(sample_ts), rec.scene.sample_rob(sample_ts), rec.eye.sample_rob(sample_ts)):
+for gz, imu, scene_frame, eye in zip(rec.gaze.sample(sample_ts), rec.imu.sample(sample_ts), rec.scene.sample(sample_ts), rec.eye.sample(sample_ts)):
     if gz:
         x = gz.x
         y = gz.y
@@ -106,33 +107,36 @@ print()
 event1_ts = rec.unique_events['recording.begin']
 event2_ts = rec.unique_events['recording.end']
 between_two_events = gaze_ts[(gaze_ts >= event1_ts) & (gaze_ts <= event2_ts)]
+print(event1_ts, event2_ts)
 
 print('between the two events:')
 print(between_two_events)
 print()
 
-gaze_np = gaze.sample_rob(between_two_events).to_numpy()
+gaze_np = np.array([s for s in gaze.sample(between_two_events)]).view(np.recarray)
 print('n samples between 2 events: ' + str(len(gaze_np)))
 print()
 
 
 # TODO(rob) - we hit end-of-file on last 7 tses, which causes the comprehension to hang?
 # all_frames = [f.rgb for f in scene.sample(between_two_events) if f]
-all_frames = []
-for f in scene.sample_rob(between_two_events):
-    if f:
-        all_frames.append(f.rgb)
+
+# this causes my swap to go crazy and even crashed macos one time
+# all_frames = []
+# for f in scene.sample(between_two_events):
+#     if f:
+#         all_frames.append(f.rgb)
 
 
-print('all_frames', len(all_frames))
+# print('all_frames', len(all_frames))
 # all_frames_np = np.dstack(all_frames)
 # print('all_frames', all_frames_np.shape)
-        
-# need to implement nicely
-# all_frames_ts = scene.sample(between_two_events).ts 
 
-# gets me the closest sample within -+0.01s 
-gaze_one_np = gaze.sample_one(event2_ts, dt = 0.01)
+# need to implement nicely
+# all_frames_ts = scene.sample(between_two_events).ts
+
+# gets me the closest sample within -+0.01s
+gaze_one_np = gaze.sample_one(event2_ts - 20, dt = 0.01)
 
 # TODO: somehow the recarray features are hidden here until you put
 # any of these in a list?
@@ -153,17 +157,17 @@ gaze = rec.gaze
 
 between_two_events = scene_video.ts[(scene_video.ts >= event1_ts) & (scene_video.ts <= event2_ts)]
 
-video = cv2.VideoWriter('video.avi', cv2.VideoWriter.fourcc('M','J','P','G'), 30, (1600, 1200))
+# video = cv2.VideoWriter('video.avi', cv2.VideoWriter.fourcc('M','J','P','G'), 30, (1600, 1200))
 
 try:
-    for gaze, world in zip(gaze.sample_rob(between_two_events), scene_video.sample_rob(between_two_events)):
+    for gaze, world in zip(gaze.sample(between_two_events), scene_video.sample(between_two_events)):
         img = world.cv2
 
-        if gaze:
-            cv2.circle(img, (int(gaze.x), int(gaze.y)), 50, (0, 0, 255), 10)
+        # if gaze:
+            # cv2.circle(img, (int(gaze.x), int(gaze.y)), 50, (0, 0, 255), 10)
             # cv2.imshow('gaze', img)
             # cv2.imwrite('gaze.png', img)
-            video.write(img)
+            # video.write(img)
 except:
     video.release()
     raise

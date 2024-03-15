@@ -5,7 +5,7 @@ import numpy as np
 
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
-from .stream.video_stream import VideoStream
+from .stream.video_stream import VideoStream, VideoType
 
 from .calib import parse_calib_bin
 from .time_utils import ns_to_s, load_and_convert_tstamps
@@ -27,8 +27,8 @@ class NeonRecording:
         self.streams = {
             'gaze': GazeStream('gaze'),
             'imu': IMUStream('imu'),
-            'scene': VideoStream('scene'),
-            'eye': VideoStream('eye')
+            'scene': VideoStream('scene', VideoType.SCENE),
+            'eye': VideoStream('eye', VideoType.EYE)
         }
 
         self.events = []
@@ -67,7 +67,7 @@ class NeonRecording:
     @property
     def scene(self) -> VideoStream:
         return self.streams['scene']
-    
+
 
     @property
     def eye(self) -> VideoStream:
@@ -102,7 +102,7 @@ def load(rec_dir_str: pathlib.Path | str) -> NeonRecording:
     rec._calib = parse_calib_bin(rec_dir)
 
     rec._version = str(rec._calib['version'])
-    rec._serial = int(rec._calib['serial'])
+    rec._serial = int(rec._calib['serial'][0])
     rec.scene_camera = {
         'matrix': rec._calib['scene_camera_matrix'],
         'distortion': rec._calib['scene_distortion_coefficients'],

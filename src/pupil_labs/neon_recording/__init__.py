@@ -6,7 +6,7 @@ except ImportError:
     from importlib_metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("pupil_labs.neon_recording")
+    __version__ = version("pupil_labs.neon_recording.neon_recording")
 except PackageNotFoundError:
     # package is not installed
     pass
@@ -16,13 +16,6 @@ import structlog
 import logging
 
 log = structlog.get_logger(__name__)
-
-# obtained from: https://betterstack.com/community/guides/logging/structlog/
-def filter_function(_, __, event_dict):
-    if event_dict.get("func_name") == "delete_files":
-        raise structlog.DropEvent
-    return event_dict
-
 
 level = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = getattr(logging, level)
@@ -35,7 +28,6 @@ structlog.configure(
         structlog.processors.CallsiteParameterAdder(
             [structlog.processors.CallsiteParameter.FUNC_NAME]
         ),
-        filter_function,
         structlog.dev.ConsoleRenderer(),
     ]
 )
