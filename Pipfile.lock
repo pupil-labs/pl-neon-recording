@@ -35,11 +35,12 @@
         },
         "comm": {
             "hashes": [
-                "sha256:0bc91edae1344d39d3661dcbc36937181fdaddb304790458f8b044dbc064b89a",
-                "sha256:87928485c0dfc0e7976fd89fc1e187023cf587e7c353e4a9b417555b44adf021"
+                "sha256:3fd7a84065306e07bea1773df6eb8282de51ba82f77c72f9c85716ab11fe980e",
+                "sha256:e6fb86cb70ff661ee8c9c14e7d36d6de3b4066f1441be4063df9c5009f0a64d3"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.2.1"
+            "version": "==0.2.2"
         },
         "debugpy": {
             "hashes": [
@@ -367,11 +368,11 @@
         },
         "traitlets": {
             "hashes": [
-                "sha256:2e5a030e6eff91737c643231bfcf04a65b0132078dad75e4936700b213652e74",
-                "sha256:8585105b371a04b8316a43d5ce29c098575c2e477850b62b848b964f1444527e"
+                "sha256:8cdd83c040dab7d1dee822678e5f5d100b514f7b72b01615b26fc5718916fdf9",
+                "sha256:fcdf85684a772ddeba87db2f398ce00b40ff550d1528c03c14dbf6a02003cd80"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==5.14.1"
+            "version": "==5.14.2"
         },
         "wcwidth": {
             "hashes": [
