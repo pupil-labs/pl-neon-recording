@@ -1,12 +1,17 @@
+import json
 import pathlib
 import typing
 
 import numpy as np
 
 from . import structlog
+
 log = structlog.get_logger(__name__)
 
-def load_with_error_check(func: typing.Callable, fpath: pathlib.Path, err_msg_supp: str):
+
+def load_with_error_check(
+    func: typing.Callable, fpath: pathlib.Path, err_msg_supp: str
+):
     log.debug(f"NeonRecording: Loading {fpath.name}")
 
     try:
@@ -20,6 +25,25 @@ def load_with_error_check(func: typing.Callable, fpath: pathlib.Path, err_msg_su
     except Exception as e:
         log.exception(f"Unexpected error loading {fpath.name}: {e}")
         raise
+
+
+def load_json_with_error_check(fpath: pathlib.Path):
+    log.debug(f"NeonRecording: Loading {fpath.name}")
+
+    try:
+        with open(fpath) as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f"File not found: {fpath}. Please double check the recording download."
+        )
+    except OSError:
+        raise OSError(f"Error opening file: {fpath}")
+    except Exception as e:
+        log.exception(f"Unexpected error loading info.json: {e}")
+        raise
+    else:
+        return data
 
 
 # obtained from @dom:
