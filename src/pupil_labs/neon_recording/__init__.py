@@ -11,9 +11,10 @@ except PackageNotFoundError:
     # package is not installed
     pass
 
-import os
-import structlog
 import logging
+import os
+
+import structlog
 
 log = structlog.get_logger(__name__)
 
@@ -29,14 +30,12 @@ structlog.configure(
             [structlog.processors.CallsiteParameter.FUNC_NAME]
         ),
         structlog.dev.ConsoleRenderer(),
-    ]
+    ],
 )
 
 log.info("NeonRecording: package loaded.")
 
 from .neon_recording import load
+from .stream.stream import subsampled_to_numpy
 
-__all__ = [
-    "__version__",
-    "load"
-    ]
+__all__ = ["__version__", "load", "subsampled_to_numpy"]

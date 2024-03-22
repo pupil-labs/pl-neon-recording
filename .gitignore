@@ -1,10 +1,9 @@
 version.py
 
 test_data/
-guide
-.python-version
 .vscode/
 *.mp4
+dev/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,windows,linux,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,macos,windows,linux,pycharm
@@ -348,3 +347,5 @@ $RECYCLE.BIN/
 
 *.png
 *.avi
+Pipfile
+Pipfile.lock

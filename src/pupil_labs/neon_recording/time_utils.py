@@ -1,8 +1,11 @@
 import pathlib
+
 import numpy as np
 
 from . import structlog
+
 log = structlog.get_logger(__name__)
+
 
 def ns_to_s(ns):
     SECONDS_PER_NANOSECOND = 1e-9
