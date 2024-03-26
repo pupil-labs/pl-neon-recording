@@ -1,10 +1,18 @@
 import pathlib
+from dataclasses import dataclass
 
 import numpy as np
 
 from . import structlog
 
 log = structlog.get_logger(__name__)
+
+
+@dataclass
+class Calibration:
+    camera_matrix: np.ndarray
+    distortion_coefficients: np.ndarray
+    extrinsics_affine_matrix: np.ndarray
 
 
 def parse_calib_bin(rec_dir: pathlib.Path):
@@ -14,12 +22,6 @@ def parse_calib_bin(rec_dir: pathlib.Path):
     try:
         with open(rec_dir / "calibration.bin", "rb") as f:
             calib_raw_data = f.read()
-    except FileNotFoundError:
-        raise FileNotFoundError(
-            f"File not found: {rec_dir / 'calibration.bin'}. Please double check the recording download."
-        )
-    except OSError:
-        raise OSError(f"Error opening file: {rec_dir / 'calibration.bin'}")
     except Exception as e:
         log.exception(f"Unexpected error loading calibration.bin: {e}")
         raise

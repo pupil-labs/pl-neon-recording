@@ -12,10 +12,6 @@ def ns_to_s(ns):
     return ns * SECONDS_PER_NANOSECOND
 
 
-# adapted from @dom and @pfaion:
-# https://github.com/pupil-labs/neon-player/blob/master/pupil_src/shared_modules/pupil_recording/update/update_utils.py
-#
-# modified according to mpk's note
 def load_and_convert_tstamps(path: pathlib.Path):
     log.debug(f"NeonRecording: Loading timestamps from: {path.name}")
 

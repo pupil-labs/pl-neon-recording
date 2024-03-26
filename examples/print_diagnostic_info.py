@@ -13,16 +13,16 @@ print("recording info:")
 pprint.pprint(rec.info)
 print()
 
-print("scene camera info:")
-pprint.pprint(rec.scene_camera)
+print("scene camera calibration values:")
+pprint.pprint(rec.scene_camera_calibration)
 print()
 
-print("eye 1 camera info:")
-pprint.pprint(rec.eye1_camera)
+print("right eye camera calibration values:")
+pprint.pprint(rec.right_eye_camera_calibration)
 print()
 
-print("eye 2 camera info:")
-pprint.pprint(rec.eye2_camera)
+print("left eye camera calibration values:")
+pprint.pprint(rec.left_eye_camera_calibration)
 print()
 
 print("available data streams:")

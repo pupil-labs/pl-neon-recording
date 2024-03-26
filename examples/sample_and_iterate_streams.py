@@ -34,8 +34,7 @@ for gaze_datum, imu_datum, scene_frame, eye_frame in combined_data:
         img = scene_frame.rgb
         gray = scene_frame.gray
         img_index = scene_frame.index  # frame index in the stream
-        # img_ts = scene_frame.ts # TODO(rob) - fix this: same as rec.streams['scene'].ts[world.index]
-        img_ts = rec.streams["scene"].ts[scene_frame.index]
+        img_ts = scene_frame.ts
         time_into_the_scene_stream = img_ts - rec.start_ts
         print("scene_frame", img_ts)
 
@@ -49,6 +48,7 @@ gaze = rec.gaze
 # gets me the closest sample within -+0.01s
 gaze_single_sample = gaze.sample_one(gaze.ts[-20], dt=0.01)
 
+print()
 print(gaze_single_sample)
 print()
 
@@ -57,13 +57,14 @@ print(gaze_single_indexed)
 print()
 
 print(gaze[42:45])
+print()
 
 # get all samples in a list
 gaze_samples_list = list(gaze.sample(gaze.ts[:15]))
 
 # get all samples as a numpy recarray (gaze/imu) or ndarray of frames (video)
-gaze_samples_np = nr.subsampled_to_numpy(gaze.sample(gaze.ts[:15]))
+gaze_samples_np = nr.sampled_to_numpy(gaze.sample(gaze.ts[:15]))
 
 # NOTE: the following is quite intense on the RAM.
-scene_samples_np = nr.subsampled_to_numpy(rec.scene.sample(rec.scene.ts[:15]))
+scene_samples_np = nr.sampled_to_numpy(rec.scene.sample(rec.scene.ts[:15]))
 print(scene_samples_np.shape)
