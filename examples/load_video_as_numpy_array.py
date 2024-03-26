@@ -20,5 +20,5 @@ gaze_ts = gaze.ts
 # all_frames_np = np.dstack(all_frames)
 # print('all_frames', all_frames_np.shape)
 
-# need to implement nicely
+# can this be implemented nicely?
 # all_frames_ts = scene.sample(between_two_events).ts

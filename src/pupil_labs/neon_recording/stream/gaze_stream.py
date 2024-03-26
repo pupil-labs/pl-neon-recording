@@ -4,7 +4,6 @@ from typing import Optional
 import numpy as np
 
 from .. import structlog
-from ..data_utils import load_with_error_check
 from ..time_utils import load_and_convert_tstamps
 from .stream import Stream
 
@@ -34,20 +33,19 @@ def _convert_gaze_data_to_recarray(gaze_data, ts, ts_rel):
 
 
 class GazeStream(Stream):
-    def linear_interp(self, sorted_ts):
-        xs = self.data.x
-        ys = self.data.y
-        ts_rel = self.data.ts_rel
+    def _sample_linear_interp(self, sorted_ts):
+        xs = self._data.x
+        ys = self._data.y
 
         interp_data = np.zeros(
             len(sorted_ts),
             dtype=[("x", "<f8"), ("y", "<f8"), ("ts", "<f8"), ("ts_rel", "<f8")],
         ).view(np.recarray)
-        interp_data.x = np.interp(sorted_ts, self.ts, xs, left=np.nan, right=np.nan)
-        interp_data.y = np.interp(sorted_ts, self.ts, ys, left=np.nan, right=np.nan)
+        interp_data.x = np.interp(sorted_ts, self._ts, xs, left=np.nan, right=np.nan)
+        interp_data.y = np.interp(sorted_ts, self._ts, ys, left=np.nan, right=np.nan)
         interp_data.ts = sorted_ts
         interp_data.ts_rel = np.interp(
-            sorted_ts, self.ts, ts_rel, left=np.nan, right=np.nan
+            sorted_ts, self._ts, self._ts_rel, left=np.nan, right=np.nan
         )
 
         for d in interp_data:
@@ -56,45 +54,43 @@ class GazeStream(Stream):
             else:
                 yield None
 
-    def load(
-        self, rec_dir: pathlib.Path, start_ts: float, file_name: Optional[str] = None
-    ) -> None:
+    def _load(self, file_name: Optional[str] = None) -> None:
         # we use gaze_200hz from cloud for the rec gaze stream
         # ts, raw = self._load_ts_and_data(rec_dir, 'gaze ps1')
-        gaze_200hz_ts, gaze_200hz_raw = self._load_ts_and_data(rec_dir, "gaze_200hz")
-        gaze_200hz_ts_rel = gaze_200hz_ts - start_ts
+        gaze_200hz_ts, gaze_200hz_raw = self._load_ts_and_data("gaze_200hz")
+        gaze_200hz_ts_rel = gaze_200hz_ts - self._recording._start_ts
 
         data = _convert_gaze_data_to_recarray(
             gaze_200hz_raw, gaze_200hz_ts, gaze_200hz_ts_rel
         )
 
-        self._backing_data = data
-        self.data = self._backing_data[:]
-        self.ts = self._backing_data[:].ts
-        self.ts_rel = self._backing_data[:].ts_rel
+        self._data = data
+        self._ts = self._data[:].ts
 
-    def _load_ts_and_data(self, rec_dir: pathlib.Path, stream_name: str):
+    def _load_ts_and_data(self, stream_filename: str):
         log.debug("NeonRecording: Loading gaze data and timestamps.")
 
-        time_path = rec_dir / (stream_name + ".time")
-        raw_path = rec_dir / (stream_name + ".raw")
+        try:
+            ts = load_and_convert_tstamps(
+                self._recording._rec_dir / (stream_filename + ".time")
+            )
+        except Exception as e:
+            log.exception(f"Error loading timestamps: {e}")
+            raise
 
-        ts = load_with_error_check(
-            load_and_convert_tstamps,
-            time_path,
-            "Possible error when converting timestamps.",
-        )
-        raw = load_with_error_check(
-            self._load_raw_data, raw_path, "Please double check the recording download."
-        )
+        try:
+            raw = self._load_gaze_raw_data(
+                self._recording._rec_dir / (stream_filename + ".raw")
+            )
+        except Exception as e:
+            log.exception(f"Error loading raw data: {e}")
+            raise
 
         return ts, raw
 
-    # adapted from @dom:
-    # https://github.com/pupil-labs/neon-player/blob/master/pupil_src/shared_modules/pupil_recording/update/neon.py
-    def _load_raw_data(self, path: pathlib.Path):
+    def _load_gaze_raw_data(self, path: pathlib.Path):
         log.debug("NeonRecording: Loading gaze raw data.")
 
         raw_data = np.fromfile(str(path), "<f4")
-        raw_data.shape = (-1, 2)
+        raw_data = raw_data.reshape((-1, 2))
         return np.asarray(raw_data, dtype=raw_data.dtype).astype(np.float64)

@@ -36,6 +36,6 @@ structlog.configure(
 log.info("NeonRecording: package loaded.")
 
 from .neon_recording import load
-from .stream.stream import subsampled_to_numpy
+from .stream.stream import sampled_to_numpy
 
-__all__ = ["__version__", "load", "subsampled_to_numpy"]
+__all__ = ["__version__", "load", "sampled_to_numpy"]
