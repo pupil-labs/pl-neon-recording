@@ -129,16 +129,9 @@ class NeonRecording:
         )
 
     def __init__(self, rec_dir_in: pathlib.Path | str):
-        self._streams = {
-            "gaze": GazeStream("gaze", self),
-            "imu": IMUStream("imu", self),
-            "scene": VideoStream("scene", self),
-            "eye": VideoStream("eye", self),
-        }
-
         self._calib_bin_loaded = False
 
-        log.info(f"NeonRecording: Loading recording from: {rec_dir_in}")
+        log.info(f"NeonRecording: Loading recording from {rec_dir_in}")
         if isinstance(rec_dir_in, str):
             self._rec_dir = pathlib.Path(rec_dir_in)
         else:
@@ -175,31 +168,6 @@ class NeonRecording:
         self._wearer["uuid"] = wearer_data["uuid"]
         self._wearer["name"] = wearer_data["name"]
 
-        # load up raw times, in case useful at some point
-        log.info("NeonRecording: Loading raw time (ns) files")
-        self._gaze_ps1_raw_time_ns = np.fromfile(
-            str(self._rec_dir / "gaze ps1.time"), dtype="<u8"
-        )
-        self._gaze_200hz_raw_time_ns = np.fromfile(
-            str(self._rec_dir / "gaze_200hz.time"), dtype="<u8"
-        )
-
-        log.info("NeonRecording: Loading gaze data")
-        self._streams["gaze"]._load()
-
-        # still not sure what gaze_right is...
-        # log.info("NeonRecording: Loading 'gaze_right_ps1' data")
-        # rec._gaze_right_ps1_ts, rec._gaze_right_ps1_raw = _load_ts_and_data(self._rec_dir, 'gaze ps1')
-
-        log.info("NeonRecording: Loading IMU data")
-        self._streams["imu"]._load()
-
-        log.info("NeonRecording: Loading scene camera video")
-        self._streams["scene"]._load("Neon Scene Camera v1 ps1")
-
-        log.info("NeonRecording: Loading eye camera video")
-        self._streams["eye"]._load("Neon Sensor Module v1 ps1")
-
         log.info("NeonRecording: Loading events")
         try:
             labels = (self._rec_dir / "event.txt").read_text().strip().split("\n")
@@ -210,6 +178,14 @@ class NeonRecording:
         events_ts = load_and_convert_tstamps(self._rec_dir / "event.time")
         self._events = [evt for evt in zip(labels, events_ts)]
         self._unique_events = None
+
+        log.info("NeonRecording: Loading data streams")
+        self._streams = {
+            "gaze": GazeStream("gaze", self),
+            "imu": IMUStream("imu", self),
+            "scene": VideoStream("scene", "Neon Scene Camera v1 ps1", self),
+            "eye": VideoStream("eye", "Neon Sensor Module v1 ps1", self),
+        }
 
         log.info("NeonRecording: Finished loading recording.")
 

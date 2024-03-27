@@ -10,6 +10,10 @@ log = structlog.get_logger(__name__)
 
 
 class IMUStream(Stream):
+    def __init__(self, name, recording):
+        super().__init__(name, recording)
+        self._load()
+
     def _sample_linear_interp(self, sorted_ts):
         interp_data = np.zeros(len(sorted_ts), dtype=IMURecording.DTYPE_RAW).view(
             np.recarray
@@ -28,7 +32,9 @@ class IMUStream(Stream):
             else:
                 yield None
 
-    def _load(self, file_name: Optional[str] = None) -> None:
+    def _load(self):
+        log.info("NeonRecording: Loading IMU data")
+
         imu_rec = IMURecording(
             self._recording._rec_dir / "extimu ps1.raw", self._recording._start_ts
         )

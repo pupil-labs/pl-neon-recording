@@ -4,6 +4,7 @@ test_data/
 .vscode/
 *.mp4
 dev/
+guide
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,windows,linux,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,macos,windows,linux,pycharm
