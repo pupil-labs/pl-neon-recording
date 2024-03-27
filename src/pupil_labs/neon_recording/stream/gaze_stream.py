@@ -33,6 +33,10 @@ def _convert_gaze_data_to_recarray(gaze_data, ts, ts_rel):
 
 
 class GazeStream(Stream):
+    def __init__(self, name, recording):
+        super().__init__(name, recording)
+        self._load()
+
     def _sample_linear_interp(self, sorted_ts):
         xs = self._data.x
         ys = self._data.y
@@ -54,11 +58,27 @@ class GazeStream(Stream):
             else:
                 yield None
 
-    def _load(self, file_name: Optional[str] = None) -> None:
+    def _load(self) -> None:
+        log.info("NeonRecording: Loading gaze data")
+
         # we use gaze_200hz from cloud for the rec gaze stream
         # ts, raw = self._load_ts_and_data(rec_dir, 'gaze ps1')
         gaze_200hz_ts, gaze_200hz_raw = self._load_ts_and_data("gaze_200hz")
         gaze_200hz_ts_rel = gaze_200hz_ts - self._recording._start_ts
+
+        # load up raw timestamps in original ns format,
+        # in case useful at some point
+        log.debug("NeonRecording: Loading raw gaze timestamps (ns)")
+        self._gaze_ps1_raw_time_ns = np.fromfile(
+            str(self._recording._rec_dir / "gaze ps1.time"), dtype="<u8"
+        )
+        self._gaze_200hz_raw_time_ns = np.fromfile(
+            str(self._recording._rec_dir / "gaze_200hz.time"), dtype="<u8"
+        )
+
+        # still not sure what gaze_right is...
+        # log.info("NeonRecording: Loading 'gaze_right_ps1' data")
+        # rec._gaze_right_ps1_ts, rec._gaze_right_ps1_raw = _load_ts_and_data(self._recording._rec_dir, 'gaze ps1')
 
         data = _convert_gaze_data_to_recarray(
             gaze_200hz_raw, gaze_200hz_ts, gaze_200hz_ts_rel

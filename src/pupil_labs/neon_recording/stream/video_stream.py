@@ -12,6 +12,14 @@ log = structlog.get_logger(__name__)
 
 
 class VideoStream(Stream):
+    def __init__(self, name, file_name, recording):
+        super().__init__(name, recording)
+        self._file_name = file_name
+        self._width = None
+        self._height = None
+
+        self._load()
+
     @property
     def width(self):
         return self._width
@@ -33,20 +41,19 @@ class VideoStream(Stream):
             "NeonRecording: Video streams only support nearest neighbor interpolation."
         )
 
-    def _load(self, file_name: Optional[str] = None) -> None:
-        if file_name is not None:
-            container, ts = self._load_video(file_name)
+    def _load(self):
+        log.info(f"NeonRecording: Loading video: {self._file_name}.")
 
-            self._backing_data = container.streams.video[0]
-            self._data = self._backing_data.frames
-            self._ts = ts
-            setattr(self._data, "ts", self._ts)
-            self._ts_rel = self._ts - self._recording._start_ts
+        container, ts = self._load_video(self._file_name)
 
-            self._width = self._data[0].width
-            self._height = self._data[0].height
-        else:
-            raise ValueError("Filename must be provided when loading a VideoStream.")
+        self._backing_data = container.streams.video[0]
+        self._data = self._backing_data.frames
+        self._ts = ts
+        setattr(self._data, "ts", self._ts)
+        self._ts_rel = self._ts - self._recording._start_ts
+
+        self._width = self._data[0].width
+        self._height = self._data[0].height
 
     def _load_video(self, video_name: str):
         log.debug(

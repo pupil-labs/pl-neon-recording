@@ -48,7 +48,7 @@ class Stream(abc.ABC):
         return self._ts_rel
 
     @abc.abstractmethod
-    def _load(self, file_name: Optional[str] = None) -> None:
+    def _load(self):
         pass
 
     @abc.abstractmethod
@@ -104,11 +104,11 @@ class Stream(abc.ABC):
             return self._sample_linear_interp(sorted_tses)
         else:
             return ValueError(
-                "Only LINEAR, NEAREST, and INSERT_ORDER methods are supported."
+                "Only LINEAR and NEAREST methods are supported."
             )
 
     def _sample_nearest_rob(self, sorted_tses):
-        log.debug("NeonRecording: Sampling nearest timestamps.")
+        log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
 
         closest_idxs = [
             np.argmin(np.abs(self._ts - curr_ts)) if not self._ts_oob(curr_ts) else None
@@ -125,7 +125,7 @@ class Stream(abc.ABC):
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
     def _sample_nearest(self, sorted_tses):
         # uggcf://jjj.lbhghor.pbz/jngpu?i=FRKKRF5i59b
-        log.debug("NeonRecording: Sampling nearest timestamps.")
+        log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
 
         closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")
         for i, ts in enumerate(sorted_tses):
