@@ -1,9 +1,10 @@
 - other sampling ideas
-	= give me this stream from ts1 to ts2 sampled at freq of 60hz
+	= give me this stream from ts1 to ts2 sampled at freq of X hz
 
 - get from cloud or run offline on file load?
 	- fixation stream
-	- eyestate/pupillometry stream - coming soon to an android near you
+
+- eyestate/pupillometry stream - coming soon to an android near you
 
 - clarify how to deal with TsNs in imu stream
 - file to notify that it has been checked
@@ -13,5 +14,3 @@ specify default option for agg, and provide stream specific aggs
 
 see here:
 https://www.notion.so/pupillabs/Neon-Recording-Python-Lib-5b247c33e1c74f638af2964fa78018ff?pvs=4#6bf3848ff3ad435aa6ea8fe37e72ee9c
-
-- check if data is from cloud or direct from phone

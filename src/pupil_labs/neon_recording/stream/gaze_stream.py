@@ -84,8 +84,12 @@ class GazeStream(Stream):
             gaze_200hz_raw, gaze_200hz_ts, gaze_200hz_ts_rel
         )
 
-        self._data = data
-        self._ts = self._data[:].ts
+        self._backing_data = data
+        self._data = self._backing_data[:]
+        self._backing_ts = data.ts
+        self._ts = self._backing_ts[:]
+        self._backing_ts_rel = data.ts_rel
+        self._ts_rel = self._backing_ts_rel[:]
 
     def _load_ts_and_data(self, stream_filename: str):
         log.debug("NeonRecording: Loading gaze data and timestamps.")

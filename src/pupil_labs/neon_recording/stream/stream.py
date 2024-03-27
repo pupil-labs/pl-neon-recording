@@ -24,8 +24,10 @@ class Stream(abc.ABC):
         self.name = name
         self._recording = recording
         self._backing_data = None
-        self._data = []
-        self._ts = []
+        self._data = None
+        self._backing_ts = None
+        self._ts = None
+        self._backing_ts_rel = None
         self._ts_rel = None
 
     @property
@@ -60,6 +62,17 @@ class Stream(abc.ABC):
 
     def _ts_oob(self, ts: float):
         return ts < self._ts[0] or ts > self._ts[-1]
+    
+    def trim(self, start_ts: float, end_ts: float):
+        if self._ts_oob(start_ts) or self._ts_oob(end_ts):
+            raise ValueError(f"Trim timestamps are out of bounds for stream: {self.name}.")
+
+        start_idx = np.searchsorted(self._ts, start_ts, side="left")
+        end_idx = np.searchsorted(self._ts, end_ts, side="right")
+
+        self._data = self._backing_data[start_idx:end_idx]
+        self._ts = self._backing_ts[start_idx:end_idx]
+        self._ts_rel = self._backing_ts_rel[start_idx:end_idx]
 
     def sample_one(
         self, ts_wanted: float, dt: float = 0.01, method=InterpolationMethod.NEAREST

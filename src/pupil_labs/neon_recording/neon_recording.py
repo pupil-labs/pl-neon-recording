@@ -128,6 +128,11 @@ class NeonRecording:
             self._calib["left_extrinsics_affine_matrix"],
         )
 
+    def trim(self, start_ts: float, end_ts: float):
+        log.info(f"NeonRecording: Trimming recording to [{start_ts}, {end_ts}]")
+        for stream in self._streams.values():
+            stream.trim(start_ts, end_ts)
+
     def __init__(self, rec_dir_in: pathlib.Path | str):
         self._calib_bin_loaded = False
 

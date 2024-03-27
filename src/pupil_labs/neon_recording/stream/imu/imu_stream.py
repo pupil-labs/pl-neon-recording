@@ -39,5 +39,9 @@ class IMUStream(Stream):
             self._recording._rec_dir / "extimu ps1.raw", self._recording._start_ts
         )
 
-        self._data = imu_rec.raw
-        self._ts = self._data[:].ts
+        self._backing_data = imu_rec.raw
+        self._data = self._backing_data[:]
+        self._backing_ts = imu_rec.ts
+        self._ts = self._backing_ts[:]
+        self._backing_ts_rel = imu_rec.ts_rel
+        self._ts_rel = self._backing_ts_rel[:]
