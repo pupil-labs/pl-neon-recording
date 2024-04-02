@@ -15,28 +15,14 @@ log = structlog.get_logger(__name__)
 
 
 class NeonRecording:
-    @property
-    def gaze(self) -> Stream:
-        return self.streams["gaze"]
-
-    @property
-    def imu(self) -> Stream:
-        return self.streams["imu"]
-
-    @property
-    def scene(self) -> Stream:
-        return self.streams["scene"]
-
-    @property
-    def eye(self) -> Stream:
-        return self.streams["eye"]
-
-
     def __init__(self, rec_dir_in: pathlib.Path | str):
 
+        pathlib.Path(rec_dir_in)
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
             raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
+
         log.info(f"NeonRecording: Loading recording from {rec_dir_in}")
+        
         log.info("NeonRecording: Loading recording info")
         with open(self._rec_dir / "info.json") as f:
             self.info = json.load(f)
@@ -98,6 +84,23 @@ class NeonRecording:
     # TODO: save for the end of development
     def check(self):
         pass
+
+    @property
+    def gaze(self) -> Stream:
+        return self.streams["gaze"]
+
+    @property
+    def imu(self) -> Stream:
+        return self.streams["imu"]
+
+    @property
+    def scene(self) -> Stream:
+        return self.streams["scene"]
+
+    @property
+    def eye(self) -> Stream:
+        return self.streams["eye"]
+
 
 
 def load(rec_dir_in: pathlib.Path | str) -> NeonRecording:
