@@ -22,7 +22,7 @@ class NeonRecording:
             raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
 
         log.info(f"NeonRecording: Loading recording from {rec_dir_in}")
-        
+
         log.info("NeonRecording: Loading recording info")
         with open(self._rec_dir / "info.json") as f:
             self.info = json.load(f)
@@ -72,7 +72,7 @@ class NeonRecording:
 
         # todo: events should be a stream
         log.info("NeonRecording: Loading events")
-            labels = (self._rec_dir / "event.txt").read_text().strip().split("\n")
+        labels = (self._rec_dir / "event.txt").read_text().strip().split("\n")
         events_ts = load_and_convert_tstamps(self._rec_dir / "event.time")
         self.events = [evt for evt in zip(labels, events_ts)]
         self.events.reverse()
