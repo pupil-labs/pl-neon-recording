@@ -52,23 +52,6 @@ class VideoStream(Stream):
             "NeonRecording: Video streams only support nearest neighbor interpolation."
         )
 
-    def _sample_nearest_rob(self, sorted_tses):
-        log.debug("NeonRecording: Sampling nearest timestamps.")
-
-        closest_idxs = [
-            np.argmin(np.abs(self._ts - curr_ts)) if not self._ts_oob(curr_ts) else None
-            for curr_ts in sorted_tses
-        ]
-
-        for idx in closest_idxs:
-            if idx is not None and not np.isnan(idx):
-                d = self._data[int(idx)]
-                setattr(d, "ts", self._ts[int(idx)])
-                setattr(d, "ts_rel", self._ts_rel[int(idx)])
-                yield d
-            else:
-                yield None
-
     # from stack overflow:
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
     def _sample_nearest(self, sorted_tses):
