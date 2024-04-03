@@ -1,7 +1,6 @@
 import abc
 import math
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 
@@ -107,24 +106,9 @@ class Stream(abc.ABC):
                 "Only LINEAR and NEAREST methods are supported."
             )
 
-    def _sample_nearest_rob(self, sorted_tses):
-        log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
-
-        closest_idxs = [
-            np.argmin(np.abs(self._ts - curr_ts)) if not self._ts_oob(curr_ts) else None
-            for curr_ts in sorted_tses
-        ]
-
-        for idx in closest_idxs:
-            if idx is not None and not np.isnan(idx):
-                yield self._data[int(idx)]
-            else:
-                yield None
-
     # from stack overflow:
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
     def _sample_nearest(self, sorted_tses):
-        # uggcf://jjj.lbhghor.pbz/jngpu?i=FRKKRF5i59b
         log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
 
         closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")

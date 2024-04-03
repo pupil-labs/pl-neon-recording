@@ -28,8 +28,6 @@ def parse_calib_bin(rec_dir: pathlib.Path):
 
     log.debug("NeonRecording: Parsing calibration data")
 
-    # obtained from @dom:
-    # https://github.com/pupil-labs/realtime-python-api/blob/main/src/pupil_labs/realtime_api/device.py#L178
     return np.frombuffer(
         calib_raw_data,
         np.dtype(
