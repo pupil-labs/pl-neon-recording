@@ -37,6 +37,9 @@ gaze_start_offset = rec.streams["gaze"].ts[0] - rec.start_ts
 scene = rec.scene
 
 for stream in rec.streams.values():
+    if isinstance(stream, nr.stream.av_stream.AudioVideoStream):
+        continue
+
     name = stream.name
 
     print(name)

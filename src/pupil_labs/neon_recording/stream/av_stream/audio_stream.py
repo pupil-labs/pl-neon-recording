@@ -85,6 +85,8 @@ class AudioStream(Stream):
                 ts_rel[ts_c] = start_time + tdiffs[tc] * t / self._samples_per_frame
                 ts_c += 1
 
+        # rewind audio back to start
+        self._backing_container.streams.audio[0].seek(0)
 
         self._ts_rel = ts_rel
         self._ts = self._ts_rel + self._video_ts[0]
