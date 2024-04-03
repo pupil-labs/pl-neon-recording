@@ -25,7 +25,7 @@
 Neon Recording API
 *******************************
 
-- As far as I can tell, between 'main' and 'multipart' branches, every requested feature in the notion doc, as well as all that was discussed at all meetings, is implemented and tested. Various implementations of some functionality were tried, to see what feels most ergonomic for a user, while balancing minimal code against efficiency, as well as explicitness. Some functionality was tested with different, but equivalent, implementations, to eliminate any possibility of errors and to provide some assurance of stability.
+- As far as I can tell, between 'main' and 'multipart' branches, every requested feature in the notion doc, as well as all that was discussed at all meetings, is implemented and the majority is tested (I just don't have access to a multipart recording yet). Various implementations of some functionality were tried, to see what feels most ergonomic for a user, while balancing minimal code against efficiency, as well as explicitness. Some functionality was tested with different, but equivalent, implementations, to eliminate any possibility of errors and to provide some assurance of stability.
 
 - See 'multipart' branch not only for code to load multipart recordings, but also for code to load different (appropriate) timestamps based on whether recording came from cloud or phone
 
