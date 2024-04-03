@@ -29,7 +29,7 @@ class VideoStream(Stream):
         self._backing_data = self._backing_container.streams.video[0]
         self._data = self._backing_data.frames
         setattr(self._data, "ts", self._ts)
-        self._ts_rel = self._ts - self._recording._start_ts
+        self._ts_rel = self._ts - self._recording.start_ts
         setattr(self._data, "ts_rel", self._ts_rel)
 
         self._width = self._data[0].width

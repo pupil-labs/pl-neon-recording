@@ -34,7 +34,7 @@ class IMUStream(Stream):
         log.info("NeonRecording: Loading IMU data")
 
         imu_rec = IMURecording(
-            self._recording._rec_dir / "extimu ps1.raw", self._recording._start_ts
+            self._recording._rec_dir / "extimu ps1.raw", self._recording.start_ts
         )
 
         self._data = imu_rec.raw

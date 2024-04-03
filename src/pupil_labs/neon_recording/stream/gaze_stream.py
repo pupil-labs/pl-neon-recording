@@ -63,7 +63,7 @@ class GazeStream(Stream):
         # we use gaze_200hz from cloud for the rec gaze stream
         # ts, raw = self._load_ts_and_data(rec_dir, 'gaze ps1')
         gaze_200hz_ts, gaze_200hz_raw = self._load_ts_and_data("gaze_200hz")
-        gaze_200hz_ts_rel = gaze_200hz_ts - self._recording._start_ts
+        gaze_200hz_ts_rel = gaze_200hz_ts - self._recording.start_ts
 
         # load up raw timestamps in original ns format,
         # in case useful at some point
