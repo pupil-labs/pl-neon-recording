@@ -64,8 +64,8 @@ avg_video_pts_size = convert_neon_pts_to_video_pts(
     avg_neon_pts_size, neon_time_base, video_time_base
 )
 
-start_ts = rec.unique_events["recording.begin"]
-end_ts = rec.unique_events["recording.end"]
+start_ts = rec._unique_events["recording.begin"]
+end_ts = rec._unique_events["recording.end"]
 
 avg_frame_dur = np.mean(np.diff(scene.ts))
 pre_ts = np.arange(start_ts, scene.ts[0] - avg_frame_dur, avg_frame_dur)
@@ -120,7 +120,7 @@ for gaze_datum, eye_frame, scene_frame, imu_datum, audio_sample in combined_data
     scene_image = (
         scene_frame.cv2
         if scene_frame is not None
-        else np.ones((scene.height, scene.width, 3), dtype="uint8") * 128  # gray frames
+        else np.ones((scene_video.height, scene_video.width, 3), dtype="uint8") * 128  # gray frames
     )
     eye_image = (
         eye_frame.cv2
@@ -135,10 +135,10 @@ for gaze_datum, eye_frame, scene_frame, imu_datum, audio_sample in combined_data
         )
 
     border_cols = [(245, 201, 176), (225, 181, 156), (225, 181, 156)]
-    transparent_rect(scene_image, 0, 950, scene.width, scene.height - 950)
-    cv2.line(scene_image, (0, 950), (scene.width, 950), border_cols[0], 2)
-    cv2.line(scene_image, (0, 950 + 80), (scene.width, 950 + 80), border_cols[1], 2)
-    cv2.line(scene_image, (0, 950 + 160), (scene.width, 950 + 160), border_cols[2], 2)
+    transparent_rect(scene_image, 0, 950, scene_video.width, scene_video.height - 950)
+    cv2.line(scene_image, (0, 950), (scene_video.width, 950), border_cols[0], 2)
+    cv2.line(scene_image, (0, 950 + 80), (scene_video.width, 950 + 80), border_cols[1], 2)
+    cv2.line(scene_image, (0, 950 + 160), (scene_video.width, 950 + 160), border_cols[2], 2)
     if imu_datum:
         sep = 0
         for i, field in enumerate(imu_maxes):
@@ -148,7 +148,7 @@ for gaze_datum, eye_frame, scene_frame, imu_datum, audio_sample in combined_data
             datum_mx = imu_maxes[field]
             gyro_data[field].append(
                 [
-                    scene.width * imu_datum.ts_rel / ts_rel_max,
+                    scene_video.width * imu_datum.ts_rel / ts_rel_max,
                     -1.0 * imu_datum[field] / datum_mx * 20 + 1000 + sep,
                 ]
             )

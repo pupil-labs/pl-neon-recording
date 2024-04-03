@@ -35,6 +35,10 @@ class VideoStream(Stream):
         self._width = self._data[0].width
         self._height = self._data[0].height
 
+        # rewind video back to start, to ensure it is synced
+        # with audio
+        self._backing_container.streams.video[0].seek(0)
+
     @property
     def width(self):
         return self._width
@@ -55,7 +59,6 @@ class VideoStream(Stream):
     # from stack overflow:
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
     def _sample_nearest(self, sorted_tses):
-        # uggcf://jjj.lbhghor.pbz/jngpu?i=FRKKRF5i59b
         log.debug("NeonRecording: Sampling nearest timestamps.")
 
         closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")
