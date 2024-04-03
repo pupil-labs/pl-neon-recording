@@ -1,14 +1,12 @@
 import json
 import pathlib
 
-import numpy as np
-
 from . import structlog
 from .calib import Calibration, parse_calib_bin
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
 from .stream.stream import Stream
-from .stream.video_stream import VideoStream
+from .stream.av_stream import AudioVideoStream, VideoStream
 from .time_utils import load_and_convert_tstamps, ns_to_s
 
 log = structlog.get_logger(__name__)
@@ -65,8 +63,8 @@ class NeonRecording:
         self.streams = {
             "gaze": GazeStream("gaze", self),
             "imu": IMUStream("imu", self),
-            "scene": VideoStream("scene", "Neon Scene Camera v1 ps1", self),
             "eye": VideoStream("eye", "Neon Sensor Module v1 ps1", self),
+            "scene": AudioVideoStream("scene", "Neon Scene Camera v1 ps1", self),
         }
 
 
