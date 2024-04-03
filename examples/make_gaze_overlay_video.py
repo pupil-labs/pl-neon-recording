@@ -11,6 +11,8 @@ rec = nr.load(sys.argv[1])
 gaze = rec.gaze
 eye = rec.eye
 scene = rec.scene
+scene_video = scene.video_stream
+scene_audio = scene.audio_stream
 imu = rec.imu
 
 
@@ -47,10 +49,12 @@ def convert_neon_pts_to_video_pts(neon_pts, neon_time_base, video_time_base):
 fps = 65535
 container = plv.open("video.mp4", mode="w")
 
-stream = container.add_stream("mpeg4", rate=fps)
-stream.width = scene.width
-stream.height = scene.height
-stream.pix_fmt = "yuv420p"
+out_video_stream = container.add_stream("mpeg4", rate=fps)
+out_video_stream.width = scene.width
+out_video_stream.height = scene.height
+out_video_stream.pix_fmt = "yuv420p"
+
+out_audio_stream = container.add_stream("aac", rate=scene_audio.sample_rate)
 
 neon_time_base = scene.data[0].time_base
 video_time_base = Fraction(1, fps)
@@ -105,9 +109,14 @@ for field in fields:
 pts_offset = 0
 video_pts = 0
 reached_video_start = False
-for gaze_datum, eye_frame, scene_frame, imu_datum in zip(
-    gaze.sample(my_ts), eye.sample(my_ts), scene.sample(my_ts), imu.sample(my_ts)
-):
+combined_data = zip(
+    gaze.sample(my_ts),
+    eye.sample(my_ts),
+    scene_video.sample(my_ts),
+    imu.sample(my_ts),
+    scene_audio.sample(my_ts),
+)
+for gaze_datum, eye_frame, scene_frame, imu_datum, audio_sample in combined_data:
     scene_image = (
         scene_frame.cv2
         if scene_frame is not None
@@ -163,7 +172,7 @@ for gaze_datum, eye_frame, scene_frame, imu_datum in zip(
 
     frame.pts = pts_offset + video_pts
     frame.time_base = video_time_base
-    for packet in stream.encode(frame):
+    for packet in out_video_stream.encode(frame):
         container.mux(packet)
 
     if scene_frame is not None:
@@ -175,8 +184,8 @@ for gaze_datum, eye_frame, scene_frame, imu_datum in zip(
         pts_offset += avg_video_pts_size
 
 try:
-    # Flush stream
-    for packet in stream.encode():
+    # Flush out_video_stream
+    for packet in out_video_stream.encode():
         container.mux(packet)
 finally:
     # Close the file

@@ -1,3 +1,3 @@
-from .stream import Stream  # noqa: F401
+from .stream import Stream
 
 __all__ = ["Stream"]

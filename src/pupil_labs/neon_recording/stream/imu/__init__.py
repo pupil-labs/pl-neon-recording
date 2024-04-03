@@ -1,3 +1,3 @@
-from .imu_stream import IMUStream  # noqa: F401
+from .imu_stream import IMUStream
 
-all = ["IMUStream"]
+__all__ = ["IMUStream"]
