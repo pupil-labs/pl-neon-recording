@@ -11,7 +11,7 @@ sample_ts = rec.gaze.ts[:15]
 combined_data = zip(
     rec.gaze.sample(sample_ts),
     rec.imu.sample(sample_ts),
-    rec.scene.sample(sample_ts),
+    rec.scene.video_stream.sample(sample_ts),
     rec.eye.sample(sample_ts),
 )
 for gaze_datum, imu_datum, scene_frame, eye_frame in combined_data:
@@ -66,5 +66,7 @@ gaze_samples_list = list(gaze.sample(gaze.ts[:15]))
 gaze_samples_np = nr.sampled_to_numpy(gaze.sample(gaze.ts[:15]))
 
 # NOTE: the following is quite intense on the RAM.
-scene_samples_np = nr.sampled_to_numpy(rec.scene.sample(rec.scene.ts[:15]))
+scene_samples_np = nr.sampled_to_numpy(
+    rec.scene.video_stream.sample(rec.scene.video_stream.ts[:15])
+)
 print(scene_samples_np.shape)

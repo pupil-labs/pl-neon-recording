@@ -50,16 +50,16 @@ fps = 65535
 container = plv.open("video.mp4", mode="w")
 
 out_video_stream = container.add_stream("mpeg4", rate=fps)
-out_video_stream.width = scene.width
-out_video_stream.height = scene.height
+out_video_stream.width = scene_video.width
+out_video_stream.height = scene_video.height
 out_video_stream.pix_fmt = "yuv420p"
 
 out_audio_stream = container.add_stream("aac", rate=scene_audio.sample_rate)
 
-neon_time_base = scene.data[0].time_base
+neon_time_base = scene_video.data[0].time_base
 video_time_base = Fraction(1, fps)
 
-avg_neon_pts_size = int(np.mean(np.diff([f.pts for f in scene.data if f is not None])))
+avg_neon_pts_size = int(np.mean(np.diff([f.pts for f in scene_video.data if f is not None])))
 avg_video_pts_size = convert_neon_pts_to_video_pts(
     avg_neon_pts_size, neon_time_base, video_time_base
 )
@@ -67,11 +67,11 @@ avg_video_pts_size = convert_neon_pts_to_video_pts(
 start_ts = rec._unique_events["recording.begin"]
 end_ts = rec._unique_events["recording.end"]
 
-avg_frame_dur = np.mean(np.diff(scene.ts))
-pre_ts = np.arange(start_ts, scene.ts[0] - avg_frame_dur, avg_frame_dur)
-post_ts = np.arange(scene.ts[-1] + avg_frame_dur, end_ts, avg_frame_dur)
+avg_frame_dur = np.mean(np.diff(scene_video.ts))
+pre_ts = np.arange(start_ts, scene_video.ts[0] - avg_frame_dur, avg_frame_dur)
+post_ts = np.arange(scene_video.ts[-1] + avg_frame_dur, end_ts, avg_frame_dur)
 
-my_ts = np.concatenate((pre_ts, scene.ts, post_ts))
+my_ts = np.concatenate((pre_ts, scene_video.ts, post_ts))
 
 fields = [
     "gyro_x",
