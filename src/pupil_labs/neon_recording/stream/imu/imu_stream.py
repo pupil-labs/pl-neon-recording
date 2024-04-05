@@ -2,21 +2,80 @@ import numpy as np
 
 from ... import structlog
 from ..stream import Stream
-from .load_imu_data import IMURecording
+from ...utils import find_sorted_multipart_files, load_multipart_timestamps
+from scipy.spatial.transform import Rotation
+from . import imu_pb2
 
 log = structlog.get_logger(__name__)
 
 
 class IMUStream(Stream):
+    DTYPE_RAW = np.dtype([
+        ("gyro_x", "<f4"),
+        ("gyro_y", "<f4"),
+        ("gyro_z", "<f4"),
+        ("accel_x", "<f4"),
+        ("accel_y", "<f4"),
+        ("accel_z", "<f4"),
+        ("pitch", "<f4"),
+        ("yaw", "<f4"),
+        ("roll", "<f4"),
+        ("quaternion_w", "<f4"),
+        ("quaternion_x", "<f4"),
+        ("quaternion_y", "<f4"),
+        ("quaternion_z", "<f4"),
+        ("tsNs", "uint64"),
+        ("ts", "<f8"),
+        ("ts_rel", "<f8"),
+    ])
+
     def __init__(self, name, recording):
         super().__init__(name, recording)
-        self._load()
+
+        log.info("NeonRecording: Loading IMU data")
+
+        start_ts = self._recording.start_ts
+
+        imu_files = find_sorted_multipart_files(self._recording._rec_dir, "extimu")
+        imu_data = []
+
+        for imu_file, _ in imu_files:
+            with imu_file.open("rb") as raw_file:
+                raw_data = raw_file.read()
+                imu_packets = parse_neon_imu_raw_packets(raw_data)
+
+                for packet in imu_packets:
+                    rotation = Rotation.from_quat(
+                        [
+                            packet.rotVecData.x,
+                            packet.rotVecData.y,
+                            packet.rotVecData.z,
+                            packet.rotVecData.w,
+                        ]
+                    )
+                    euler = rotation.as_euler(seq="XZY", degrees=True)
+
+                    ts = packet.tsNs
+                    ts_rel = ts - start_ts
+
+                    imu_data.append((
+                        packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
+                        packet.accelData.x, packet.accelData.y, packet.accelData.z,
+                        *euler,
+                        packet.rotVecData.w, packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z,
+                        packet.tsNs,
+                        ts,
+                        ts_rel,
+                    ))
+
+        self._data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
+        self._ts = load_multipart_timestamps([p[1] for p in imu_files])
 
     def _sample_linear_interp(self, sorted_ts):
-        interp_data = np.zeros(len(sorted_ts), dtype=IMURecording.DTYPE_RAW).view(
+        interp_data = np.zeros(len(sorted_ts), dtype=IMUStream.DTYPE_RAW).view(
             np.recarray
         )
-        for field in IMURecording.DTYPE_RAW.names:
+        for field in IMUStream.DTYPE_RAW.names:
             if field == "ts":
                 interp_data[field] = sorted_ts
 
@@ -30,12 +89,22 @@ class IMUStream(Stream):
             else:
                 yield None
 
-    def _load(self):
-        log.info("NeonRecording: Loading IMU data")
 
-        imu_rec = IMURecording(
-            self._recording._rec_dir / "extimu ps1.raw", self._recording.start_ts
-        )
+def parse_neon_imu_raw_packets(buffer):
+    index = 0
+    packet_sizes = []
+    while True:
+        nums = np.frombuffer(buffer[index : index + 2], np.uint16)
 
-        self._data = imu_rec.raw
-        self._ts = self._data[:].ts
+        if nums.size <= 0:
+            break
+
+        index += 2
+        packet_size = nums[0]
+        packet_sizes.append(packet_size)
+        packet_bytes = buffer[index : index + packet_size]
+        index += packet_size
+        packet = imu_pb2.ImuPacket()
+        packet.ParseFromString(packet_bytes)
+
+        yield packet

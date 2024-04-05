@@ -47,10 +47,6 @@ class Stream(abc.ABC):
         return self._ts_rel
 
     @abc.abstractmethod
-    def _load(self):
-        pass
-
-    @abc.abstractmethod
     def _sample_linear_interp(self, sorted_ts):
         pass
 

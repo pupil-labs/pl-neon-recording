@@ -5,9 +5,8 @@ from . import structlog
 from .calib import Calibration, parse_calib_bin
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
-from .stream.stream import Stream
-from .stream.av_stream import AudioVideoStream, VideoStream
-from .time_utils import load_and_convert_tstamps, ns_to_s
+from .stream.av_stream.video_stream import VideoStream
+from .utils import load_and_convert_tstamps
 
 log = structlog.get_logger(__name__)
 
@@ -25,7 +24,7 @@ class NeonRecording:
             self.info = json.load(f)
 
         self.start_ts_ns = self.info["start_time"]
-        self.start_ts = ns_to_s(self.start_ts_ns)
+        self.start_ts = self.start_ts_ns * 1e-9
 
         log.info("NeonRecording: Loading wearer")
         self.wearer = {"uuid": "", "name": ""}
@@ -57,15 +56,13 @@ class NeonRecording:
             self._calib["left_extrinsics_affine_matrix"],
         )
 
-
         log.info("NeonRecording: Loading data streams")
         self.streams = {
             "gaze": GazeStream("gaze", self),
             "imu": IMUStream("imu", self),
-            "eye": VideoStream("eye", "Neon Sensor Module v1 ps1", self),
-            "scene": AudioVideoStream("scene", "Neon Scene Camera v1 ps1", self),
+            "eye": VideoStream("eye", "Neon Sensor Module v1", self),
+            "scene": VideoStream("scene", "Neon Scene Camera v1", self),
         }
-
 
         # todo: events should be a stream
         log.info("NeonRecording: Loading events")
@@ -83,19 +80,19 @@ class NeonRecording:
         pass
 
     @property
-    def gaze(self) -> Stream:
+    def gaze(self) -> GazeStream:
         return self.streams["gaze"]
 
     @property
-    def imu(self) -> Stream:
+    def imu(self) -> IMUStream:
         return self.streams["imu"]
 
     @property
-    def scene(self) -> Stream:
+    def scene(self) -> VideoStream:
         return self.streams["scene"]
 
     @property
-    def eye(self) -> Stream:
+    def eye(self) -> VideoStream:
         return self.streams["eye"]
 
 
