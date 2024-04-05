@@ -33,7 +33,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     out_video_stream = output_container.add_stream("libx264", rate=fps)
     out_video_stream.time_base = Fraction(1, fps)
 
-    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], out_video_stream.time_base)
+    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1/fps)
 
     combined_data = zip(
         recording.scene.sample(output_timestamps),
@@ -46,7 +46,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         frame_idx += 1
         frame_pixels = scene_frame.bgr
 
-        if gaze_datum is not None:
+        if gaze_datum is not None and not np.isnan(gaze_datum.x):
             frame_pixels = cv2.circle(
                 frame_pixels,
                 (int(gaze_datum.x), int(gaze_datum.y)),
@@ -72,4 +72,4 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
 
 
 if __name__ == '__main__':
-    make_overlaid_video(sys.argv[1], "gaze-overlay-output-video.mp4", 3)
+    make_overlaid_video(sys.argv[1], "gaze-overlay-output-video.mp4", 24)

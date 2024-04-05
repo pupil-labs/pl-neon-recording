@@ -21,57 +21,66 @@ class InterpolationMethod(Enum):
 class Stream(abc.ABC):
     def __init__(self, name, recording):
         self.name = name
-        self._recording = recording
-        self._backing_data = None
-        self._data = []
-        self._ts = []
-        self._ts_rel = None
-
-    @property
-    def recording(self):
-        return self._recording
-
-    @property
-    def data(self):
-        return self._data
+        self.recording = recording
+        self.data = None
 
     @property
     def ts(self):
-        return self._ts
+        return self.data.ts
 
     @property
     def ts_rel(self):
-        if self._ts_rel is None:
-            self._ts_rel = self._ts - self.recording.start_ts
-
-        return self._ts_rel
+        return self.data.ts - self.recording.start_ts
 
     @abc.abstractmethod
     def _sample_linear_interp(self, sorted_ts):
         pass
 
     def __getitem__(self, idxs):
-        return self._data[idxs]
+        if isinstance(idxs, tuple):
+            if isinstance(idxs[0], slice):
+                start = idxs[0].start or 0
+                stop = idxs[0].stop or len(self.data)
+                step = idxs[0].step or 1
 
-    def _ts_oob(self, ts: float):
-        return ts < self._ts[0] or ts > self._ts[-1]
+                rows_idxs = list(range(start, stop, step))
+
+            if isinstance(idxs[1], slice):
+                names = self.data.dtype.names
+                start = idxs[0].start or 0
+                stop = idxs[0].stop or len(names)
+                step = idxs[0].step or 1
+                column_names = names[start:stop:step]
+
+            else:
+                column_names = [self.data.dtype.names[idxs[1]]]
+
+        else:
+            rows_idxs = idxs
+            column_names = self.data.dtype.names
+
+        rows = self.data[rows_idxs]
+        return rows[list(column_names)]
+
+
+    def ts_oob(self, ts: float):
+        return ts < self.ts[0] or ts > self.ts[-1]
 
     def sample_one(
         self, ts_wanted: float, dt: float = 0.01, method=InterpolationMethod.NEAREST
     ):
-        log.debug("NeonRecording: Sampling one timestamp.")
-
-        if self._ts_oob(ts_wanted):
+        if self.ts_oob(ts_wanted):
             return None
 
         if method == InterpolationMethod.NEAREST:
-            diffs = np.abs(self._ts - ts_wanted)
+            diffs = np.abs(self.ts - ts_wanted)
 
             if np.any(diffs < dt):
                 idx = int(np.argmin(diffs))
-                return self._data[idx]
+                return self.data[idx]
             else:
                 return None
+
         elif method == InterpolationMethod.LINEAR:
             datum = self._sample_linear_interp([ts_wanted])
             if np.abs(datum.ts - ts_wanted) < dt:
@@ -82,44 +91,40 @@ class Stream(abc.ABC):
     def sample(self, tstamps, method=InterpolationMethod.NEAREST):
         log.debug("NeonRecording: Sampling timestamps.")
 
-        # in case they pass one float
-        # see note at https://numpy.org/doc/stable/reference/generated/numpy.isscalar.html
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
 
         if len(tstamps) == 1:
-            if self._ts_oob(tstamps[0]):
+            if self.ts_oob(tstamps[0]):
                 return None
 
         sorted_tses = np.sort(tstamps)
 
         if method == InterpolationMethod.NEAREST:
             return self._sample_nearest(sorted_tses)
+
         elif method == InterpolationMethod.LINEAR:
             return self._sample_linear_interp(sorted_tses)
-        else:
-            return ValueError(
-                "Only LINEAR and NEAREST methods are supported."
-            )
 
     # from stack overflow:
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
     def _sample_nearest(self, sorted_tses):
         log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
 
-        closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")
+        closest_idxs = np.searchsorted(self.ts, sorted_tses, side="right")
         for i, ts in enumerate(sorted_tses):
-            if self._ts_oob(ts):
+            if self.ts_oob(ts):
                 yield None
+
             else:
                 idx = closest_idxs[i]
                 if idx > 0 and (
-                    idx == len(self._ts)
-                    or math.fabs(ts - self._ts[idx - 1]) < math.fabs(ts - self._ts[idx])
+                    idx == len(self.ts)
+                    or math.fabs(ts - self.ts[idx - 1]) < math.fabs(ts - self.ts[idx])
                 ):
-                    yield self._data[int(idx - 1)]
+                    yield self.data[int(idx - 1)]
                 else:
-                    yield self._data[int(idx)]
+                    yield self.data[int(idx)]
 
 
 def sampled_to_numpy(sample_generator):

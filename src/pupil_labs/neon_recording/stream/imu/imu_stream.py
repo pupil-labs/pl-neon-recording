@@ -34,9 +34,9 @@ class IMUStream(Stream):
 
         log.info("NeonRecording: Loading IMU data")
 
-        start_ts = self._recording.start_ts
+        start_ts = self.recording.start_ts
 
-        imu_files = find_sorted_multipart_files(self._recording._rec_dir, "extimu")
+        imu_files = find_sorted_multipart_files(self.recording._rec_dir, "extimu")
         imu_data = []
 
         for imu_file, _ in imu_files:
@@ -68,8 +68,7 @@ class IMUStream(Stream):
                         ts_rel,
                     ))
 
-        self._data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
-        self._ts = load_multipart_timestamps([p[1] for p in imu_files])
+        self.data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
 
     def _sample_linear_interp(self, sorted_ts):
         interp_data = np.zeros(len(sorted_ts), dtype=IMUStream.DTYPE_RAW).view(

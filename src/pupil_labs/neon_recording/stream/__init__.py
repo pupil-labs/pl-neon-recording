@@ -1,3 +1,1 @@
-from .stream import Stream
-
-__all__ = ["Stream"]
+from .stream import Stream, InterpolationMethod

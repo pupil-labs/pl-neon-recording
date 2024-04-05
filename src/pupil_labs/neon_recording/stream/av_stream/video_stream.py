@@ -18,7 +18,7 @@ class VideoStream(Stream):
 
         self._video_ts_pairs = []
 
-        video_files = find_sorted_multipart_files(self._recording._rec_dir, self._base_name, ".mp4")
+        video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
         time_parts = []
         for (video_file, time_file) in video_files:
             ts = np.fromfile(time_file, dtype="<u8").astype(np.float64) * 1e-9
@@ -29,7 +29,6 @@ class VideoStream(Stream):
             time_parts.append(ts)
 
         self._ts = np.concatenate(time_parts)
-        self._ts_rel = self._ts - self._recording.start_ts
 
         container = self._video_ts_pairs[0][0]
         first_frame = next(container.decode(container.streams.video[0]))
@@ -47,7 +46,7 @@ class VideoStream(Stream):
 
         closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")
         for frame_idx, ts in zip(closest_idxs, sorted_tses):
-            if self._ts_oob(ts):
+            if self.ts_oob(ts):
                 yield None
 
             else:
@@ -59,8 +58,12 @@ class VideoStream(Stream):
                         video.seek(frame_idx)
                         frame = next(video.decode(video.streams.video[0]))
                         setattr(frame, "ts", timestamps[frame_idx])
-                        setattr(frame, "ts_rel", timestamps[frame_idx] - self._recording.start_ts)
+                        setattr(frame, "ts_rel", timestamps[frame_idx] - self.recording.start_ts)
                         yield frame
                         break
                     else:
                         frame_idx -= len(timestamps)
+
+    @property
+    def ts(self):
+        return self._ts
