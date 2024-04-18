@@ -58,7 +58,6 @@ class VideoStream(Stream):
                         video.seek(frame_idx)
                         frame = next(video.decode(video.streams.video[0]))
                         setattr(frame, "ts", timestamps[frame_idx])
-                        setattr(frame, "ts_rel", timestamps[frame_idx] - self.recording.start_ts)
                         yield frame
                         break
                     else:

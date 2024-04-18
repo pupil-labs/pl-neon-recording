@@ -26,7 +26,6 @@ class IMUStream(Stream):
         ("quaternion_z", "<f4"),
         ("tsNs", "uint64"),
         ("ts", "<f8"),
-        ("ts_rel", "<f8"),
     ])
 
     def __init__(self, name, recording):
@@ -56,7 +55,6 @@ class IMUStream(Stream):
                     euler = rotation.as_euler(seq="XZY", degrees=True)
 
                     ts = packet.tsNs
-                    ts_rel = ts - start_ts
 
                     imu_data.append((
                         packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
@@ -65,7 +63,6 @@ class IMUStream(Stream):
                         packet.rotVecData.w, packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z,
                         packet.tsNs,
                         ts,
-                        ts_rel,
                     ))
 
         self.data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)

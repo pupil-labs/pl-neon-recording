@@ -28,11 +28,10 @@ class GazeStream(Stream):
             gaze_file_pairs = find_sorted_multipart_files(self.recording._rec_dir, "gaze")
 
         gaze_data, time_data = load_multipart_data_time_pairs(gaze_file_pairs, "<f4", 2)
-        time_data_rel = time_data - self.recording.start_ts
 
         self.data = np.rec.fromarrays(
-            [time_data, time_data_rel, gaze_data[:,0], gaze_data[:,1]],
-            names=["ts", "ts_rel", "x", "y"]
+            [time_data, gaze_data[:,0], gaze_data[:,1]],
+            names=["ts", "x", "y"]
         )
 
     def _sample_linear_interp(self, sorted_ts):

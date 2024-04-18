@@ -28,10 +28,6 @@ class Stream(abc.ABC):
     def ts(self):
         return self.data.ts
 
-    @property
-    def ts_rel(self):
-        return self.data.ts - self.recording.start_ts
-
     @abc.abstractmethod
     def _sample_linear_interp(self, sorted_ts):
         pass
