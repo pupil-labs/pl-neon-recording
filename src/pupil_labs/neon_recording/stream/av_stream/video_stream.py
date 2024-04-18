@@ -22,17 +22,14 @@ class VideoStream(Stream):
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
         container_start_idx = 0
         for (video_file, _) in video_files:
-            video = plv.open(video_file)
-            ts = self._ts[container_start_idx:container_start_idx+video.streams.video[0].frames]
-            self._video_ts_pairs.append((video, ts))
+            container = plv.open(video_file)
+            ts = self._ts[container_start_idx:container_start_idx+container.streams.video[0].frames]
+            self._video_ts_pairs.append((container, ts))
 
-            container_start_idx += video.streams.video[0].frames
+            container_start_idx += container.streams.video[0].frames
 
-        container = self._video_ts_pairs[0][0]
-        first_frame = next(container.decode(container.streams.video[0]))
-        container.seek(0)
-        self.width = first_frame.width
-        self.height = first_frame.height
+        self.width = container.streams.video[0].width
+        self.height = container.streams.video[0].height
 
     def _sample_linear_interp(self, sorted_ts):
         raise NotImplementedError(
