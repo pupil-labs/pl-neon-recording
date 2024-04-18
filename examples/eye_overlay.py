@@ -37,23 +37,13 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
 
     combined_data = zip(
         recording.scene.sample(output_timestamps, epsilon=1/15),
-        recording.gaze.sample(output_timestamps, epsilon=1/100),
         recording.eye.sample(output_timestamps, epsilon=1/15),
     )
 
     frame_idx = 0
-    for scene_frame, gaze_datum, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
+    for scene_frame, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
         frame_idx += 1
         frame_pixels = scene_frame.bgr
-
-        if gaze_datum is not None and not np.isnan(gaze_datum.x):
-            frame_pixels = cv2.circle(
-                frame_pixels,
-                (int(gaze_datum.x), int(gaze_datum.y)),
-                50,
-                (0, 0, 255),
-                10
-            )
 
         if eye_frame is not None:
             eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
@@ -72,4 +62,4 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
 
 
 if __name__ == '__main__':
-    make_overlaid_video(sys.argv[1], "gaze-overlay-output-video.mp4", 24)
+    make_overlaid_video(sys.argv[1], "eye-overlay-output-video.mp4", 24)
