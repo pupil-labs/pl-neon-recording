@@ -4,7 +4,7 @@ import numpy as np
 
 from ... import structlog
 from ..stream import Stream
-from ...utils import find_sorted_multipart_files
+from ...utils import find_sorted_multipart_files, load_multipart_timestamps
 
 import pupil_labs.video as plv
 
@@ -19,16 +19,14 @@ class VideoStream(Stream):
         self._video_ts_pairs = []
 
         video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
-        time_parts = []
-        for (video_file, time_file) in video_files:
-            ts = np.fromfile(time_file, dtype="<u8").astype(np.float64) * 1e-9
-            self._video_ts_pairs.append((
-                plv.open(video_file),
-                ts,
-            ))
-            time_parts.append(ts)
+        self._ts = load_multipart_timestamps([p[1] for p in video_files])
+        container_start_idx = 0
+        for (video_file, _) in video_files:
+            video = plv.open(video_file)
+            ts = self._ts[container_start_idx:container_start_idx+video.streams.video[0].frames]
+            self._video_ts_pairs.append((video, ts))
 
-        self._ts = np.concatenate(time_parts)
+            container_start_idx += video.streams.video[0].frames
 
         container = self._video_ts_pairs[0][0]
         first_frame = next(container.decode(container.streams.video[0]))
