@@ -84,7 +84,7 @@ class Stream(abc.ABC):
             else:
                 return None
 
-    def sample(self, tstamps, method=InterpolationMethod.NEAREST):
+    def sample(self, tstamps, method=InterpolationMethod.NEAREST, epsilon=None):
         log.debug("NeonRecording: Sampling timestamps.")
 
         if np.ndim(tstamps) == 0:
@@ -97,30 +97,34 @@ class Stream(abc.ABC):
         sorted_tses = np.sort(tstamps)
 
         if method == InterpolationMethod.NEAREST:
-            return self._sample_nearest(sorted_tses)
+            return self._sample_nearest(sorted_tses, epsilon)
 
         elif method == InterpolationMethod.LINEAR:
-            return self._sample_linear_interp(sorted_tses)
+            return self._sample_linear_interp(sorted_tses, epsilon)
 
     # from stack overflow:
     # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
-    def _sample_nearest(self, sorted_tses):
+    def _sample_nearest(self, sorted_tses, epsilon):
         log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
 
         closest_idxs = np.searchsorted(self.ts, sorted_tses, side="right")
-        for i, ts in enumerate(sorted_tses):
-            if self.ts_oob(ts):
+        for i, requested_ts in enumerate(sorted_tses):
+            if self.ts_oob(requested_ts):
                 yield None
 
             else:
                 idx = closest_idxs[i]
                 if idx > 0 and (
                     idx == len(self.ts)
-                    or math.fabs(ts - self.ts[idx - 1]) < math.fabs(ts - self.ts[idx])
+                    or math.fabs(requested_ts - self.ts[idx - 1]) < math.fabs(requested_ts - self.ts[idx])
                 ):
-                    yield self.data[int(idx - 1)]
+                    idx -= 1
+
+                actual_ts = self.ts[idx]
+                if epsilon is not None and abs(actual_ts - requested_ts) > epsilon:
+                    yield None
                 else:
-                    yield self.data[int(idx)]
+                    yield self.data[idx]
 
 
 def sampled_to_numpy(sample_generator):

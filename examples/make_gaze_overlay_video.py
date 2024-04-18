@@ -36,9 +36,9 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1/fps)
 
     combined_data = zip(
-        recording.scene.sample(output_timestamps),
-        recording.gaze.sample(output_timestamps),
-        recording.eye.sample(output_timestamps),
+        recording.scene.sample(output_timestamps, epsilon=1/15),
+        recording.gaze.sample(output_timestamps, epsilon=1/100),
+        recording.eye.sample(output_timestamps, epsilon=1/15),
     )
 
     frame_idx = 0

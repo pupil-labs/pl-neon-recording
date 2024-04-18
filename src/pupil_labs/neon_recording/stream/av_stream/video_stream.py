@@ -36,23 +36,28 @@ class VideoStream(Stream):
             "NeonRecording: Video streams only support nearest neighbor interpolation."
         )
 
-    def _sample_nearest(self, sorted_tses):
+    def _sample_nearest(self, sorted_tses, epsilon):
         log.debug("NeonRecording: Sampling nearest timestamps.")
 
         closest_idxs = np.searchsorted(self._ts, sorted_tses, side="right")
-        for frame_idx, ts in zip(closest_idxs, sorted_tses):
-            if self.ts_oob(ts):
+        for frame_idx, requested_ts in zip(closest_idxs, sorted_tses):
+            if self.ts_oob(requested_ts):
                 yield None
 
             else:
                 frame_idx = int(frame_idx)
                 for (video, timestamps) in self._video_ts_pairs:
 
-                    if ts < timestamps[-1]:
-                        ts = timestamps[frame_idx]
+                    if requested_ts < timestamps[-1]:
+                        actual_ts = timestamps[frame_idx]
+
+                        if epsilon is not None and abs(actual_ts - requested_ts) > epsilon:
+                            yield GrayFrame(self.width, self.height)
+                            break
+
                         video.seek(frame_idx)
                         frame = next(video.decode(video.streams.video[0]))
-                        setattr(frame, "ts", timestamps[frame_idx])
+                        setattr(frame, "ts", actual_ts)
                         yield frame
                         break
                     else:
@@ -61,3 +66,25 @@ class VideoStream(Stream):
     @property
     def ts(self):
         return self._ts
+
+class GrayFrame():
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+        self._bgr = None
+        self._gray = None
+
+    @property
+    def bgr(self):
+        if self._bgr is None:
+            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype='uint8')
+
+        return self._bgr
+
+    @property
+    def gray(self):
+        if self._gray is None:
+            self._gray = 128 * np.ones([self.height, self.width], dtype='uint8')
+
+        return self._gray
