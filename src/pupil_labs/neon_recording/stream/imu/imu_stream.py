@@ -29,13 +29,9 @@ class IMUStream(Stream):
     ])
 
     def __init__(self, name, recording):
-        super().__init__(name, recording)
-
         log.info("NeonRecording: Loading IMU data")
 
-        start_ts = self.recording.start_ts
-
-        imu_files = find_sorted_multipart_files(self.recording._rec_dir, "extimu")
+        imu_files = find_sorted_multipart_files(recording._rec_dir, "extimu")
         imu_data = []
 
         for imu_file, _ in imu_files:
@@ -65,7 +61,9 @@ class IMUStream(Stream):
                         ts,
                     ))
 
-        self.data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
+        data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
+        super().__init__(name, recording, data)
+
 
     def _sample_linear_interp(self, sorted_ts):
         interp_data = np.zeros(len(sorted_ts), dtype=IMUStream.DTYPE_RAW).view(

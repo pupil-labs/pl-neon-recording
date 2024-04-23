@@ -14,127 +14,46 @@ class InterpolationMethod(Enum):
     LINEAR = "linear"
 
 
-# this implements mpk's idea for a stream of data
-# from a neon sensor that can be sampled via ts values
-# see here:
-# https://www.notion.so/pupillabs/Neon-Recording-Python-Lib-5b247c33e1c74f638af2964fa78018ff?pvs=4
-class Stream(abc.ABC):
-    def __init__(self, name, recording):
-        self.name = name
-        self.recording = recording
-        self.data = None
 
-    @property
-    def ts(self):
-        return self.data.ts
+class SimpleDataSampler:
+    def __init__(self, data):
+        self._data = data
 
-    @abc.abstractmethod
-    def _sample_linear_interp(self, sorted_ts):
-        pass
-
-    def __getitem__(self, idxs):
-        if isinstance(idxs, tuple):
-            if isinstance(idxs[0], slice):
-                start = idxs[0].start or 0
-                stop = idxs[0].stop or len(self.data)
-                step = idxs[0].step or 1
-
-                rows_idxs = list(range(start, stop, step))
-
-            if isinstance(idxs[1], slice):
-                names = self.data.dtype.names
-                start = idxs[0].start or 0
-                stop = idxs[0].stop or len(names)
-                step = idxs[0].step or 1
-                column_names = names[start:stop:step]
-
-            else:
-                column_names = [self.data.dtype.names[idxs[1]]]
-
-        else:
-            rows_idxs = idxs
-            column_names = self.data.dtype.names
-
-        rows = self.data[rows_idxs]
-        return rows[list(column_names)]
-
-
-    def ts_oob(self, ts: float):
-        return ts < self.ts[0] or ts > self.ts[-1]
-
-    def sample_one(
-        self, ts_wanted: float, dt: float = 0.01, method=InterpolationMethod.NEAREST
-    ):
-        if self.ts_oob(ts_wanted):
-            return None
-
-        if method == InterpolationMethod.NEAREST:
-            diffs = np.abs(self.ts - ts_wanted)
-
-            if np.any(diffs < dt):
-                idx = int(np.argmin(diffs))
-                return self.data[idx]
-            else:
-                return None
-
-        elif method == InterpolationMethod.LINEAR:
-            datum = self._sample_linear_interp([ts_wanted])
-            if np.abs(datum.ts - ts_wanted) < dt:
-                return datum
-            else:
-                return None
-
-    def sample(self, tstamps, method=InterpolationMethod.NEAREST, epsilon=None):
-        log.debug("NeonRecording: Sampling timestamps.")
-
+    def sample(self, tstamps, method=InterpolationMethod.NEAREST):
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
 
-        if len(tstamps) == 1:
-            if self.ts_oob(tstamps[0]):
-                return None
-
-        sorted_tses = np.sort(tstamps)
-
         if method == InterpolationMethod.NEAREST:
-            return self._sample_nearest(sorted_tses, epsilon)
+            return self._sample_nearest(tstamps)
 
         elif method == InterpolationMethod.LINEAR:
-            return self._sample_linear_interp(sorted_tses, epsilon)
+            return self._sample_linear_interp(tstamps)
 
-    # from stack overflow:
-    # https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
-    def _sample_nearest(self, sorted_tses, epsilon):
-        log.debug("NeonRecording: Sampling timestamps with nearest neighbor method.")
+    def _sample_nearest(self, ts):
+        last_idx = len(self._data) - 1
+        idxs = np.searchsorted(self.ts, ts, side="right")
+        idxs[idxs > last_idx] = last_idx
 
-        closest_idxs = np.searchsorted(self.ts, sorted_tses, side="right")
-        for i, requested_ts in enumerate(sorted_tses):
-            if self.ts_oob(requested_ts):
-                yield None
+        return SimpleDataSampler(self._data[idxs])
 
-            else:
-                idx = closest_idxs[i]
-                if idx > 0 and (
-                    idx == len(self.ts)
-                    or math.fabs(requested_ts - self.ts[idx - 1]) < math.fabs(requested_ts - self.ts[idx])
-                ):
-                    idx -= 1
+    def __iter__(self):
+        for sample in self.data:
+            yield sample
 
-                actual_ts = self.ts[idx]
-                if epsilon is not None and abs(actual_ts - requested_ts) > epsilon:
-                    yield None
-                else:
-                    yield self.data[idx]
+    def to_numpy(self):
+        return self._data
+
+    @property
+    def data(self):
+        return self._data
+
+    @property
+    def ts(self):
+        return self._data.ts
 
 
-def sampled_to_numpy(sample_generator):
-    fst = next(sample_generator)
-
-    if isinstance(fst, np.record):
-        # gaze or imu stream
-        samples_np = np.fromiter(sample_generator, dtype=fst.dtype).view(np.recarray)
-        return np.hstack([fst, samples_np])
-    else:
-        # video stream
-        frames = [fst.rgb] + [frame.rgb for frame in sample_generator]
-        return np.array(frames)
+class Stream(SimpleDataSampler):
+    def __init__(self, name, recording, data):
+        super().__init__(data)
+        self.name = name
+        self.recording = recording
