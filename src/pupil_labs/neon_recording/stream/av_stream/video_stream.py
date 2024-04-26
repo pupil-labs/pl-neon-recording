@@ -55,25 +55,30 @@ class VideoStreamPart:
     def __init__(self, container, timestamps):
         self.container = container
         self.timestamps = timestamps
-        self.frame_idx = -1
         self.current_frame = None
+        self.frame_generator = self.container.decode(self.container.streams.video[0])
 
     def goto_index(self, frame_idx):
         video = self.container.streams.video[0]
 
-        seek_distance = frame_idx - self.frame_idx - 1
+        seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
             target_rel_timestamp = int(frame_idx/video.average_rate)
             self.container.seek(int(target_rel_timestamp*1e6), backward=True)
-            self.current_frame = next(self.container.decode(video))
-            self.frame_idx = int(self.current_frame.pts * video.time_base * video.average_rate)
+            self.current_frame = next(self.frame_generator)
 
         for _ in range(self.frame_idx, frame_idx):
-            self.current_frame = next(self.container.decode(video))
-
-        self.frame_idx = frame_idx
+            self.current_frame = next(self.frame_generator)
 
         return self.current_frame
+
+    @property
+    def frame_idx(self):
+        if self.current_frame is None:
+            return -1
+
+        video = self.container.streams.video[0]
+        return int(self.current_frame.pts * video.time_base * video.average_rate)
 
 class VideoStream(VideoSampler):
     def __init__(self, name, base_name, recording):
