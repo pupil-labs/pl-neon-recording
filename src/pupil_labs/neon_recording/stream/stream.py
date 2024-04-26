@@ -36,6 +36,14 @@ class SimpleDataSampler:
 
         return SimpleDataSampler(self._data[idxs])
 
+    def _sample_linear_interp(self, sorted_ts):
+        result = np.zeros(len(sorted_ts), self.data.dtype)
+
+        for key in self.data.dtype.names:
+            result[key] = np.interp(sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan)
+
+        return SimpleDataSampler(result)
+
     def __iter__(self):
         for sample in self.data:
             yield sample

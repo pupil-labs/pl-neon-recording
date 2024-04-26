@@ -33,11 +33,3 @@ class GazeStream(Stream):
         )
 
         super().__init__(name, recording, data)
-
-    def _sample_linear_interp(self, sorted_ts):
-        result = np.zeros(len(sorted_ts), self.data.dtype).view(np.recarray)
-
-        for key in self.data.dtype.names:
-            result[key] = np.interp(sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan)
-
-        return result

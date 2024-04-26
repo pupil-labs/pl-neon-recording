@@ -65,25 +65,6 @@ class IMUStream(Stream):
         super().__init__(name, recording, data)
 
 
-    def _sample_linear_interp(self, sorted_ts):
-        interp_data = np.zeros(len(sorted_ts), dtype=IMUStream.DTYPE_RAW).view(
-            np.recarray
-        )
-        for field in IMUStream.DTYPE_RAW.names:
-            if field == "ts":
-                interp_data[field] = sorted_ts
-
-            interp_data[field] = np.interp(
-                sorted_ts, self._ts, self._data[field], left=np.nan, right=np.nan
-            )
-
-        for d in interp_data:
-            if not np.isnan(d.gyro_x):
-                yield d
-            else:
-                yield None
-
-
 def parse_neon_imu_raw_packets(buffer):
     index = 0
     packet_sizes = []
