@@ -16,39 +16,29 @@ class VideoSampler:
         self.video_stream = video_stream
         self._ts = sample_timestamps
 
-
     def sample(self, tstamps, method=InterpolationMethod.NEAREST):
         return self._sample_nearest(tstamps)
 
     def _sample_nearest(self, ts):
         last_idx = len(self._ts) - 1
-        idxs = np.searchsorted(self._ts, ts, side="right")
+        idxs = np.searchsorted(self._ts, ts, side="left")
         idxs[idxs > last_idx] = last_idx
 
         return VideoSampler(self.video_stream, self.ts[idxs])
 
     def __iter__(self):
-        closest_idxs = np.searchsorted(self.video_stream.ts, self.ts, side="right")
-        for frame_idx, requested_ts in zip(closest_idxs, self.ts):
-                for (container, timestamps) in self.video_stream._video_ts_pairs:
-                    if requested_ts < timestamps[-1]:
-                        actual_ts = timestamps[frame_idx]
-
-                        video = container.streams.video[0]
-
-                        target_rel_timestamp = int(frame_idx/video.average_rate)
-                        container.seek(int(target_rel_timestamp*1e6), backward=True)
-
-                        frame = next(container.decode(video))
-                        current_frame_idx = int(frame.pts * video.time_base * video.average_rate)
-                        for _ in range(current_frame_idx, frame_idx):
-                            frame = next(container.decode(video))
+        closest_idxs = np.searchsorted(self.video_stream.ts, self.ts, side="left")
+        for frame_idx in closest_idxs:
+                for video_part in self.video_stream.video_parts:
+                    if frame_idx < len(video_part.timestamps):
+                        frame = video_part.goto_index(frame_idx)
+                        actual_ts = video_part.timestamps[frame_idx]
 
                         setattr(frame, "ts", actual_ts)
                         yield frame
                         break
                     else:
-                        frame_idx -= len(timestamps)
+                        frame_idx -= len(video_part.timestamps)
 
     @property
     def data(self):
@@ -61,7 +51,29 @@ class VideoSampler:
     def to_numpy(self):
         return np.array([frame.rgb for frame in self])
 
+class VideoStreamPart:
+    def __init__(self, container, timestamps):
+        self.container = container
+        self.timestamps = timestamps
+        self.frame_idx = -1
+        self.current_frame = None
 
+    def goto_index(self, frame_idx):
+        video = self.container.streams.video[0]
+
+        seek_distance = frame_idx - self.frame_idx - 1
+        if seek_distance < 0 or seek_distance > 40:
+            target_rel_timestamp = int(frame_idx/video.average_rate)
+            self.container.seek(int(target_rel_timestamp*1e6), backward=True)
+            self.current_frame = next(self.container.decode(video))
+            self.frame_idx = int(self.current_frame.pts * video.time_base * video.average_rate)
+
+        for _ in range(self.frame_idx, frame_idx):
+            self.current_frame = next(self.container.decode(video))
+
+        self.frame_idx = frame_idx
+
+        return self.current_frame
 
 class VideoStream(VideoSampler):
     def __init__(self, name, base_name, recording):
@@ -71,7 +83,7 @@ class VideoStream(VideoSampler):
 
         log.info(f"NeonRecording: Loading video: {self._base_name}.")
 
-        self._video_ts_pairs = []
+        self.video_parts = []
 
         video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
@@ -79,7 +91,7 @@ class VideoStream(VideoSampler):
         for (video_file, _) in video_files:
             container = plv.open(video_file)
             ts = self._ts[container_start_idx:container_start_idx+container.streams.video[0].frames]
-            self._video_ts_pairs.append((container, ts))
+            self.video_parts.append(VideoStreamPart(container, ts))
 
             container_start_idx += container.streams.video[0].frames
 
