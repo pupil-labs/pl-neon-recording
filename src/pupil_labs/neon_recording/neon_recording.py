@@ -4,9 +4,9 @@ import pathlib
 from . import structlog
 from .calib import Calibration, parse_calib_bin
 from .stream.gaze_stream import GazeStream
+from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
 from .stream.av_stream.video_stream import VideoStream
-from .utils import load_and_convert_tstamps
 
 log = structlog.get_logger(__name__)
 
@@ -62,16 +62,8 @@ class NeonRecording:
             "imu": IMUStream("imu", self),
             "eye": VideoStream("eye", "Neon Sensor Module v1", self),
             "scene": VideoStream("scene", "Neon Scene Camera v1", self),
+            "events": EventStream("events", self),
         }
-
-        # todo: events should be a stream
-        log.info("NeonRecording: Loading events")
-        labels = (self._rec_dir / "event.txt").read_text().strip().split("\n")
-        events_ts = load_and_convert_tstamps(self._rec_dir / "event.time")
-        self.events = [evt for evt in zip(labels, events_ts)]
-        self.events.reverse()
-        self._unique_events = dict(self.events)
-        self.events.reverse()
 
         log.info("NeonRecording: Finished loading recording.")
 
@@ -94,6 +86,10 @@ class NeonRecording:
     @property
     def eye(self) -> VideoStream:
         return self.streams["eye"]
+
+    @property
+    def events(self) -> EventStream:
+        return self.streams["events"]
 
 
 

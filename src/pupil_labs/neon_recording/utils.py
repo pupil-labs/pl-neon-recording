@@ -19,7 +19,11 @@ def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
         data_buffer += open(data_file, "rb").read()
         ts_buffer += open(time_file, "rb").read()
 
-    data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
+    if dtype == "str":
+        data = data_buffer.decode().rstrip("\n").split("\n")
+    else:
+        data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
+
     timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.float64) * 1e-9
 
     return data, timestamps
