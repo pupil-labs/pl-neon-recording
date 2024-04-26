@@ -16,6 +16,11 @@ class VideoSampler:
         self.video_stream = video_stream
         self._ts = sample_timestamps
 
+        self.frame_generators = {
+            vp: vp.container.decode(vp.container.streams.video[0])
+            for vp in self.video_stream.video_parts
+        }
+
     def sample(self, tstamps, method=InterpolationMethod.NEAREST):
         return self._sample_nearest(tstamps)
 
@@ -31,7 +36,7 @@ class VideoSampler:
         for frame_idx in closest_idxs:
                 for video_part in self.video_stream.video_parts:
                     if frame_idx < len(video_part.timestamps):
-                        frame = video_part.goto_index(frame_idx)
+                        frame = video_part.goto_index(frame_idx, self.frame_generators[video_part])
                         actual_ts = video_part.timestamps[frame_idx]
 
                         setattr(frame, "ts", actual_ts)
@@ -42,7 +47,7 @@ class VideoSampler:
 
     @property
     def data(self):
-        pass
+        return self.video_stream
 
     @property
     def ts(self):
@@ -56,19 +61,18 @@ class VideoStreamPart:
         self.container = container
         self.timestamps = timestamps
         self.current_frame = None
-        self.frame_generator = self.container.decode(self.container.streams.video[0])
 
-    def goto_index(self, frame_idx):
+    def goto_index(self, frame_idx, frame_generator):
         video = self.container.streams.video[0]
 
         seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
             target_rel_timestamp = int(frame_idx/video.average_rate)
             self.container.seek(int(target_rel_timestamp*1e6), backward=True)
-            self.current_frame = next(self.frame_generator)
+            self.current_frame = next(frame_generator)
 
         for _ in range(self.frame_idx, frame_idx):
-            self.current_frame = next(self.frame_generator)
+            self.current_frame = next(frame_generator)
 
         return self.current_frame
 
