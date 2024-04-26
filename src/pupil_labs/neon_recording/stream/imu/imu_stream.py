@@ -11,6 +11,7 @@ log = structlog.get_logger(__name__)
 
 class IMUStream(Stream):
     DTYPE_RAW = np.dtype([
+        ("ts", "<f8"),
         ("gyro_x", "<f4"),
         ("gyro_y", "<f4"),
         ("gyro_z", "<f4"),
@@ -24,8 +25,6 @@ class IMUStream(Stream):
         ("quaternion_x", "<f4"),
         ("quaternion_y", "<f4"),
         ("quaternion_z", "<f4"),
-        ("tsNs", "uint64"),
-        ("ts", "<f8"),
     ])
 
     def __init__(self, name, recording):
@@ -50,15 +49,12 @@ class IMUStream(Stream):
                     )
                     euler = rotation.as_euler(seq="XZY", degrees=True)
 
-                    ts = packet.tsNs
-
                     imu_data.append((
+                        packet.tsNs*1e-9,
                         packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
                         packet.accelData.x, packet.accelData.y, packet.accelData.z,
                         *euler,
                         packet.rotVecData.w, packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z,
-                        packet.tsNs,
-                        ts,
                     ))
 
         data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
