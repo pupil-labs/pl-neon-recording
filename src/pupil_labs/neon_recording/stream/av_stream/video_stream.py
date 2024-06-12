@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 
 from ... import structlog
@@ -73,6 +71,7 @@ class VideoSampler:
     def to_numpy(self):
         return np.array([frame.rgb for frame in self])
 
+
 class VideoStreamPart:
     def __init__(self, container, timestamps):
         self.container = container
@@ -84,8 +83,8 @@ class VideoStreamPart:
 
         seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
-            target_rel_timestamp = int(frame_idx/video.average_rate)
-            self.container.seek(int(target_rel_timestamp*1e6), backward=True)
+            target_rel_timestamp = int(frame_idx / video.average_rate)
+            self.container.seek(int(target_rel_timestamp * 1e6), backward=True)
             self.current_frame = next(frame_generator)
 
         for _ in range(self.frame_idx, frame_idx):
@@ -100,6 +99,7 @@ class VideoStreamPart:
 
         video = self.container.streams.video[0]
         return int(self.current_frame.pts * video.time_base * video.average_rate)
+
 
 class VideoStream(VideoSampler):
     def __init__(self, name, base_name, recording):
@@ -116,7 +116,7 @@ class VideoStream(VideoSampler):
         container_start_idx = 0
         for (video_file, _) in video_files:
             container = av.open(video_file)
-            ts = self._ts[container_start_idx:container_start_idx+container.streams.video[0].frames]
+            ts = self._ts[container_start_idx: container_start_idx + container.streams.video[0].frames]
             self.video_parts.append(VideoStreamPart(container, ts))
 
             container_start_idx += container.streams.video[0].frames

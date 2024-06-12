@@ -7,6 +7,7 @@ from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame
 
 from tqdm import tqdm
 
+
 def make_overlaid_video(recording_dir, output_video_path, fps=30):
     recording = nr.load(recording_dir)
 
@@ -17,7 +18,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         (recording.scene.width, recording.scene.height)
     )
 
-    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1/fps)
+    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1 / fps)
 
     scene_datas = recording.scene.sample(output_timestamps)
     combined_data = zip(
@@ -29,12 +30,12 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     frame_idx = 0
     for ts, scene_frame, gaze_datum in tqdm(combined_data, total=len(output_timestamps)):
         frame_idx += 1
-        if abs(scene_frame.ts - ts) < 2/fps:
+        if abs(scene_frame.ts - ts) < 2 / fps:
             frame_pixels = scene_frame.bgr
         else:
             frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
 
-        if abs(gaze_datum.ts - ts) < 2/fps:
+        if abs(gaze_datum.ts - ts) < 2 / fps:
             frame_pixels = cv2.circle(
                 frame_pixels,
                 (int(gaze_datum.x), int(gaze_datum.y)),

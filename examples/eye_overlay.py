@@ -7,6 +7,7 @@ from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame
 
 from tqdm import tqdm
 
+
 def overlay_image(img, img_overlay, x, y):
     """Overlay `img_overlay` onto `img` at (x, y)."""
 
@@ -25,6 +26,7 @@ def overlay_image(img, img_overlay, x, y):
     img_overlay_crop = img_overlay[y1o:y2o, x1o:x2o]
     img_crop[:] = img_overlay_crop
 
+
 def make_overlaid_video(recording_dir, output_video_path, fps=30):
     recording = nr.load(recording_dir)
 
@@ -35,7 +37,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         (recording.scene.width, recording.scene.height)
     )
 
-    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1/fps)
+    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1 / fps)
 
     combined_data = zip(
         output_timestamps,
@@ -46,12 +48,12 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     frame_idx = 0
     for ts, scene_frame, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
         frame_idx += 1
-        if abs(scene_frame.ts - ts) < 2/fps:
+        if abs(scene_frame.ts - ts) < 2 / fps:
             frame_pixels = scene_frame.bgr
         else:
             frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
 
-        if abs(eye_frame.ts - ts) < 2/fps:
+        if abs(eye_frame.ts - ts) < 2 / fps:
             eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
         else:
             eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr
