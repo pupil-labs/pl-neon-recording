@@ -6,9 +6,26 @@ from ... import structlog
 from ..stream import InterpolationMethod
 from ...utils import find_sorted_multipart_files, load_multipart_timestamps
 
-import pupil_labs.video as plv
+import av
 
 log = structlog.get_logger(__name__)
+
+
+class TimestampedFrame:
+    def __init__(self, frame, ts):
+        self._frame = frame
+        self.ts = ts
+
+    def __getattr__(self, name):
+        return getattr(self._frame, name)
+
+    @property
+    def bgr(self):
+        return self.to_ndarray(format='bgr24')
+
+    @property
+    def gray(self):
+        return self.to_ndarray(format='gray')
 
 
 class VideoSampler:
@@ -34,16 +51,16 @@ class VideoSampler:
     def __iter__(self):
         closest_idxs = np.searchsorted(self.video_stream.ts, self.ts, side="left")
         for frame_idx in closest_idxs:
-                for video_part in self.video_stream.video_parts:
-                    if frame_idx < len(video_part.timestamps):
-                        frame = video_part.goto_index(frame_idx, self.frame_generators[video_part])
-                        actual_ts = video_part.timestamps[frame_idx]
+            for video_part in self.video_stream.video_parts:
+                if frame_idx < len(video_part.timestamps):
+                    frame = video_part.goto_index(frame_idx, self.frame_generators[video_part])
+                    actual_ts = video_part.timestamps[frame_idx]
 
-                        setattr(frame, "ts", actual_ts)
-                        yield frame
-                        break
-                    else:
-                        frame_idx -= len(video_part.timestamps)
+                    ts_frame = TimestampedFrame(frame, actual_ts)
+                    yield ts_frame
+                    break
+                else:
+                    frame_idx -= len(video_part.timestamps)
 
     @property
     def data(self):
@@ -98,7 +115,7 @@ class VideoStream(VideoSampler):
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
         container_start_idx = 0
         for (video_file, _) in video_files:
-            container = plv.open(video_file)
+            container = av.open(video_file)
             ts = self._ts[container_start_idx:container_start_idx+container.streams.video[0].frames]
             self.video_parts.append(VideoStreamPart(container, ts))
 
