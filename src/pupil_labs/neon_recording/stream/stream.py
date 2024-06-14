@@ -31,7 +31,7 @@ class SimpleDataSampler:
 
     def _sample_nearest(self, ts):
         last_idx = len(self._data) - 1
-        idxs = np.searchsorted(self.ts, ts, side="right")
+        idxs = np.searchsorted(self.ts, ts)
         idxs[idxs > last_idx] = last_idx
 
         return SimpleDataSampler(self._data[idxs])
