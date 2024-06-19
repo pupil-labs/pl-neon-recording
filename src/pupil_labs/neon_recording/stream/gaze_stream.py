@@ -8,7 +8,7 @@ log = structlog.get_logger(__name__)
 
 
 class GazeStream(Stream):
-    def __init__(self, name, recording):
+    def __init__(self, recording):
         log.info("NeonRecording: Loading gaze data")
 
         gaze_file_pairs = []
@@ -30,4 +30,4 @@ class GazeStream(Stream):
             names=["ts", "x", "y"]
         )
 
-        super().__init__(name, recording, data)
+        super().__init__("gaze", recording, data)

@@ -6,7 +6,7 @@ from .calib import Calibration, parse_calib_bin
 from .stream.gaze_stream import GazeStream
 from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
-from .stream.av_stream.video_stream import VideoStream
+from .stream.av_stream.video_stream import EyeVideoStream, SceneVideoStream
 
 log = structlog.get_logger(__name__)
 
@@ -58,10 +58,10 @@ class NeonRecording:
 
         log.info("NeonRecording: Loading data streams")
         self.streams = {
-            "gaze": GazeStream("gaze", self),
-            "imu": IMUStream("imu", self),
-            "eye": VideoStream("eye", "Neon Sensor Module v1", self),
-            "scene": VideoStream("scene", "Neon Scene Camera v1", self),
+            "gaze": GazeStream(self),
+            "imu": IMUStream(self),
+            "eye": EyeVideoStream(self),
+            "scene": SceneVideoStream(self),
             "events": EventStream("events", self),
         }
 
@@ -80,11 +80,11 @@ class NeonRecording:
         return self.streams["imu"]
 
     @property
-    def scene(self) -> VideoStream:
+    def scene(self) -> SceneVideoStream:
         return self.streams["scene"]
 
     @property
-    def eye(self) -> VideoStream:
+    def eye(self) -> EyeVideoStream:
         return self.streams["eye"]
 
     @property

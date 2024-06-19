@@ -27,7 +27,7 @@ class IMUStream(Stream):
         ("quaternion_z", "<f4"),
     ])
 
-    def __init__(self, name, recording):
+    def __init__(self, recording):
         log.info("NeonRecording: Loading IMU data")
 
         imu_files = find_sorted_multipart_files(recording._rec_dir, "extimu")
@@ -58,14 +58,14 @@ class IMUStream(Stream):
                     ))
 
         data = np.array(imu_data, dtype=IMUStream.DTYPE_RAW).view(np.recarray)
-        super().__init__(name, recording, data)
+        super().__init__("imu", recording, data)
 
 
 def parse_neon_imu_raw_packets(buffer):
     index = 0
     packet_sizes = []
     while True:
-        nums = np.frombuffer(buffer[index : index + 2], np.uint16)
+        nums = np.frombuffer(buffer[index: index + 2], np.uint16)
 
         if nums.size <= 0:
             break
@@ -73,7 +73,7 @@ def parse_neon_imu_raw_packets(buffer):
         index += 2
         packet_size = nums[0]
         packet_sizes.append(packet_size)
-        packet_bytes = buffer[index : index + packet_size]
+        packet_bytes = buffer[index: index + packet_size]
         index += packet_size
         packet = imu_pb2.ImuPacket()
         packet.ParseFromString(packet_bytes)
