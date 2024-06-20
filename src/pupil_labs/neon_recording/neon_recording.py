@@ -64,7 +64,7 @@ class NeonRecording:
             "eye": EyeVideoStream(self),
             "eye_state": EyeStateStream(self),
             "scene": SceneVideoStream(self),
-            "events": EventStream("events", self),
+            "events": EventStream(self),
         }
 
         log.info("NeonRecording: Finished loading recording.")

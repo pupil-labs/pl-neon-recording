@@ -8,7 +8,7 @@ log = structlog.get_logger(__name__)
 
 
 class EventStream(Stream):
-    def __init__(self, name, recording):
+    def __init__(self, recording):
         log.info("NeonRecording: Loading event data")
 
         events_file = recording._rec_dir / "event.txt"
@@ -21,7 +21,7 @@ class EventStream(Stream):
             names=["ts", "event"]
         )
 
-        super().__init__(name, recording, data)
+        super().__init__("event", recording, data)
 
     def unique(self):
         return dict(zip(self.data.event, self.data.ts))
