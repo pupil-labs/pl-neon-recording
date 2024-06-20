@@ -58,14 +58,7 @@ class NeonRecording:
         )
 
         log.info("NeonRecording: Loading data streams")
-        self.streams = {
-            "gaze": GazeStream(self),
-            "imu": IMUStream(self),
-            "eye": EyeVideoStream(self),
-            "eye_state": EyeStateStream(self),
-            "scene": SceneVideoStream(self),
-            "events": EventStream(self),
-        }
+        self.streams = {}
 
         log.info("NeonRecording: Finished loading recording.")
 
@@ -75,26 +68,44 @@ class NeonRecording:
 
     @property
     def gaze(self) -> GazeStream:
+        if "gaze" not in self.streams:
+            self.streams["gaze"] = GazeStream(self)
+
         return self.streams["gaze"]
 
     @property
     def imu(self) -> IMUStream:
+        if "imu" not in self.streams:
+            self.streams["imu"] = IMUStream(self)
+
         return self.streams["imu"]
 
     @property
     def eye_state(self) -> EyeStateStream:
+        if "eye_state" not in self.streams:
+            self.streams["eye_state"] = EyeStateStream(self)
+
         return self.streams["eye_state"]
 
     @property
     def scene(self) -> SceneVideoStream:
+        if "scene" not in self.streams:
+            self.streams["scene"] = SceneVideoStream(self)
+
         return self.streams["scene"]
 
     @property
     def eye(self) -> EyeVideoStream:
+        if "eye" not in self.streams:
+            self.stream["eye"] = EyeVideoStream(self)
+
         return self.streams["eye"]
 
     @property
     def events(self) -> EventStream:
+        if "event" not in self.streams:
+            self.streams["event"] = EventStream(self)
+
         return self.streams["events"]
 
 
