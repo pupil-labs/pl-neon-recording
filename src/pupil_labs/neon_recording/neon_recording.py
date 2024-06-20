@@ -14,7 +14,7 @@ log = structlog.get_logger(__name__)
 
 class NeonRecording:
     def __init__(self, rec_dir_in: pathlib.Path | str):
-        self._rec_dir = pathlib.Path(rec_dir_in)
+        self._rec_dir = pathlib.Path(rec_dir_in).resolve()
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
             raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
 

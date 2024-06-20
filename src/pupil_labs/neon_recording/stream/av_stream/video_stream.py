@@ -115,7 +115,7 @@ class VideoStream(VideoSampler):
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
         container_start_idx = 0
         for (video_file, _) in video_files:
-            container = av.open(video_file)
+            container = av.open(str(video_file))
             ts = self._ts[container_start_idx: container_start_idx + container.streams.video[0].frames]
             self.video_parts.append(VideoStreamPart(container, ts))
 
