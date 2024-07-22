@@ -97,7 +97,7 @@ class NeonRecording:
     @property
     def eye(self) -> EyeVideoStream:
         if "eye" not in self.streams:
-            self.stream["eye"] = EyeVideoStream(self)
+            self.streams["eye"] = EyeVideoStream(self)
 
         return self.streams["eye"]
 
