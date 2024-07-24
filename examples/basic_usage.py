@@ -22,13 +22,6 @@ print(f"\tDevice serial  : {recording.serial}")
 print("")
 
 
-# get available data streams
-print("Available data streams:")
-for stream_name, stream in recording.streams.items():
-    print(f"\t{stream_name}")
-print("")
-
-
 # read 10 gaze samples
 print("First 10 gaze samples:")
 timestamps = recording.gaze.ts[:10]
