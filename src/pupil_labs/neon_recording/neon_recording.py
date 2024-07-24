@@ -8,6 +8,7 @@ from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.av_stream.video_stream import EyeVideoStream, SceneVideoStream
+from .stream.av_stream.audio_stream import AudioStream
 
 log = structlog.get_logger(__name__)
 
@@ -107,6 +108,13 @@ class NeonRecording:
             self.streams["event"] = EventStream(self)
 
         return self.streams["events"]
+
+    @property
+    def audio(self) -> AudioStream:
+        if "scene" not in self.streams:
+            self.streams["audio"] = AudioStream(self)
+
+        return self.streams["audio"]
 
 
 
