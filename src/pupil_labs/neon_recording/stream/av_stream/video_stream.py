@@ -1,13 +1,13 @@
 import numpy as np
 
 from ... import structlog
-from .base_stream import BaseStream
+from .base_av_stream import BaseAVStream
 
 
 log = structlog.get_logger(__name__)
 
 
-class VideoStream(BaseStream):
+class VideoStream(BaseAVStream):
     def __init__(self, name, base_name, recording):
         super().__init__(name, base_name, recording, "video")
 

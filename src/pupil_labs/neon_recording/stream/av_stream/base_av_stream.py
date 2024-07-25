@@ -108,7 +108,7 @@ class VideoStreamPart:
         return int(self.current_frame.pts * video.time_base * video.average_rate)
 
 
-class BaseStream(StreamSampler):
+class BaseAVStream(StreamSampler):
     def __init__(self, name, base_name, recording, audio_or_video):
         self.name = name
         self._base_name = base_name
@@ -119,9 +119,6 @@ class BaseStream(StreamSampler):
         self.video_parts = []
 
         video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
-        print("Found videos")
-        for v in video_files:
-            print(f"\t{v}")
 
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
         container_start_idx = 0
