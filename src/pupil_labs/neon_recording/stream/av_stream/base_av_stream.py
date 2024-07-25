@@ -63,7 +63,7 @@ class StreamSampler:
 
     @property
     def data(self):
-        return self.video_stream
+        return self.raw_stream
 
     @property
     def ts(self):
