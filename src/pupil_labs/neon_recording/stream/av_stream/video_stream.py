@@ -16,16 +16,6 @@ class VideoStream(BaseAVStream):
         self.height = container.streams.video[0].height
 
 
-class EyeVideoStream(VideoStream):
-    def __init__(self, recording):
-        super().__init__("eye", "Neon Sensor Module v1", recording)
-
-
-class SceneVideoStream(VideoStream):
-    def __init__(self, recording):
-        super().__init__("scene", "Neon Scene Camera v1", recording)
-
-
 class GrayFrame():
     def __init__(self, width, height):
         self.width = width

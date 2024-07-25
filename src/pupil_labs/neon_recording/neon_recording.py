@@ -7,7 +7,7 @@ from .stream.gaze_stream import GazeStream
 from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
 from .stream.eye_state_stream import EyeStateStream
-from .stream.av_stream.video_stream import EyeVideoStream, SceneVideoStream
+from .stream.av_stream.video_stream import VideoStream
 from .stream.av_stream.audio_stream import AudioStream
 
 log = structlog.get_logger(__name__)
@@ -91,14 +91,14 @@ class NeonRecording:
     @property
     def scene(self) -> SceneVideoStream:
         if "scene" not in self.streams:
-            self.streams["scene"] = SceneVideoStream(self)
+            self.streams["scene"] = VideoStream("scene", "Neon Scene Camera v1", self)
 
         return self.streams["scene"]
 
     @property
-    def eye(self) -> EyeVideoStream:
+    def eye(self) -> VideoStream:
         if "eye" not in self.streams:
-            self.streams["eye"] = EyeVideoStream(self)
+            self.streams["eye"] = VideoStream("eye", "Neon Sensor Module v1", self)
 
         return self.streams["eye"]
 
