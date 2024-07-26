@@ -11,7 +11,7 @@ log = structlog.get_logger(__name__)
 
 class TimestampedFrame:
     """
-    Wraps either a `VideoFrame <https://pyav.basswood-io.com/docs/stable/api/video.html#av.video.frame.VideoFrame>`_ or an `AudioFrame <https://pyav.basswood-io.com/docs/stable/api/audio.html#av.audio.frame.AudioFrame>`_
+    Wraps either a :class:`av.video.frame.VideoFrame` or an :class:`av.audio.frame.AudioFrame`
     """
 
     def __init__(self, frame, ts):

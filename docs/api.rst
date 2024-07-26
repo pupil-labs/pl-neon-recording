@@ -8,6 +8,11 @@
     :undoc-members:
     :show-inheritance:
 
+.. autoclass:: pupil_labs.neon_recording.calib.Calibration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: pupil_labs.neon_recording.stream.stream
     :members:
     :undoc-members:

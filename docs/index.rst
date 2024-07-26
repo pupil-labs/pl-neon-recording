@@ -1,5 +1,5 @@
-Welcome to the Neon Recording API documentation!
-================================================
+Neon Recording API Documentation
+================================
 
 .. toctree::
    :maxdepth: 1

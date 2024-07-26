@@ -55,19 +55,19 @@ interpolated_gazes = recording.gaze.sample(recording.scene.ts, InterpolationMeth
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)
 for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
-    if matched_gaze:
-        frame = cv2.circle(
-            scene_frame.bgr,
-            (int(matched_gaze.x), int(matched_gaze.y)),
-            50, (0, 0, 255), 10
-        )
+    # draw the nearest-time gaze sample in red
+    frame = cv2.circle(
+        scene_frame.bgr,
+        (int(matched_gaze.x), int(matched_gaze.y)),
+        50, (0, 0, 255), 10
+    )
 
-    if interpolated_gaze:
-        frame = cv2.circle(
-            frame,
-            (int(interpolated_gaze.x), int(interpolated_gaze.y)),
-            50, (255, 0, 0), 10
-        )
+    # draw the interpolated gaze sample in blue
+    frame = cv2.circle(
+        frame,
+        (int(interpolated_gaze.x), int(interpolated_gaze.y)),
+        50, (255, 0, 0), 10
+    )
 
     cv2.imshow('Gaze sample comparison', frame)
     cv2.pollKey()

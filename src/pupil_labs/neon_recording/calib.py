@@ -15,7 +15,7 @@ class Calibration:
     extrinsics_affine_matrix: np.ndarray
 
 
-def parse_calib_bin(rec_dir: pathlib.Path):
+def _parse_calib_bin(rec_dir: pathlib.Path):
     log.debug("NeonRecording: Loading calibration.bin data")
 
     calib_raw_data: bytes = b""

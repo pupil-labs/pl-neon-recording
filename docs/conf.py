@@ -32,4 +32,6 @@ nitpicky = True
 extensions += ["sphinx.ext.intersphinx"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "av": ("https://pyav.org/docs/stable/", None),
 }
