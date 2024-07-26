@@ -1,17 +1,11 @@
-Welcome to the |Neon Recording API| documentation!
-===================================
+Welcome to the Neon Recording API documentation!
+================================================
 
 .. toctree::
    :maxdepth: 1
 
+   api
    history
-
-
-.. automodule:: neon_recording
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Indices and tables
 ==================

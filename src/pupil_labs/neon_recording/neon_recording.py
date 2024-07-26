@@ -15,23 +15,23 @@ log = structlog.get_logger(__name__)
 
 class NeonRecording:
     """
-    Class to handle the Neon Recording data.
+    Class to handle the Neon Recording data
 
     Attributes:
-        info (dict): Information loaded from info.json
-        start_ts_ns (int): Start timestamp in nanoseconds
-        start_ts (float): Start timestamp in seconds
-        wearer (dict): Wearer information containing uuid and name
-        serial (int): Serial number of the device
-        scene_camera_calibration (Calibration): Scene camera calibration data
-        right_eye_camera_calibration (Calibration): Right eye camera calibration data
-        left_eye_camera_calibration (Calibration): Left eye camera calibration data
-        streams (dict): data streams of the recording
+        * `info` (dict): Information loaded from info.json
+        * `start_ts_ns` (int): Start timestamp in nanoseconds
+        * `start_ts` (float): Start timestamp in seconds
+        * `wearer` (dict): Wearer information containing uuid and name
+        * `serial` (int): Serial number of the device
+        * `scene_camera_calibration` (Calibration): Scene camera calibration data
+        * `right_eye_camera_calibration` (Calibration): Right eye camera calibration data
+        * `left_eye_camera_calibration` (Calibration): Left eye camera calibration data
+        * `streams` (dict): data streams of the recording
     """
 
     def __init__(self, rec_dir_in: pathlib.Path | str):
         """
-        Initialize the NeonRecording object.
+        Initialize the NeonRecording object
 
         Args:
             rec_dir_in (pathlib.Path | str): Path to the recording directory.
@@ -90,15 +90,13 @@ class NeonRecording:
     @property
     def gaze(self) -> GazeStream:
         """
-        2D gaze data in scene-camera space.
+        2D gaze data in scene-camera space
 
         Returns:
             GazeStream: Each record contains
-                ts:
-                    The moment these data were recorded
+                ts: The moment these data were recorded
                 x:
-                y:
-                    The position of the gaze estimate
+                y: The position of the gaze estimate
         """
         if "gaze" not in self.streams:
             self.streams["gaze"] = GazeStream(self)
@@ -111,26 +109,7 @@ class NeonRecording:
         Motion and orientation data
 
         Returns:
-            IMUStream: Each record contains
-                ts:
-                    The moment these data were recorded
-                gyro_x:
-                gyro_y:
-                gyro_z:
-                    Gyroscope data
-                accel_x:
-                accel_y:
-                accel_z:
-                    Acceleration data
-                pitch:
-                yaw:
-                roll:
-                    Orientation in Euler angles (degrees)
-                quaternion_w:
-                quaternion_x:
-                quaternion_y:
-                quaternion_z:
-                    Orientation as a quaternion
+            IMUStream:
         """
         if "imu" not in self.streams:
             self.streams["imu"] = IMUStream(self)
@@ -143,26 +122,7 @@ class NeonRecording:
         Eye state data
 
         Returns:
-            EyeStateStream: Each record contains
-                ts:
-                    The moment these data were recorded
-                pupil_diameter_left:
-                pupil_diameter_right:
-                    The diameter of each pupil in mm
-                eyeball_center_left_x:
-                eyeball_center_left_y:
-                eyeball_center_left_z:
-                eyeball_center_right_x:
-                eyeball_center_right_y:
-                eyeball_center_right_z:
-                    The position of each eyeball relative to the scene camera, in mm
-                optical_axis_left_x:
-                optical_axis_left_y:
-                optical_axis_left_z:
-                optical_axis_right_x:
-                optical_axis_right_y:
-                optical_axis_right_z:
-                    A vector in the forward direction of each eye's optical axis
+            EyeStateStream
         """
         if "eye_state" not in self.streams:
             self.streams["eye_state"] = EyeStateStream(self)
@@ -175,7 +135,7 @@ class NeonRecording:
         Frames of video from the scene camera
 
         Returns:
-            VideoStream: Each record contains a TimestampedFrame object
+            VideoStream
         """
         if "scene" not in self.streams:
             self.streams["scene"] = VideoStream("scene", "Neon Scene Camera v1", self)
@@ -188,7 +148,7 @@ class NeonRecording:
         Frames of video from the eye cameras
 
         Returns:
-            VideoStream: Each record contains a TimestampedFrame object
+            VideoStream
         """
         if "eye" not in self.streams:
             self.streams["eye"] = VideoStream("eye", "Neon Sensor Module v1", self)
@@ -201,11 +161,7 @@ class NeonRecording:
         Event annotations
 
         Returns:
-            EventStream: Each record contains
-                ts:
-                    The moment these data were recorded
-                event:
-                    The name of the event
+            EventStream
         """
         if "event" not in self.streams:
             self.streams["event"] = EventStream(self)
@@ -218,7 +174,7 @@ class NeonRecording:
         Audio from the scene video
 
         Returns:
-            AudioStream: Each record contains a TimestampedFrame object
+            AudioStream
         """
         if "scene" not in self.streams:
             self.streams["audio"] = AudioStream(self)
@@ -227,4 +183,7 @@ class NeonRecording:
 
 
 def load(rec_dir_in: pathlib.Path | str) -> NeonRecording:
+    """
+    Load a :class:`.NeonRecording`
+    """
     return NeonRecording(rec_dir_in)

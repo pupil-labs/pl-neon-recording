@@ -8,6 +8,12 @@ log = structlog.get_logger(__name__)
 
 
 class VideoStream(BaseAVStream):
+    """
+    Video frames from a camera
+
+    Each item is a :class:`.TimestampedFrame`
+    """
+
     def __init__(self, name, base_name, recording):
         super().__init__(name, base_name, recording, "video")
 
