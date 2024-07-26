@@ -33,7 +33,7 @@ class EyeStateStream(Stream):
     """
 
     def __init__(self, recording):
-        log.info("NeonRecording: Loading eye state data")
+        log.debug("NeonRecording: Loading eye state data")
 
         eye_state_files = find_sorted_multipart_files(recording._rec_dir, "eye_state")
         eye_state_data, time_data = load_multipart_data_time_pairs(eye_state_files, "<f4", 2)

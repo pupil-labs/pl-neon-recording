@@ -17,7 +17,7 @@ class EventStream(Stream):
     """
 
     def __init__(self, recording):
-        log.info("NeonRecording: Loading event data")
+        log.debug("NeonRecording: Loading event data")
 
         events_file = recording._rec_dir / "event.txt"
         time_file = events_file.with_suffix(".time")

@@ -34,6 +34,4 @@ structlog.configure(
     ],
 )
 
-log.info("NeonRecording: package loaded.")
-
 __all__ = ["__version__", "load"]

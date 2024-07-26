@@ -45,16 +45,16 @@ class NeonRecording:
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
             raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
 
-        log.info(f"NeonRecording: Loading recording from {rec_dir_in}")
+        log.debug(f"NeonRecording: Loading recording from {rec_dir_in}")
 
-        log.info("NeonRecording: Loading recording info")
+        log.debug("NeonRecording: Loading recording info")
         with open(self._rec_dir / "info.json") as f:
             self.info = json.load(f)
 
         self.start_ts_ns = self.info["start_time"]
         self.start_ts = self.start_ts_ns * 1e-9
 
-        log.info("NeonRecording: Loading wearer")
+        log.debug("NeonRecording: Loading wearer")
         self.wearer = {"uuid": "", "name": ""}
         with open(self._rec_dir / "wearer.json") as f:
             wearer_data = json.load(f)
@@ -62,7 +62,7 @@ class NeonRecording:
         self.wearer["uuid"] = wearer_data["uuid"]
         self.wearer["name"] = wearer_data["name"]
 
-        log.info("NeonRecording: Loading calibration data")
+        log.debug("NeonRecording: Loading calibration data")
         self._calib = _parse_calib_bin(self._rec_dir)
 
         self.calib_version = str(self._calib["version"])
@@ -83,10 +83,7 @@ class NeonRecording:
             self._calib["left_extrinsics_affine_matrix"],
         )
 
-        log.info("NeonRecording: Loading data streams")
         self.streams = {}
-
-        log.info("NeonRecording: Finished loading recording.")
 
     @property
     def gaze(self) -> GazeStream:
