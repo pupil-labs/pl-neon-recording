@@ -1,5 +1,6 @@
 import json
 import pathlib
+from typing import Union
 
 from . import structlog
 from .calib import Calibration, _parse_calib_bin
@@ -29,12 +30,12 @@ class NeonRecording:
         * `streams` (dict): data streams of the recording
     """
 
-    def __init__(self, rec_dir_in: pathlib.Path | str):
+    def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
         """
         Initialize the NeonRecording object
 
         Args:
-            rec_dir_in (pathlib.Path | str): Path to the recording directory.
+            rec_dir_in: Path to the recording directory.
 
         Raises:
             FileNotFoundError: If the directory does not exist or is not valid.
@@ -182,7 +183,7 @@ class NeonRecording:
         return self.streams["audio"]
 
 
-def load(rec_dir_in: pathlib.Path | str) -> NeonRecording:
+def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:
     """
     Load a :class:`.NeonRecording`
     """
