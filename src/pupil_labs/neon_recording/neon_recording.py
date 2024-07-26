@@ -2,7 +2,7 @@ import json
 import pathlib
 
 from . import structlog
-from .calib import Calibration, parse_calib_bin
+from .calib import Calibration, _parse_calib_bin
 from .stream.gaze_stream import GazeStream
 from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
@@ -62,7 +62,7 @@ class NeonRecording:
         self.wearer["name"] = wearer_data["name"]
 
         log.info("NeonRecording: Loading calibration data")
-        self._calib = parse_calib_bin(self._rec_dir)
+        self._calib = _parse_calib_bin(self._rec_dir)
 
         self.calib_version = str(self._calib["version"])
         self.serial = int(self._calib["serial"][0])

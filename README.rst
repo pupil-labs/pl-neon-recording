@@ -25,8 +25,8 @@
 Neon Recording API
 *******************************
 
-Check out the Examples for ways to use this library, but note that the examples have additional dependencies.
+Check out the `documentation <https://pl-neon-recording.readthedocs.io/en/latest/>_` or examples for ways to use this library, but note that the examples have additional dependencies.
 
 .. code-block:: bash
 
-   pip install "pl-neon-recording[examples] @ git+https://github.com/pupil-labs/pl-neon-recording.git"
+   pip install pl-neon-recording[examples]

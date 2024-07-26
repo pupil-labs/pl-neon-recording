@@ -49,11 +49,13 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     for ts, scene_frame, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
         frame_idx += 1
         if abs(scene_frame.ts - ts) < 2 / fps:
+            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
             frame_pixels = scene_frame.bgr
         else:
             frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
 
         if abs(eye_frame.ts - ts) < 2 / fps:
+            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
             eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
         else:
             eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr
