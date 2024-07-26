@@ -125,7 +125,7 @@ class BaseAVStream(StreamSampler):
         self._base_name = base_name
         self.recording = recording
 
-        log.info(f"NeonRecording: Loading video: {self._base_name}.")
+        log.debug(f"NeonRecording: Loading video: {self._base_name}.")
 
         self.video_parts = []
 

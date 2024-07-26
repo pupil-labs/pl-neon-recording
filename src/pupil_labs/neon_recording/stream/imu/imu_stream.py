@@ -51,7 +51,7 @@ class IMUStream(Stream):
     ])
 
     def __init__(self, recording):
-        log.info("NeonRecording: Loading IMU data")
+        log.debug("NeonRecording: Loading IMU data")
 
         imu_files = find_sorted_multipart_files(recording._rec_dir, "extimu")
         imu_data = []
