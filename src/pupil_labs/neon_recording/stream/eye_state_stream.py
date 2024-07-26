@@ -8,6 +8,30 @@ log = structlog.get_logger(__name__)
 
 
 class EyeStateStream(Stream):
+    """
+    Eye state data
+
+    Each record contains:
+        * `ts`: The moment these data were recorded
+        * The diameter of each pupil in mm
+            * `pupil_diameter_left`
+            * `pupil_diameter_right`
+        * The position of each eyeball relative to the scene camera, in mm
+            * `eyeball_center_left_x`
+            * `eyeball_center_left_y`
+            * `eyeball_center_left_z`
+            * `eyeball_center_right_x`
+            * `eyeball_center_right_y`
+            * `eyeball_center_right_z`
+        * A vector in the forward direction of each eye's optical axis
+            * `optical_axis_left_x`
+            * `optical_axis_left_y`
+            * `optical_axis_left_z`
+            * `optical_axis_right_x`
+            * `optical_axis_right_y`
+            * `optical_axis_right_z`
+    """
+
     def __init__(self, recording):
         log.info("NeonRecording: Loading eye state data")
 

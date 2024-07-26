@@ -10,12 +10,20 @@ log = structlog.get_logger(__name__)
 
 
 class TimestampedFrame:
+    """
+    Wraps either a `VideoFrame <https://pyav.basswood-io.com/docs/stable/api/video.html#av.video.frame.VideoFrame>`_ or an `AudioFrame <https://pyav.basswood-io.com/docs/stable/api/audio.html#av.audio.frame.AudioFrame>`_
+    """
+
     def __init__(self, frame, ts):
         self._frame = frame
-        self.ts = ts
+        self._ts = ts
 
     def __getattr__(self, name):
         return getattr(self._frame, name)
+
+    @property
+    def ts(self):
+        return self._ts
 
     @property
     def bgr(self):
@@ -27,6 +35,9 @@ class TimestampedFrame:
 
 
 class StreamSampler:
+    """
+    """
+
     def __init__(self, raw_stream, sample_timestamps, audio_or_video):
         self.raw_stream = raw_stream
         self._ts = sample_timestamps

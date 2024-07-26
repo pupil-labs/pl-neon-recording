@@ -14,7 +14,7 @@ class InterpolationMethod(Enum):
     LINEAR = "linear"
 
 
-def record_truthiness(self):
+def _record_truthiness(self):
     for field in self.dtype.names:
         if np.isnan(self[field]):
             return False
@@ -22,7 +22,7 @@ def record_truthiness(self):
     return True
 
 
-np.record.__bool__ = record_truthiness
+np.record.__bool__ = _record_truthiness
 
 
 class SimpleDataSampler:

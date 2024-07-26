@@ -8,6 +8,14 @@ log = structlog.get_logger(__name__)
 
 
 class EventStream(Stream):
+    """
+    Event annotations
+
+    Each record contains:
+        * `ts`: The moment these data were recorded
+        * `event`: The name of the event
+    """
+
     def __init__(self, recording):
         log.info("NeonRecording: Loading event data")
 
