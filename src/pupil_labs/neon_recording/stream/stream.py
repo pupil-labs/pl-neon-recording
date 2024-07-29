@@ -26,6 +26,8 @@ np.record.__bool__ = _record_truthiness
 
 
 class SimpleDataSampler:
+    sampler_class = None
+
     def __init__(self, data):
         self._data = data
 
@@ -44,7 +46,7 @@ class SimpleDataSampler:
         idxs = np.searchsorted(self.ts, ts)
         idxs[idxs > last_idx] = last_idx
 
-        return SimpleDataSampler(self._data[idxs])
+        return self.sampler_class(self._data[idxs])
 
     def _sample_linear_interp(self, sorted_ts):
         result = np.zeros(len(sorted_ts), self.data.dtype)
@@ -52,7 +54,7 @@ class SimpleDataSampler:
         for key in self.data.dtype.names:
             result[key] = np.interp(sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan)
 
-        return SimpleDataSampler(result)
+        return self.sampler_class(result)
 
     def __iter__(self):
         for sample in self.data:
@@ -68,6 +70,9 @@ class SimpleDataSampler:
     @property
     def ts(self):
         return self._data.ts
+
+
+SimpleDataSampler.sampler_class = SimpleDataSampler
 
 
 class Stream(SimpleDataSampler):
