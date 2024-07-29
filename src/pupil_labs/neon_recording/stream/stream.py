@@ -60,6 +60,9 @@ class SimpleDataSampler:
         for sample in self.data:
             yield sample
 
+    def __len__(self):
+        return len(self._data.ts)
+
     def to_numpy(self):
         return self._data
 
