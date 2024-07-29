@@ -1,12 +1,32 @@
 import numpy as np
 
 from ... import structlog
-from ..stream import Stream
-from ...utils import find_sorted_multipart_files, load_multipart_timestamps
+from ..stream import Stream, SimpleDataSampler
+from ...utils import find_sorted_multipart_files
 from scipy.spatial.transform import Rotation
 from . import imu_pb2
 
 log = structlog.get_logger(__name__)
+
+
+class IMUStreamSampler(SimpleDataSampler):
+    def __init__(self, data):
+        # Ensure that quaternions are normalized
+        w = data['quaternion_w']
+        x = data['quaternion_x']
+        y = data['quaternion_y']
+        z = data['quaternion_z']
+        norms = np.sqrt(w**2 + x**2 + y**2 + z**2)
+
+        data['quaternion_w'] /= norms
+        data['quaternion_x'] /= norms
+        data['quaternion_y'] /= norms
+        data['quaternion_z'] /= norms
+
+        super().__init__(data)
+
+
+IMUStreamSampler.sampler_class = IMUStreamSampler
 
 
 class IMUStream(Stream):
@@ -50,6 +70,8 @@ class IMUStream(Stream):
         ("quaternion_z", "<f4"),
     ])
 
+    sampler_class = IMUStreamSampler
+
     def __init__(self, recording):
         log.debug("NeonRecording: Loading IMU data")
 
@@ -73,7 +95,7 @@ class IMUStream(Stream):
                     euler = rotation.as_euler(seq="XZY", degrees=True)
 
                     imu_data.append((
-                        packet.tsNs*1e-9,
+                        packet.tsNs * 1e-9,
                         packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
                         packet.accelData.x, packet.accelData.y, packet.accelData.z,
                         *euler,
