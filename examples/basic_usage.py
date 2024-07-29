@@ -63,11 +63,14 @@ for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
     )
 
     # draw the interpolated gaze sample in blue
-    frame = cv2.circle(
-        frame,
-        (int(interpolated_gaze.x), int(interpolated_gaze.y)),
-        50, (255, 0, 0), 10
-    )
+    if interpolated_gaze: # interpolation will fail at the end of the stream
+        frame = cv2.circle(
+            frame,
+            (int(interpolated_gaze.x), int(interpolated_gaze.y)),
+            50, (255, 0, 0), 10
+        )
+    else:
+        print("Interpolation fail")
 
     cv2.imshow('Gaze sample comparison', frame)
     cv2.pollKey()
