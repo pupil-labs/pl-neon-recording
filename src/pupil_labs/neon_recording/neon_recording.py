@@ -83,7 +83,15 @@ class NeonRecording:
             self._calib["left_extrinsics_affine_matrix"],
         )
 
-        self.streams = {}
+        self.streams = {
+            "audio": None,
+            "events": None,
+            "eye": None,
+            "eye_state": None,
+            "gaze": None,
+            "imu": None,
+            "scene": None,
+        }
 
     @property
     def gaze(self) -> GazeStream:
@@ -96,7 +104,7 @@ class NeonRecording:
                 x:
                 y: The position of the gaze estimate
         """
-        if "gaze" not in self.streams:
+        if self.streams["gaze"] is None:
             self.streams["gaze"] = GazeStream(self)
 
         return self.streams["gaze"]
@@ -109,7 +117,7 @@ class NeonRecording:
         Returns:
             IMUStream:
         """
-        if "imu" not in self.streams:
+        if self.streams["imu"] is None:
             self.streams["imu"] = IMUStream(self)
 
         return self.streams["imu"]
@@ -122,7 +130,7 @@ class NeonRecording:
         Returns:
             EyeStateStream
         """
-        if "eye_state" not in self.streams:
+        if self.streams["eye_state"] is None:
             self.streams["eye_state"] = EyeStateStream(self)
 
         return self.streams["eye_state"]
@@ -135,7 +143,7 @@ class NeonRecording:
         Returns:
             VideoStream
         """
-        if "scene" not in self.streams:
+        if self.streams["scene"] is None:
             self.streams["scene"] = VideoStream("scene", "Neon Scene Camera v1", self)
 
         return self.streams["scene"]
@@ -148,7 +156,7 @@ class NeonRecording:
         Returns:
             VideoStream
         """
-        if "eye" not in self.streams:
+        if self.streams["eye"] is None:
             self.streams["eye"] = VideoStream("eye", "Neon Sensor Module v1", self)
 
         return self.streams["eye"]
@@ -161,7 +169,7 @@ class NeonRecording:
         Returns:
             EventStream
         """
-        if "event" not in self.streams:
+        if self.streams["event"] is None:
             self.streams["event"] = EventStream(self)
 
         return self.streams["events"]
@@ -174,7 +182,7 @@ class NeonRecording:
         Returns:
             AudioStream
         """
-        if "scene" not in self.streams:
+        if self.streams["scene"] is None:
             self.streams["audio"] = AudioStream(self)
 
         return self.streams["audio"]
