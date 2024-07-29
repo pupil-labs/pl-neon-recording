@@ -25,7 +25,7 @@
 Neon Recording API
 *******************************
 
-Check out the `documentation <https://pl-neon-recording.readthedocs.io/en/latest/>_` or examples for ways to use this library, but note that the examples have additional dependencies.
+Check out the `documentation https://pl-neon-recording.readthedocs.io/en/latest/` or examples for ways to use this library, but note that the examples have additional dependencies.
 
 .. code-block:: bash
 
