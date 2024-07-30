@@ -31,7 +31,10 @@ class SimpleDataSampler:
     def __init__(self, data):
         self._data = data
 
-    def sample(self, tstamps, method=InterpolationMethod.NEAREST):
+    def sample(self, tstamps=None, method=InterpolationMethod.NEAREST):
+        if tstamps is None:
+            tstamps = self.ts
+
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
 
