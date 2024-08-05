@@ -95,6 +95,7 @@ class VideoStreamPart:
         self.container = container
         self.timestamps = timestamps
         self.current_frame = None
+        self.frame_idx = -1
 
     def goto_index(self, frame_idx, frame_generator):
         video = self.container.streams.video[0]
@@ -108,15 +109,9 @@ class VideoStreamPart:
         for _ in range(self.frame_idx, frame_idx):
             self.current_frame = next(frame_generator)
 
+        self.frame_idx = frame_idx
+
         return self.current_frame
-
-    @property
-    def frame_idx(self):
-        if self.current_frame is None:
-            return -1
-
-        video = self.container.streams.video[0]
-        return int(self.current_frame.pts * video.time_base * video.average_rate)
 
 
 class BaseAVStream(StreamSampler):
