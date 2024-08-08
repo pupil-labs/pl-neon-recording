@@ -28,8 +28,12 @@ def _parse_calib_bin(rec_dir: pathlib.Path):
 
     log.debug("NeonRecording: Parsing calibration data")
 
+    return calibration_from_buffer(calib_raw_data)
+
+
+def calibration_from_buffer(buffer):
     return np.frombuffer(
-        calib_raw_data,
+        buffer,
         np.dtype(
             [
                 ("version", "u1"),
@@ -46,4 +50,4 @@ def _parse_calib_bin(rec_dir: pathlib.Path):
                 ("crc", "u4"),
             ]
         ),
-    )
+    )[0]
