@@ -48,7 +48,10 @@ class StreamSampler:
             for vp in self.raw_stream.video_parts
         }
 
-    def sample(self, tstamps, method=InterpolationMethod.NEAREST):
+    def sample(self, tstamps=None, method=InterpolationMethod.NEAREST):
+        if tstamps is None:
+            tstamps = self.ts
+
         return self._sample_nearest(tstamps)
 
     def _sample_nearest(self, ts):
