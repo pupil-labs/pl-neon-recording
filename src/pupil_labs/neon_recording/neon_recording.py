@@ -3,7 +3,7 @@ import pathlib
 from typing import Union
 
 from . import structlog
-from .calib import Calibration, _parse_calib_bin
+from .calib import Calibration
 from .stream.gaze_stream import GazeStream
 from .stream.event_stream import EventStream
 from .stream.imu import IMUStream
@@ -23,10 +23,8 @@ class NeonRecording:
         * `start_ts_ns` (int): Start timestamp in nanoseconds
         * `start_ts` (float): Start timestamp in seconds
         * `wearer` (dict): Wearer information containing uuid and name
-        * `serial` (int): Serial number of the device
-        * `scene_camera_calibration` (Calibration): Scene camera calibration data
-        * `right_eye_camera_calibration` (Calibration): Right eye camera calibration data
-        * `left_eye_camera_calibration` (Calibration): Left eye camera calibration data
+        * `calibration` (Calibration): Camera calibration data
+        * `device_serial` (str): Serial number of the device
         * `streams` (dict): data streams of the recording
     """
 
@@ -63,25 +61,8 @@ class NeonRecording:
         self.wearer["name"] = wearer_data["name"]
 
         log.debug("NeonRecording: Loading calibration data")
-        self._calib = _parse_calib_bin(self._rec_dir)
-
-        self.calib_version = str(self._calib["version"])
-        self.serial = int(self._calib["serial"][0])
-        self.scene_camera_calibration = Calibration(
-            self._calib["scene_camera_matrix"],
-            self._calib["scene_distortion_coefficients"],
-            self._calib["scene_extrinsics_affine_matrix"],
-        )
-        self.right_eye_camera_calibration = Calibration(
-            self._calib["right_camera_matrix"],
-            self._calib["right_distortion_coefficients"],
-            self._calib["right_extrinsics_affine_matrix"],
-        )
-        self.left_eye_camera_calibration = Calibration(
-            self._calib["left_camera_matrix"],
-            self._calib["left_distortion_coefficients"],
-            self._calib["left_extrinsics_affine_matrix"],
-        )
+        self.calibration = Calibration.from_file(self._rec_dir / "calibration.bin")
+        self.device_serial = self.calibration.serial.decode()
 
         self.streams = {
             "audio": None,

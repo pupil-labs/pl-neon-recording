@@ -1,49 +1,48 @@
-import pathlib
-from dataclasses import dataclass
-
 import numpy as np
-
-from . import structlog
-
-log = structlog.get_logger(__name__)
+import typing as T
+import numpy.typing as npt
 
 
-@dataclass
-class Calibration:
-    camera_matrix: np.ndarray
-    distortion_coefficients: np.ndarray
-    extrinsics_affine_matrix: np.ndarray
-
-
-def _parse_calib_bin(rec_dir: pathlib.Path):
-    log.debug("NeonRecording: Loading calibration.bin data")
-
-    calib_raw_data: bytes = b""
-    try:
-        with open(rec_dir / "calibration.bin", "rb") as f:
-            calib_raw_data = f.read()
-    except Exception as e:
-        log.exception(f"Unexpected error loading calibration.bin: {e}")
-        raise
-
-    log.debug("NeonRecording: Parsing calibration data")
-
-    return np.frombuffer(
-        calib_raw_data,
-        np.dtype(
-            [
-                ("version", "u1"),
-                ("serial", "6a"),
-                ("scene_camera_matrix", "(3,3)d"),
-                ("scene_distortion_coefficients", "8d"),
-                ("scene_extrinsics_affine_matrix", "(4,4)d"),
-                ("right_camera_matrix", "(3,3)d"),
-                ("right_distortion_coefficients", "8d"),
-                ("right_extrinsics_affine_matrix", "(4,4)d"),
-                ("left_camera_matrix", "(3,3)d"),
-                ("left_distortion_coefficients", "8d"),
-                ("left_extrinsics_affine_matrix", "(4,4)d"),
-                ("crc", "u4"),
-            ]
-        ),
+class Calibration(T.NamedTuple):
+    dtype = np.dtype(
+        [
+            ("version", "u1"),
+            ("serial", "6a"),
+            ("scene_camera_matrix", "(3,3)d"),
+            ("scene_distortion_coefficients", "8d"),
+            ("scene_extrinsics_affine_matrix", "(4,4)d"),
+            ("right_camera_matrix", "(3,3)d"),
+            ("right_distortion_coefficients", "8d"),
+            ("right_extrinsics_affine_matrix", "(4,4)d"),
+            ("left_camera_matrix", "(3,3)d"),
+            ("left_distortion_coefficients", "8d"),
+            ("left_extrinsics_affine_matrix", "(4,4)d"),
+            ("crc", "u4"),
+        ],
     )
+
+    version: int
+    serial: str
+    scene_camera_matrix: npt.NDArray[np.float64]
+    scene_distortion_coefficients: npt.NDArray[np.float64]
+    scene_extrinsics_affine_matrix: npt.NDArray[np.float64]
+    right_camera_matrix: npt.NDArray[np.float64]
+    right_distortion_coefficients: npt.NDArray[np.float64]
+    right_extrinsics_affine_matrix: npt.NDArray[np.float64]
+    left_camera_matrix: npt.NDArray[np.float64]
+    left_distortion_coefficients: npt.NDArray[np.float64]
+    left_extrinsics_affine_matrix: npt.NDArray[np.float64]
+    crc: int
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            return getattr(self, key)
+        return self[key]
+
+    @classmethod
+    def from_buffer(cls, buffer: bytes):
+        return cls(*np.frombuffer(buffer, cls)[0])
+
+    @classmethod
+    def from_file(cls, path: str):
+        return cls(*np.fromfile(path, cls)[0])
