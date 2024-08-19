@@ -95,23 +95,31 @@ class VideoStreamPart:
         self.container = container
         self.timestamps = timestamps
         self.current_frame = None
-        self.frame_idx = -1
+
+        packets = container.demux(video=0)
+        self._pts = np.array([packet.pts for packet in packets][:-1])
+        container.seek(0)
 
     def goto_index(self, frame_idx, frame_generator):
         video = self.container.streams.video[0]
 
         seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
-            target_rel_timestamp = int(frame_idx / video.average_rate)
-            self.container.seek(int(target_rel_timestamp * 1e6), backward=True)
+            target_rel_timestamp = frame_idx / video.average_rate / video.time_base
+            self.container.seek(int(target_rel_timestamp), backward=seek_distance < 0)
             self.current_frame = next(frame_generator)
 
         for _ in range(self.frame_idx, frame_idx):
             self.current_frame = next(frame_generator)
 
-        self.frame_idx = frame_idx
-
         return self.current_frame
+
+    @property
+    def frame_idx(self):
+        if self.current_frame is None:
+            return -1
+
+        return np.searchsorted(self._pts, self.current_frame.pts)
 
 
 class BaseAVStream(StreamSampler):
