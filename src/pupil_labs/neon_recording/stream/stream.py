@@ -73,7 +73,7 @@ class SimpleDataSampler:
 
     @property
     def ts(self):
-        return self._data.ts
+        return self._data['ts']
 
 
 SimpleDataSampler.sampler_class = SimpleDataSampler
