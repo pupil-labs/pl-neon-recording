@@ -150,8 +150,8 @@ class NeonRecording:
         Returns:
             EventStream
         """
-        if self.streams["event"] is None:
-            self.streams["event"] = EventStream(self)
+        if self.streams["events"] is None:
+            self.streams["events"] = EventStream(self)
 
         return self.streams["events"]
 
