@@ -92,6 +92,7 @@ class IMUStream(Stream):
                             packet.rotVecData.w,
                         ]
                     )
+
                     euler = rotation.as_euler(seq="XZY", degrees=True)
 
                     imu_data.append((
@@ -116,7 +117,7 @@ def _parse_neon_imu_raw_packets(buffer):
             break
 
         index += 2
-        packet_size = nums[0]
+        packet_size = int(nums[0])
         packet_sizes.append(packet_size)
         packet_bytes = buffer[index: index + packet_size]
         index += packet_size
