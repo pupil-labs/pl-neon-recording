@@ -108,8 +108,12 @@ class VideoStreamPart:
 
         seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
-            target_rel_timestamp = frame_idx / video.average_rate / video.time_base
-            self.container.seek(int(target_rel_timestamp), backward=seek_distance < 0)
+            self.container.seek(
+                int(self._pts[frame_idx]),
+                backward=seek_distance < 0,
+                any_frame=False,
+                stream=video
+            )
             self.current_frame = next(frame_generator)
 
         for _ in range(self.frame_idx, frame_idx):
