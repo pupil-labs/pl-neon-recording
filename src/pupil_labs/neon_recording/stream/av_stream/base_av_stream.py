@@ -151,3 +151,11 @@ class BaseAVStream(StreamSampler):
             container_start_idx += container.streams.video[0].frames
 
         super().__init__(self, self._ts, audio_or_video)
+
+    @property
+    def av_containers(self):
+        return [v.container for v in self.video_parts]
+
+    @property
+    def av_streams(self):
+        return [getattr(c.streams, self.audio_or_video)[0] for c in self.av_containers]
