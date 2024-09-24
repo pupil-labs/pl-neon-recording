@@ -27,7 +27,7 @@ def overlay_image(img, img_overlay, x, y):
     img_crop[:] = img_overlay_crop
 
 
-def make_overlaid_video(recording_dir, output_video_path, fps=30):
+def make_overlaid_video(recording_dir, output_video_path, fps=None):
     recording = nr.load(recording_dir)
 
     video_writer = cv2.VideoWriter(
@@ -37,7 +37,10 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         (recording.scene.width, recording.scene.height)
     )
 
-    output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1 / fps)
+    if fps is None:
+        output_timestamps = recording.scene.ts
+    else:
+        output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1 / fps)
 
     combined_data = zip(
         output_timestamps,
