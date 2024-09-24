@@ -1,10 +1,8 @@
 import numpy as np
 
-from ... import structlog
 from ..stream import InterpolationMethod
-from ...utils import find_sorted_multipart_files, load_multipart_timestamps
+from ... import structlog
 
-import av
 
 log = structlog.get_logger(__name__)
 
@@ -69,8 +67,7 @@ class StreamSampler:
                     frame = video_part.goto_index(frame_idx, self.frame_generators[video_part])
                     actual_ts = video_part.timestamps[frame_idx]
 
-                    ts_frame = TimestampedFrame(frame, actual_ts)
-                    yield ts_frame
+                    yield TimestampedFrame(frame, actual_ts)
                     break
                 else:
                     frame_idx -= len(video_part.timestamps)
@@ -93,18 +90,16 @@ class StreamSampler:
         return len(self._ts)
 
 
-class VideoStreamPart:
-    def __init__(self, container, timestamps):
+class AVStreamPart:
+    def __init__(self, container, audio_or_video):
         self.container = container
-        self.timestamps = timestamps
+        self.timestamps = None
         self.current_frame = None
 
-        packets = container.demux(video=0)
-        self._pts = np.array([packet.pts for packet in packets][:-1])
-        container.seek(0)
+        self.audio_or_video = audio_or_video
 
     def goto_index(self, frame_idx, frame_generator):
-        video = self.container.streams.video[0]
+        stream = getattr(self.container.streams, self.audio_or_video)[0]
 
         seek_distance = frame_idx - self.frame_idx
         if seek_distance < 0 or seek_distance > 40:
@@ -112,7 +107,7 @@ class VideoStreamPart:
                 int(self._pts[frame_idx]),
                 backward=seek_distance < 0,
                 any_frame=False,
-                stream=video
+                stream=stream
             )
             self.current_frame = next(frame_generator)
 
@@ -130,27 +125,8 @@ class VideoStreamPart:
 
 
 class BaseAVStream(StreamSampler):
-    def __init__(self, name, base_name, recording, audio_or_video):
-        self.name = name
-        self._base_name = base_name
-        self.recording = recording
-
-        log.debug(f"NeonRecording: Loading video: {self._base_name}.")
-
-        self.video_parts = []
-
-        video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
-
-        self._ts = load_multipart_timestamps([p[1] for p in video_files])
-        container_start_idx = 0
-        for (video_file, _) in video_files:
-            container = av.open(str(video_file))
-            ts = self._ts[container_start_idx: container_start_idx + container.streams.video[0].frames]
-            self.video_parts.append(VideoStreamPart(container, ts))
-
-            container_start_idx += container.streams.video[0].frames
-
-        super().__init__(self, self._ts, audio_or_video)
+    def __init__(self, ts, audio_or_video):
+        super().__init__(self, ts, audio_or_video)
 
     @property
     def av_containers(self):
