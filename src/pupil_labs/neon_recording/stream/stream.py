@@ -53,9 +53,16 @@ class SimpleDataSampler:
             return self._sample_linear_interp(tstamps)
 
     def _sample_nearest(self, ts):
-        last_idx = len(self._data) - 1
-        idxs = np.abs(self.ts[:, np.newaxis] - ts).argmin(axis=0)
-        idxs[idxs > last_idx] = last_idx
+        # Use searchsorted to get the insertion points
+        idxs = np.searchsorted(self.ts, ts)
+
+        # Ensure index bounds are valid
+        idxs = np.clip(idxs, 1, len(self.ts) - 1)
+        left = self.ts[idxs - 1]
+        right = self.ts[idxs]
+
+        # Determine whether the left or right value is closer
+        idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
 
         return self.sampler_class(self._data[idxs])
 
