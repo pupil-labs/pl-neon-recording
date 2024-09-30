@@ -81,7 +81,7 @@ class IMUStream(Stream):
         for imu_file, _ in imu_files:
             with imu_file.open("rb") as raw_file:
                 raw_data = raw_file.read()
-                imu_packets = _parse_neon_imu_raw_packets(raw_data)
+                imu_packets = parse_neon_imu_raw_packets(raw_data)
 
                 for packet in imu_packets:
                     rotation = Rotation.from_quat(
@@ -107,7 +107,7 @@ class IMUStream(Stream):
         super().__init__("imu", recording, data)
 
 
-def _parse_neon_imu_raw_packets(buffer):
+def parse_neon_imu_raw_packets(buffer):
     index = 0
     packet_sizes = []
     while True:
