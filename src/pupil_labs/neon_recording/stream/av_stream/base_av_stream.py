@@ -105,7 +105,7 @@ class AVStreamPart:
         if seek_distance < 0 or seek_distance > 40:
             self.container.seek(
                 int(self._pts[frame_idx]),
-                backward=seek_distance < 0,
+                backward=True,
                 any_frame=False,
                 stream=stream
             )
