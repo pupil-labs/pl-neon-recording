@@ -75,3 +75,10 @@ for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
 
     cv2.imshow('Gaze sample comparison', frame)
     cv2.pollKey()
+
+cv2.destroyAllWindows()
+
+# Extract data by index
+print("64th Gaze Sample:", recording.gaze.data[64])
+cv2.imshow('64th scene frame (push any key to quit)', recording.scene.data[64].bgr)
+cv2.waitKey(0)
