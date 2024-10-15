@@ -72,9 +72,12 @@ class StreamSampler:
                 else:
                     frame_idx -= len(video_part.timestamps)
 
+    def __getitem__(self, index):
+        return next(iter(self.sample([self.ts[index]])))
+
     @property
     def data(self):
-        return self.raw_stream
+        return self
 
     @property
     def ts(self):
