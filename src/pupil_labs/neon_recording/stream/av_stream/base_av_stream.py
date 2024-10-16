@@ -85,7 +85,7 @@ class StreamSampler:
 
     def to_numpy(self):
         if self.audio_or_video == "video":
-            return np.array([frame.rgb for frame in self])
+            return np.array([frame.bgr for frame in self])
         elif self.audio_or_video == "audio":
             return np.array([frame.to_ndarray() for frame in self])
 
