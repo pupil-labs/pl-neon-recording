@@ -1,9 +1,12 @@
+from typing import Optional
 import numpy as np
 import av
+import numpy.typing as npt
 
 from .base_av_stream import BaseAVStream, AVStreamPart
 from ... import structlog
 from ...utils import find_sorted_multipart_files, load_multipart_timestamps
+from pupil_labs.video import MultiPartReader
 
 
 log = structlog.get_logger(__name__)
@@ -20,7 +23,7 @@ class VideoStreamPart(AVStreamPart):
         container.seek(0)
 
 
-class VideoStream(BaseAVStream):
+class VideoStream:
     """
     Video frames from a camera
 
@@ -34,31 +37,38 @@ class VideoStream(BaseAVStream):
 
         log.debug(f"NeonRecording: Loading video: {self._base_name}.")
 
-        self.video_parts = []
-
-        video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
+        video_files = find_sorted_multipart_files(
+            self.recording._rec_dir, self._base_name, ".mp4"
+        )
+        self.reader = MultiPartReader([p[0] for p in video_files])
         self._ts = load_multipart_timestamps([p[1] for p in video_files])
-        container_start_idx = 0
 
-        for (video_file, _) in video_files:
-            container = av.open(str(video_file))
-            ts = self._ts[container_start_idx: container_start_idx + container.streams.video[0].frames]
-            part = VideoStreamPart(container, ts)
-            self.video_parts.append(part)
-            container_start_idx += container.streams.video[0].frames
+    def sample(self, tstamps: Optional[npt.NDArray] = None):
+        if tstamps is None:
+            tstamps = self._ts
 
-        super().__init__(self._ts, "video")
+        last_idx = len(self._ts) - 1
+        for t in tstamps:
+            idx = np.searchsorted(self._ts, t, side="left")
+            idx = last_idx if idx > last_idx else idx
+            frame = self.reader[int(idx)]
+            frame.ts = t
+            yield frame
 
     @property
     def width(self):
-        return self.video_parts[0].container.streams.video[0].width
+        return self.reader.width
 
     @property
     def height(self):
-        return self.video_parts[0].container.streams.video[0].height
+        return self.reader.height
+
+    @property
+    def ts(self):
+        return self._ts
 
 
-class GrayFrame():
+class GrayFrame:
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -69,13 +79,13 @@ class GrayFrame():
     @property
     def bgr(self):
         if self._bgr is None:
-            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype='uint8')
+            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype="uint8")
 
         return self._bgr
 
     @property
     def gray(self):
         if self._gray is None:
-            self._gray = 128 * np.ones([self.height, self.width], dtype='uint8')
+            self._gray = 128 * np.ones([self.height, self.width], dtype="uint8")
 
         return self._gray
