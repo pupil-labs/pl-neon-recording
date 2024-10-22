@@ -48,9 +48,10 @@ class VideoStream:
             tstamps = self._ts
 
         last_idx = len(self._ts) - 1
-        for t in tstamps:
-            idx = np.searchsorted(self._ts, t, side="left")
-            idx = last_idx if idx > last_idx else idx
+        idxs = np.searchsorted(self._ts, tstamps, side="left")
+        idxs[idxs > last_idx] = last_idx
+
+        for t, idx in zip(tstamps, idxs):
             frame = self.reader[int(idx)]
             frame.ts = t
             yield frame
