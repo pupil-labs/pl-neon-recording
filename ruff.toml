@@ -1,0 +1,100 @@
+fix = true
+
+[lint]
+extend-select = [
+        # flake8-builtins
+        "A",
+        # flake8-bugbear
+        "B",
+        # flake8-comprehensions
+        "C4",
+        # mccabe
+        "C90",
+        # missing-trailing-comma
+        "COM812",
+        # prohibited-trailing-comma
+        "COM812",
+        # pycodestyle
+        "D",
+        # Error
+        "E",
+        # pyflakes
+        "F",
+        # isort
+        "I",
+        # flake8-implicit-str-concat
+        "ISC",
+        # manual-list-comprehension
+        "PERF401",
+        # pygrep-hooks
+        "PGH",
+        # flake8-quotes
+        "Q",
+        # ruff
+        "RUF",
+        # flake8-bandit
+        "S",
+        # flake8-simplify
+        "SIM",
+        # flake8-debugger
+        "T10",
+        # tryceratops
+        "TRY",
+        # pyupgrade
+        "UP",
+        # Warning
+        "W",
+        # flake8-2020
+        "YTT",
+]
+ignore = [
+        # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+        "W191",
+        "E111",
+        "E114",
+        "E117",
+        "D206",
+        "D300",
+        ### Various undocumented-X
+        "D100",
+        "D101",
+        "D102",
+        "D103",
+        "D104",
+        "D105",
+        "D106",
+        "D107",
+        # one-blank-line-before-class
+        "D203",
+        # multi-line-summary-second-line
+        "D213",
+        # ends-in-period
+        "D400",
+        # ends-in-punctuation
+        "D415",
+        ###
+        "Q000",
+        "Q001",
+        "Q002",
+        "Q003",
+        "COM812",
+        "COM819",
+        "ISC001",
+        "ISC002",
+        # raise-vanilla-args
+        "TRY003",
+        # blanket-type-ignore
+        "PGH003",
+        # assert
+        "S101",
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[format]
+# Enable preview to get hugged parenthesis unwrapping and other nice surprises
+# See https://github.com/jaraco/skeleton/pull/133#issuecomment-2239538373
+preview = true
+# https://docs.astral.sh/ruff/settings/#format_quote-style
+quote-style = "double"
