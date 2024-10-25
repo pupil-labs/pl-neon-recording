@@ -1,5 +1,7 @@
-import numpy as np
 import typing as T
+from pathlib import Path
+
+import numpy as np
 import numpy.typing as npt
 
 
@@ -44,5 +46,5 @@ class Calibration(T.NamedTuple):
         return cls(*np.frombuffer(buffer, cls)[0])
 
     @classmethod
-    def from_file(cls, path: str):
+    def from_file(cls, path: str | Path):
         return cls(*np.fromfile(path, cls)[0])

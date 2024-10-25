@@ -1,7 +1,7 @@
 import sys
 
-import numpy as np
 import cv2
+import numpy as np
 
 import pupil_labs.neon_recording as nr
 from pupil_labs.neon_recording.stream import InterpolationMethod
@@ -12,7 +12,6 @@ if len(sys.argv) < 2:
 
 # load a recording
 recording = nr.load(sys.argv[1])
-
 
 # get basic info
 print("Recording Info:")
@@ -35,11 +34,7 @@ print("")
 # resample by interpolation
 print("First 10 gaze samples @ 30Hz:")
 fps = 30
-timestamps = np.arange(
-    recording.gaze.ts[0],
-    recording.gaze.ts[-1],
-    1 / fps
-)
+timestamps = np.arange(recording.gaze.ts[0], recording.gaze.ts[-1], 1 / fps)
 
 subsample = recording.gaze.sample(timestamps[:10], InterpolationMethod.LINEAR)
 for gaze_datum in subsample:
@@ -51,34 +46,36 @@ print("")
 matched_gazes = recording.gaze.sample(recording.scene.ts)
 
 # interpolate gaze data to scene frame timestamps
-interpolated_gazes = recording.gaze.sample(recording.scene.ts, InterpolationMethod.LINEAR)
+interpolated_gazes = recording.gaze.sample(
+    recording.scene.ts, InterpolationMethod.LINEAR
+)
 
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)
 for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
     # draw the nearest-time gaze sample in red
     frame = cv2.circle(
-        scene_frame.bgr,
-        (int(matched_gaze.x), int(matched_gaze.y)),
-        50, (0, 0, 255), 10
+        scene_frame.bgr, (int(matched_gaze.x), int(matched_gaze.y)), 50, (0, 0, 255), 10
     )
 
     # draw the interpolated gaze sample in blue
-    if interpolated_gaze: # interpolation will fail at the end of the stream
+    if interpolated_gaze:  # interpolation will fail at the end of the stream
         frame = cv2.circle(
             frame,
             (int(interpolated_gaze.x), int(interpolated_gaze.y)),
-            50, (255, 0, 0), 10
+            50,
+            (255, 0, 0),
+            10,
         )
     else:
         print("Interpolation fail")
 
-    cv2.imshow('Gaze sample comparison', frame)
+    cv2.imshow("Gaze sample comparison", frame)
     cv2.pollKey()
 
 cv2.destroyAllWindows()
 
 # Extract data by index
 print("64th Gaze Sample:", recording.gaze.data[64])
-cv2.imshow('64th scene frame (push any key to quit)', recording.scene.data[64].bgr)
+cv2.imshow("64th scene frame (push any key to quit)", recording.scene.data[64].bgr)
 cv2.waitKey(0)
