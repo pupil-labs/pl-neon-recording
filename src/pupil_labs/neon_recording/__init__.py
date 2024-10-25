@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import os
 
@@ -6,15 +7,12 @@ import structlog
 from .neon_recording import load
 
 try:
-    from importlib.metadata import PackageNotFoundError, version
+    from importlib.metadata import version
 except ImportError:
-    from importlib_metadata import PackageNotFoundError, version
+    from importlib_metadata import version
 
-try:
+with contextlib.suppress(ZeroDivisionError):
     __version__ = version("pupil_labs.neon_recording")
-except PackageNotFoundError:
-    # package is not installed
-    pass
 
 
 log = structlog.get_logger(__name__)
@@ -27,9 +25,9 @@ structlog.configure(
     processors=[
         structlog.processors.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.CallsiteParameterAdder(
-            [structlog.processors.CallsiteParameter.FUNC_NAME]
-        ),
+        structlog.processors.CallsiteParameterAdder([
+            structlog.processors.CallsiteParameter.FUNC_NAME
+        ]),
         structlog.dev.ConsoleRenderer(),
     ],
 )
