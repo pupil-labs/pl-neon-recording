@@ -1,17 +1,14 @@
 from logging import getLogger
 from pathlib import Path
 
-import numpy as np
-
-from pupil_labs.matching import Sensor
-
 from ..utils import find_sorted_multipart_files, load_multipart_data_time_pairs
+from .numpy_timeseries import NumpyTimeseries
 
 log = getLogger(__name__)
 
 
-class Gaze(np.ndarray, Sensor):
-    def __new__(cls, rec_dir: Path):
+class Gaze(NumpyTimeseries):
+    def __init__(self, rec_dir: Path):
         log.debug("NeonRecording: Loading gaze data")
 
         gaze_file_pairs = []
@@ -27,11 +24,4 @@ class Gaze(np.ndarray, Sensor):
             gaze_file_pairs = find_sorted_multipart_files(rec_dir, "gaze")
 
         gaze_data, time_data = load_multipart_data_time_pairs(gaze_file_pairs, "<f4", 2)
-
-        data = np.rec.fromarrays(
-            [time_data, gaze_data[:, 0], gaze_data[:, 1]], names=["ts", "x", "y"]
-        )
-        data = data.view(cls)
-
-        data.timestamps = data["ts"]
-        return data
+        super().__init__(time_data, gaze_data)
