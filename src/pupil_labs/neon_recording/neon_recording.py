@@ -2,13 +2,12 @@ import json
 import pathlib
 from typing import Union
 
-from pupil_labs.neon_recording.sensors.video_sensor import VideoSensor
+from pupil_labs.neon_recording.video_timeseries import VideoTimeseries
 
 from . import structlog
 from .calib import Calibration
-from .sensors.event import Event
-from .sensors.eye_state import EyeState
-from .sensors.gaze import Gaze
+from .numpy_timeseries import NumpyTimeseries
+from .utils import find_sorted_multipart_files, load_multipart_data_time_pairs
 
 log = structlog.get_logger(__name__)
 
@@ -78,9 +77,27 @@ class NeonRecording:
         }
 
     @property
-    def gaze(self) -> Gaze:
+    def gaze(self) -> NumpyTimeseries:
         if self.streams["gaze"] is None:
-            self.streams["gaze"] = Gaze(self._rec_dir)
+            log.debug("NeonRecording: Loading gaze data")
+
+            gaze_file_pairs = []
+
+            gaze_200hz_file = self._rec_dir / "gaze_200hz.raw"
+            time_200hz_file = self._rec_dir / "gaze_200hz.time"
+            if gaze_200hz_file.exists() and time_200hz_file.exists():
+                log.debug("NeonRecording: Using 200Hz gaze data")
+                gaze_file_pairs.append((gaze_200hz_file, time_200hz_file))
+
+            else:
+                log.debug("NeonRecording: Using realtime gaze data")
+                gaze_file_pairs = find_sorted_multipart_files(self._rec_dir, "gaze")
+
+            gaze_data, time_data = load_multipart_data_time_pairs(
+                gaze_file_pairs, "<f4", 2
+            )
+
+            self.streams["gaze"] = NumpyTimeseries(time_data, gaze_data)
 
         return self.streams["gaze"]
 
@@ -92,37 +109,50 @@ class NeonRecording:
     #     return self.streams["imu"]
 
     @property
-    def eye_state(self) -> EyeState:
+    def eye_state(self) -> NumpyTimeseries:
         if self.streams["eye_state"] is None:
-            self.streams["eye_state"] = EyeState(self._rec_dir)
+            log.debug("NeonRecording: Loading eye state data")
+
+            eye_state_files = find_sorted_multipart_files(self._rec_dir, "eye_state")
+            eye_state_data, time_data = load_multipart_data_time_pairs(
+                eye_state_files, "<f4", 2
+            )
+            data = eye_state_data.reshape(-1, 14)
+            self.streams["eye_state"] = NumpyTimeseries(time_data, data)
 
         return self.streams["eye_state"]
 
     @property
-    def scene(self) -> VideoSensor:
+    def scene(self) -> VideoTimeseries:
         if self.streams["scene"] is None:
-            self.streams["scene"] = VideoSensor(self._rec_dir, "Neon Scene Camera v1")
+            self.streams["scene"] = VideoTimeseries(
+                self._rec_dir, "Neon Scene Camera v1"
+            )
 
         return self.streams["scene"]
 
     @property
-    def eye(self) -> VideoSensor:
+    def eye(self) -> VideoTimeseries:
         if self.streams["eye"] is None:
-            self.streams["eye"] = VideoSensor(self._rec_dir, "Neon Sensor Module v1")
+            self.streams["eye"] = VideoTimeseries(
+                self._rec_dir, "Neon Sensor Module v1"
+            )
 
         return self.streams["eye"]
 
     @property
-    def events(self) -> Event:
-        """Event annotations
-
-        Returns
-        -------
-            EventStream
-
-        """
+    def events(self) -> NumpyTimeseries:
         if self.streams["events"] is None:
-            self.streams["events"] = Event(self._rec_dir)
+            log.debug("NeonRecording: Loading event data")
+
+            events_file = self._rec_dir / "event.txt"
+            time_file = events_file.with_suffix(".time")
+            if events_file.exists and time_file.exists():
+                event_names, time_data = load_multipart_data_time_pairs(
+                    [(events_file, time_file)], "str", 1
+                )
+
+            self.streams["events"] = NumpyTimeseries(time_data, event_names)
 
         return self.streams["events"]
 
