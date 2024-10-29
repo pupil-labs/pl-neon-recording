@@ -3,11 +3,11 @@ from typing import Iterator, Optional, overload
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.matching.matcher import Sensor
+from pupil_labs.matching import Timeseries
 from pupil_labs.video.array_like import ArrayLike
 
 
-class NumpyTimeseries(Sensor):
+class NumpyTimeseries(Timeseries):
     def __init__(
         self,
         timestamps: npt.NDArray[np.int32 | np.float32],

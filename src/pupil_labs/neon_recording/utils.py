@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 
@@ -15,7 +16,9 @@ def find_sorted_multipart_files(
     return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
 
 
-def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
+def load_multipart_data_time_pairs(
+    file_pairs, dtype, field_count
+) -> Tuple[np.ndarray, np.ndarray]:
     data_buffer = b""
     ts_buffer = b""
     for data_file, time_file in file_pairs:
@@ -25,7 +28,7 @@ def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
             ts_buffer += f.read()
 
     if dtype == "str":
-        data = data_buffer.decode().rstrip("\n").split("\n")
+        data = np.array(data_buffer.decode().rstrip("\n").split("\n"))
     else:
         data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
 
