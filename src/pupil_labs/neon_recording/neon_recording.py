@@ -2,6 +2,8 @@ import json
 import pathlib
 from typing import Union
 
+import pandas as pd
+
 from pupil_labs.neon_recording.video_timeseries import VideoTimeseries
 
 from . import structlog
@@ -77,7 +79,7 @@ class NeonRecording:
         }
 
     @property
-    def gaze(self) -> NumpyTimeseries:
+    def gaze(self) -> pd.DataFrame:
         if self.streams["gaze"] is None:
             log.debug("NeonRecording: Loading gaze data")
 
@@ -97,7 +99,10 @@ class NeonRecording:
                 gaze_file_pairs, "<f4", 2
             )
 
-            self.streams["gaze"] = NumpyTimeseries(time_data, gaze_data)
+            df = pd.DataFrame(index=time_data, data=gaze_data, columns=["x", "y"])
+            df.columns.name = "gaze"
+            df.index.name = "timestamp"
+            self.streams["gaze"] = df
 
         return self.streams["gaze"]
 
@@ -118,7 +123,27 @@ class NeonRecording:
                 eye_state_files, "<f4", 2
             )
             data = eye_state_data.reshape(-1, 14)
-            self.streams["eye_state"] = NumpyTimeseries(time_data, data)
+            self.streams["eye_state"] = pd.DataFrame(
+                index=time_data,
+                data=data,
+                columns=[
+                    "ts",
+                    "pupil_diameter_left",
+                    "eyeball_center_left_x",
+                    "eyeball_center_left_y",
+                    "eyeball_center_left_z",
+                    "optical_axis_left_x",
+                    "optical_axis_left_y",
+                    "optical_axis_left_z",
+                    "pupil_diameter_right",
+                    "eyeball_center_right_x",
+                    "eyeball_center_right_y",
+                    "eyeball_center_right_z",
+                    "optical_axis_right_x",
+                    "optical_axis_right_y",
+                    "optical_axis_right_z",
+                ],
+            )
 
         return self.streams["eye_state"]
 
