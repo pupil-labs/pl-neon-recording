@@ -123,11 +123,10 @@ class NeonRecording:
                 eye_state_files, "<f4", 2
             )
             data = eye_state_data.reshape(-1, 14)
-            self.streams["eye_state"] = pd.DataFrame(
+            df = pd.DataFrame(
                 index=time_data,
                 data=data,
                 columns=[
-                    "ts",
                     "pupil_diameter_left",
                     "eyeball_center_left_x",
                     "eyeball_center_left_y",
@@ -144,7 +143,9 @@ class NeonRecording:
                     "optical_axis_right_z",
                 ],
             )
-
+            df.columns.name = "eye_state"
+            df.index.name = "timestamps"
+            self.streams["eye_state"] = df
         return self.streams["eye_state"]
 
     @property
@@ -176,8 +177,14 @@ class NeonRecording:
                 event_names, time_data = load_multipart_data_time_pairs(
                     [(events_file, time_file)], "str", 1
                 )
-
-            self.streams["events"] = NumpyTimeseries(time_data, event_names)
+            df = pd.DataFrame(
+                index=time_data,
+                data=event_names,
+                columns=["event_name"],
+            )
+            df.columns.name = "events"
+            df.index.name = "timestamps"
+            self.streams["events"] = df
 
         return self.streams["events"]
 
