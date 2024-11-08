@@ -1,15 +1,15 @@
 import json
 import pathlib
+from functools import cached_property
 from typing import Union
-
-import pandas as pd
 
 from pupil_labs.neon_recording.video_timeseries import VideoTimeseries
 
 from . import structlog
 from .calib import Calibration
-from .numpy_timeseries import NumpyTimeseries
-from .utils import find_sorted_multipart_files, load_multipart_data_time_pairs
+from .events import Events
+from .eye_state import EyeState
+from .gaze import Gaze
 
 log = structlog.get_logger(__name__)
 
@@ -29,25 +29,25 @@ class NeonRecording:
 
     """
 
-    def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
+    def __init__(self, rec_dir: pathlib.Path | str):
         """Initialize the NeonRecording object
 
         Args:
         ----
-            rec_dir_in: Path to the recording directory.
+            rec_dir: Path to the recording directory.
 
         Raises:
         ------
             FileNotFoundError: If the directory does not exist or is not valid.
 
         """
-        self._rec_dir = pathlib.Path(rec_dir_in).resolve()
+        self._rec_dir = pathlib.Path(rec_dir).resolve()
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
             raise FileNotFoundError(
                 f"Directory not found or not valid: {self._rec_dir}"
             )
 
-        log.debug(f"NeonRecording: Loading recording from {rec_dir_in}")
+        log.debug(f"NeonRecording: Loading recording from {rec_dir}")
 
         log.debug("NeonRecording: Loading recording info")
         with open(self._rec_dir / "info.json") as f:
@@ -73,38 +73,14 @@ class NeonRecording:
             "events": None,
             "eye": None,
             "eye_state": None,
-            "gaze": None,
+            # "gaze": None,
             "imu": None,
             "scene": None,
         }
 
-    @property
-    def gaze(self) -> pd.DataFrame:
-        if self.streams["gaze"] is None:
-            log.debug("NeonRecording: Loading gaze data")
-
-            gaze_file_pairs = []
-
-            gaze_200hz_file = self._rec_dir / "gaze_200hz.raw"
-            time_200hz_file = self._rec_dir / "gaze_200hz.time"
-            if gaze_200hz_file.exists() and time_200hz_file.exists():
-                log.debug("NeonRecording: Using 200Hz gaze data")
-                gaze_file_pairs.append((gaze_200hz_file, time_200hz_file))
-
-            else:
-                log.debug("NeonRecording: Using realtime gaze data")
-                gaze_file_pairs = find_sorted_multipart_files(self._rec_dir, "gaze")
-
-            gaze_data, time_data = load_multipart_data_time_pairs(
-                gaze_file_pairs, "<f4", 2
-            )
-
-            df = pd.DataFrame(index=time_data, data=gaze_data, columns=["x", "y"])
-            df.columns.name = "gaze"
-            df.index.name = "timestamp"
-            self.streams["gaze"] = df
-
-        return self.streams["gaze"]
+    @cached_property
+    def gaze(self) -> Gaze:
+        return Gaze(self._rec_dir)
 
     # @property
     # def imu(self) -> IMU:
@@ -113,40 +89,9 @@ class NeonRecording:
 
     #     return self.streams["imu"]
 
-    @property
-    def eye_state(self) -> NumpyTimeseries:
-        if self.streams["eye_state"] is None:
-            log.debug("NeonRecording: Loading eye state data")
-
-            eye_state_files = find_sorted_multipart_files(self._rec_dir, "eye_state")
-            eye_state_data, time_data = load_multipart_data_time_pairs(
-                eye_state_files, "<f4", 2
-            )
-            data = eye_state_data.reshape(-1, 14)
-            df = pd.DataFrame(
-                index=time_data,
-                data=data,
-                columns=[
-                    "pupil_diameter_left",
-                    "eyeball_center_left_x",
-                    "eyeball_center_left_y",
-                    "eyeball_center_left_z",
-                    "optical_axis_left_x",
-                    "optical_axis_left_y",
-                    "optical_axis_left_z",
-                    "pupil_diameter_right",
-                    "eyeball_center_right_x",
-                    "eyeball_center_right_y",
-                    "eyeball_center_right_z",
-                    "optical_axis_right_x",
-                    "optical_axis_right_y",
-                    "optical_axis_right_z",
-                ],
-            )
-            df.columns.name = "eye_state"
-            df.index.name = "timestamps"
-            self.streams["eye_state"] = df
-        return self.streams["eye_state"]
+    @cached_property
+    def eye_state(self) -> EyeState:
+        return EyeState(self._rec_dir)
 
     @property
     def scene(self) -> VideoTimeseries:
@@ -166,27 +111,9 @@ class NeonRecording:
 
         return self.streams["eye"]
 
-    @property
-    def events(self) -> NumpyTimeseries:
-        if self.streams["events"] is None:
-            log.debug("NeonRecording: Loading event data")
-
-            events_file = self._rec_dir / "event.txt"
-            time_file = events_file.with_suffix(".time")
-            if events_file.exists and time_file.exists():
-                event_names, time_data = load_multipart_data_time_pairs(
-                    [(events_file, time_file)], "str", 1
-                )
-            df = pd.DataFrame(
-                index=time_data,
-                data=event_names,
-                columns=["event_name"],
-            )
-            df.columns.name = "events"
-            df.index.name = "timestamps"
-            self.streams["events"] = df
-
-        return self.streams["events"]
+    @cached_property
+    def events(self) -> Events:
+        return Events(self._rec_dir)
 
     # @property
     # def audio(self) -> AudioStream:
