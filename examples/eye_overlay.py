@@ -2,15 +2,38 @@ import sys
 
 import cv2
 import numpy as np
-import pupil_labs.neon_recording as nr
-from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame
-
 from tqdm import tqdm
+
+import pupil_labs.neon_recording as nr
+from pupil_labs.matching import Matcher
+from pupil_labs.video import Writer
+
+
+class GrayFrame:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+        self._bgr = None
+        self._gray = None
+
+    @property
+    def bgr(self):
+        if self._bgr is None:
+            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype="uint8")
+
+        return self._bgr
+
+    @property
+    def gray(self):
+        if self._gray is None:
+            self._gray = 128 * np.ones([self.height, self.width], dtype="uint8")
+
+        return self._gray
 
 
 def overlay_image(img, img_overlay, x, y):
     """Overlay `img_overlay` onto `img` at (x, y)."""
-
     # Image ranges
     y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
     x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
@@ -27,50 +50,39 @@ def overlay_image(img, img_overlay, x, y):
     img_crop[:] = img_overlay_crop
 
 
-def make_overlaid_video(recording_dir, output_video_path, fps=None):
+def make_overlaid_video(recording_dir, output_video_path, fps=30):
     recording = nr.load(recording_dir)
-
-    video_writer = cv2.VideoWriter(
-        str(output_video_path),
-        cv2.VideoWriter_fourcc(*'MJPG'),
-        fps,
-        (recording.scene.width, recording.scene.height)
+    target_timestamps = np.arange(
+        recording.eye.timestamps[0], recording.scene.timestamps[-1], 1 / fps
+    )
+    matched_data = Matcher(
+        target_timestamps,
+        [recording.scene, recording.eye],
+        tolerance=2 / fps,
     )
 
-    if fps is None:
-        output_timestamps = recording.scene.ts
-    else:
-        output_timestamps = np.arange(recording.scene.ts[0], recording.scene.ts[-1], 1 / fps)
+    with Writer(output_video_path) as video_writer:
+        for scene_frame, eye_frame in tqdm(matched_data, total=len(target_timestamps)):
+            if scene_frame is None:
+                # If no frame exists within the tolerance, replace it with a gray frame
+                frame_pixels = GrayFrame(
+                    recording.scene.width, recording.scene.height
+                ).bgr
+            else:
+                frame_pixels = scene_frame.bgr
 
-    combined_data = zip(
-        output_timestamps,
-        recording.scene.sample(output_timestamps),
-        recording.eye.sample(output_timestamps),
-    )
+            if eye_frame is None:
+                # If no frame exists within the tolerance, replace it with a gray frame
+                eye_pixels = GrayFrame(recording.eye.width, recording.eye.height).bgr
+            else:
+                eye_pixels = eye_frame.bgr
 
-    frame_idx = 0
-    for ts, scene_frame, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
-        frame_idx += 1
-        if abs(scene_frame.ts - ts) < 2 / fps:
-            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
-            frame_pixels = scene_frame.bgr
-        else:
-            frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
+            overlay_image(frame_pixels, eye_pixels, 50, 50)
 
-        if abs(eye_frame.ts - ts) < 2 / fps:
-            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
-            eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
-        else:
-            eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr
-
-        overlay_image(frame_pixels, eye_pixels, 50, 50)
-
-        video_writer.write(frame_pixels)
-        cv2.imshow('Frame', frame_pixels)
-        cv2.pollKey()
-
-    video_writer.release()
+            video_writer.write(frame_pixels)
+            cv2.imshow("Frame", frame_pixels)
+            cv2.pollKey()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     make_overlaid_video(sys.argv[1], "eye-overlay-output-video.avi", 24)
