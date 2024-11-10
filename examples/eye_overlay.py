@@ -85,4 +85,4 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
 
 
 if __name__ == "__main__":
-    make_overlaid_video(sys.argv[1], "eye-overlay-output-video.avi", 24)
+    make_overlaid_video(sys.argv[1], "eye-overlay-output-video.mp4", 24)
