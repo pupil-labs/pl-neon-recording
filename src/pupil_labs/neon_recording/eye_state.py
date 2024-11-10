@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import NamedTuple
+from typing import Iterator, NamedTuple, overload
 
 import numpy as np
 import numpy.typing as npt
@@ -59,14 +59,30 @@ class EyeState:
     def data(self) -> npt.NDArray[np.float64]:
         return self._data
 
-    def __getitem__(self, key: int) -> EyeStateRecord:
-        record = EyeStateRecord(
-            self._time_data[key],
-            self._data[key, 0],
-            self._data[key, 1:4],
-            self._data[key, 4:7],
-            self._data[key, 7],
-            self._data[key, 8:11],
-            self._data[key, 11:14],
-        )
+    def __len__(self) -> int:
+        return len(self._time_data)
+
+    @overload
+    def __getitem__(self, key: int, /) -> EyeStateRecord: ...
+    @overload
+    def __getitem__(self, key: slice, /) -> "EyeState": ...
+    def __getitem__(self, key: int | slice) -> "EyeStateRecord | EyeState":
+        if isinstance(key, int):
+            record = EyeStateRecord(
+                self._time_data[key],
+                self._data[key, 0],
+                self._data[key, 1:4],
+                self._data[key, 4:7],
+                self._data[key, 7],
+                self._data[key, 8:11],
+                self._data[key, 11:14],
+            )
+            return record
+        else:
+            # TODO
+            raise NotImplementedError
         return record
+
+    def __iter__(self) -> Iterator[EyeStateRecord]:
+        for i in range(len(self)):
+            yield self[i]

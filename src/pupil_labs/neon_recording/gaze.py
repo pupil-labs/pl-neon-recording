@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import NamedTuple
+from typing import Iterator, NamedTuple, overload
 
 import numpy as np
 import numpy.typing as npt
@@ -8,6 +8,7 @@ from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
+from pupil_labs.video.array_like import ArrayLike
 
 
 class GazeRecord(NamedTuple):
@@ -16,7 +17,7 @@ class GazeRecord(NamedTuple):
     y: float
 
 
-class Gaze:
+class Gaze(ArrayLike[GazeRecord]):
     def __init__(self, rec_dir: Path):
         gaze_200hz_file = rec_dir / "gaze_200hz.raw"
         time_200hz_file = rec_dir / "gaze_200hz.time"
@@ -47,9 +48,24 @@ class Gaze:
     def y(self) -> npt.NDArray[np.float64]:
         return self._gaze_data[:, 1]
 
-    def __getitem__(self, key: int) -> GazeRecord:
-        record = GazeRecord(self._time_data[key], *self._gaze_data[key])
+    def __len__(self) -> int:
+        return len(self._time_data)
+
+    @overload
+    def __getitem__(self, key: int, /) -> GazeRecord: ...
+    @overload
+    def __getitem__(self, key: slice, /) -> "Gaze": ...
+    def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
+        if isinstance(key, int):
+            record = GazeRecord(self._time_data[key], *self._gaze_data[key])
+        else:
+            # TODO
+            raise NotImplementedError
         return record
+
+    def __iter__(self) -> Iterator[GazeRecord]:
+        for i in range(len(self)):
+            yield self[i]
 
 
 # The issue with the below is that it doesn't suppored mixed data types
