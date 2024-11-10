@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import Iterator, NamedTuple, overload
+from typing import Iterator, NamedTuple, Optional, overload
 
 import numpy as np
 import numpy.typing as npt
 
+from pupil_labs.matching import Matcher, MatchingMethod
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -86,3 +87,20 @@ class EyeState:
     def __iter__(self) -> Iterator[EyeStateRecord]:
         for i in range(len(self)):
             yield self[i]
+
+    def sample(
+        self,
+        timestamps: npt.NDArray[np.float64],
+        method: MatchingMethod = MatchingMethod.NEAREST,
+        tolerance: Optional[float] = None,
+        include_timeseries_ts: bool = False,
+        include_target_ts: bool = False,
+    ) -> Matcher:
+        return Matcher(
+            timestamps,
+            self,
+            method=method,
+            tolerance=tolerance,
+            include_timeseries_ts=include_timeseries_ts,
+            include_target_ts=include_target_ts,
+        )
