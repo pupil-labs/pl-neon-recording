@@ -12,20 +12,12 @@ from pupil_labs.neon_recording.utils import (
 
 class EyeStateRecord(NamedTuple):
     ts: int
-    pupil_diameter_left: float
-    eyeball_center_left_x: float
-    eyeball_center_left_y: float
-    eyeball_center_left_z: float
-    optical_axis_left_x: float
-    optical_axis_left_y: float
-    optical_axis_left_z: float
+    pupil_diameter_left: npt.NDArray[np.float64]
+    eyeball_center_left: npt.NDArray[np.float64]
+    optical_axis_left: npt.NDArray[np.float64]
     pupil_diameter_right: float
-    eyeball_center_right_x: float
-    eyeball_center_right_y: float
-    eyeball_center_right_z: float
-    optical_axis_right_x: float
-    optical_axis_right_y: float
-    optical_axis_right_z: float
+    eyeball_center_right: npt.NDArray[np.float64]
+    optical_axis_right: npt.NDArray[np.float64]
 
 
 class EyeState:
@@ -68,5 +60,13 @@ class EyeState:
         return self._data
 
     def __getitem__(self, key: int) -> EyeStateRecord:
-        record = EyeStateRecord(self._time_data[key], *self._data[key])
+        record = EyeStateRecord(
+            self._time_data[key],
+            self._data[key, 0],
+            self._data[key, 1:4],
+            self._data[key, 4:7],
+            self._data[key, 7],
+            self._data[key, 8:11],
+            self._data[key, 11:14],
+        )
         return record
