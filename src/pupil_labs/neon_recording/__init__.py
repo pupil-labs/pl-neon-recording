@@ -3,7 +3,7 @@ import os
 
 import structlog
 
-from .neon_recording import load
+from .neon_recording import load, NeonRecording
 
 try:
     from importlib.metadata import PackageNotFoundError, version
@@ -34,4 +34,4 @@ structlog.configure(
     ],
 )
 
-__all__ = ["__version__", "load"]
+__all__ = ["__version__", "load", "NeonRecording"]
