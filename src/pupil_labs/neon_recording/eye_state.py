@@ -4,11 +4,12 @@ from typing import Iterator, NamedTuple, Optional, overload
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.matching import Matcher, MatchingMethod
+from pupil_labs.matching import MatchedIndividual, MatchingMethod
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
+from pupil_labs.video.array_like import ArrayLike
 
 
 class EyeStateRecord(NamedTuple):
@@ -21,14 +22,20 @@ class EyeStateRecord(NamedTuple):
     optical_axis_right: npt.NDArray[np.float64]
 
 
-class EyeState:
-    def __init__(self, rec_dir: Path):
+class EyeState(ArrayLike[EyeStateRecord]):
+    def __init__(
+        self, time_data: npt.NDArray[np.int64], eye_state_data: npt.NDArray[np.float64]
+    ):
+        self._time_data = time_data
+        self._data = eye_state_data.reshape(-1, 14)
+
+    @staticmethod
+    def from_native_recording(rec_dir: Path):
         eye_state_files = find_sorted_multipart_files(rec_dir, "eye_state")
         eye_state_data, time_data = load_multipart_data_time_pairs(
             eye_state_files, "<f4", 2
         )
-        self._time_data = time_data
-        self._data = eye_state_data.reshape(-1, 14)
+        return EyeState(time_data, eye_state_data)
 
     @property
     def timestamps(self) -> npt.NDArray[np.int64]:
@@ -82,7 +89,6 @@ class EyeState:
         else:
             # TODO
             raise NotImplementedError
-        return record
 
     def __iter__(self) -> Iterator[EyeStateRecord]:
         for i in range(len(self)):
@@ -93,14 +99,10 @@ class EyeState:
         timestamps: npt.NDArray[np.float64],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
-        include_timeseries_ts: bool = False,
-        include_target_ts: bool = False,
-    ) -> Matcher:
-        return Matcher(
+    ) -> MatchedIndividual:
+        return MatchedIndividual(
             timestamps,
             self,
             method=method,
             tolerance=tolerance,
-            include_timeseries_ts=include_timeseries_ts,
-            include_target_ts=include_target_ts,
         )

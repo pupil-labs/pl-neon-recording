@@ -4,7 +4,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.matching import Matcher, MatchingMethod
+from pupil_labs.matching import MatchedIndividual, MatchingMethod
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -19,7 +19,13 @@ class GazeRecord(NamedTuple):
 
 
 class Gaze(ArrayLike[GazeRecord]):
-    def __init__(self, rec_dir: Path):
+    def __init__(self, time_data: ArrayLike[int], gaze_data: ArrayLike[float]):
+        assert len(time_data) == len(gaze_data)
+        self._time_data = np.array(time_data)
+        self._gaze_data = np.array(gaze_data)
+
+    @staticmethod
+    def from_native_recording(rec_dir: Path):
         gaze_200hz_file = rec_dir / "gaze_200hz.raw"
         time_200hz_file = rec_dir / "gaze_200hz.time"
         gaze_file_pairs = []
@@ -28,8 +34,8 @@ class Gaze(ArrayLike[GazeRecord]):
         else:
             gaze_file_pairs = find_sorted_multipart_files(rec_dir, "gaze")
         gaze_data, time_data = load_multipart_data_time_pairs(gaze_file_pairs, "<f4", 2)
-        self._time_data = np.array(time_data)
-        self._gaze_data = np.array(gaze_data)
+
+        return Gaze(time_data, gaze_data)
 
     @property
     def timestamps(self) -> npt.NDArray[np.float64]:
@@ -60,8 +66,7 @@ class Gaze(ArrayLike[GazeRecord]):
         if isinstance(key, int):
             record = GazeRecord(self._time_data[key], *self._gaze_data[key])
         else:
-            # TODO
-            raise NotImplementedError
+            return Gaze(self._time_data[key], self._gaze_data[key])
         return record
 
     def __iter__(self) -> Iterator[GazeRecord]:
@@ -73,16 +78,12 @@ class Gaze(ArrayLike[GazeRecord]):
         timestamps: ArrayLike[int] | ArrayLike[float],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
-        include_timeseries_ts: bool = False,
-        include_target_ts: bool = False,
-    ) -> Matcher:
-        return Matcher(
+    ) -> MatchedIndividual:
+        return MatchedIndividual(
             timestamps,
             self,
             method=method,
             tolerance=tolerance,
-            include_timeseries_ts=include_timeseries_ts,
-            include_target_ts=include_target_ts,
         )
 
 
