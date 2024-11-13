@@ -1,0 +1,32 @@
+{
+  "recording_id": "1fe9c984-ef69-443f-8935-a0d385b63250",
+  "workspace_id": "805abbd1-b56b-4dc9-9179-532eead979bd",
+  "data_format_version": "2.3",
+  "app_version": "2.8.30-stage",
+  "start_time": 1726825501543000000,
+  "duration": 11013000000,
+  "android_device_id": "e6f98cdfb9268aa8",
+  "android_device_name": "Neon Companion",
+  "android_device_model": "rtwo_g",
+  "module_serial_number": "537468",
+  "wearer_id": "ade59fa1-67d7-4750-86c0-29c1deb28f80",
+  "template_data": {
+    "id": "dbb5bbc8-9c02-482b-8c42-11c6c98b6ec9",
+    "version": "2020-09-08T12:43:11.532000Z",
+    "recording_name": "2024-09-20:16:45:01",
+    "data": {}
+  },
+  "gaze_offset": [27.986145, -13.577515],
+  "calib_version": 1,
+  "pipeline_version": "2.7.0",
+  "os_version": "13",
+  "frame_id": "9",
+  "frame_name": "Is this thing on",
+  "firmware_version": [24, 8],
+  "gaze_frequency": 200,
+  "wearer_ied": 63.0,
+  "developer_settings": {
+    "post_processing": ["pp_inextrinsics", "pp_filtering"],
+    "gaze_processor": "GPU"
+  }
+}

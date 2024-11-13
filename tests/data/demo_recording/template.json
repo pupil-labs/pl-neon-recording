@@ -1,0 +1,13 @@
+{
+  "archived_at": null,
+  "created_at": "2020-09-08T12:42:11.704000Z",
+  "published_at": null,
+  "id": "dbb5bbc8-9c02-482b-8c42-11c6c98b6ec9",
+  "name": "auto_name: date and time",
+  "recording_ids": null,
+  "recording_name_format": ["{date}", ":", "{time}"],
+  "is_default_template": false,
+  "description": "",
+  "items": [],
+  "updated_at": "2021-05-05T15:50:54.229835Z"
+}
