@@ -33,10 +33,9 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     target_timestamps = np.arange(
         recording.eye.timestamps[0], recording.scene.timestamps[-1], 1 / fps
     )
-    matched_data = Matcher(
-        target_timestamps,
-        [recording.scene, recording.eye],
-        tolerance=2 / fps,
+    matched_data = zip(
+        Matcher(target_timestamps, recording.scene, tolerance=2 / fps),
+        Matcher(target_timestamps, recording.eye, tolerance=2 / fps),
     )
 
     with Writer(output_video_path) as video_writer:
