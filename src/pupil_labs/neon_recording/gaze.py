@@ -17,6 +17,10 @@ class GazeRecord(NamedTuple):
     x: float
     y: float
 
+    @property
+    def xy(self) -> tuple[float, float]:
+        return self.x, self.y
+
 
 class Gaze(ArrayLike[GazeRecord]):
     def __init__(self, time_data: ArrayLike[int], gaze_data: ArrayLike[float]):

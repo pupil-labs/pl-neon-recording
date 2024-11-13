@@ -21,6 +21,17 @@ class EyeStateRecord(NamedTuple):
     eyeball_center_right: npt.NDArray[np.float64]
     optical_axis_right: npt.NDArray[np.float64]
 
+    @property
+    def data(self) -> npt.NDArray[np.float64]:
+        return np.concatenate([
+            [self.ts, self.pupil_diameter_left],
+            self.eyeball_center_left,
+            self.optical_axis_left,
+            [self.pupil_diameter_right],
+            self.eyeball_center_right,
+            self.optical_axis_right,
+        ])
+
 
 class EyeState(ArrayLike[EyeStateRecord]):
     def __init__(
