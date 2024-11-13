@@ -55,6 +55,8 @@ class NeonRecording:
 
         self.start_ts_ns = self.info["start_time"]
         self.start_ts = self.start_ts_ns * 1e-9
+        self.duration_ns = self.info["duration"]
+        self.duration = self.duration_ns * 1e-9
 
         log.debug("NeonRecording: Loading wearer")
         self.wearer = {"uuid": "", "name": ""}
@@ -80,7 +82,7 @@ class NeonRecording:
 
     @cached_property
     def gaze(self) -> Gaze:
-        return Gaze(self._rec_dir)
+        return Gaze.from_native_recording(self._rec_dir)
 
     # @property
     # def imu(self) -> IMU:
@@ -91,7 +93,7 @@ class NeonRecording:
 
     @cached_property
     def eye_state(self) -> EyeState:
-        return EyeState(self._rec_dir)
+        return EyeState.from_native_recording(self._rec_dir)
 
     @property
     def scene(self) -> VideoTimeseries:
