@@ -10,6 +10,7 @@ from .calib import Calibration
 from .events import Events
 from .eye_state import EyeState
 from .gaze import Gaze
+from .imu import IMU
 
 log = structlog.get_logger(__name__)
 
@@ -84,34 +85,21 @@ class NeonRecording:
     def gaze(self) -> Gaze:
         return Gaze.from_native_recording(self._rec_dir)
 
-    # @property
-    # def imu(self) -> IMU:
-    #     if self.streams["imu"] is None:
-    #         self.streams["imu"] = IMU(self)
-
-    #     return self.streams["imu"]
+    @cached_property
+    def imu(self) -> IMU:
+        return IMU.from_native_recording(self._rec_dir)
 
     @cached_property
     def eye_state(self) -> EyeState:
         return EyeState.from_native_recording(self._rec_dir)
 
-    @property
+    @cached_property
     def scene(self) -> VideoTimeseries:
-        if self.streams["scene"] is None:
-            self.streams["scene"] = VideoTimeseries(
-                self._rec_dir, "Neon Scene Camera v1"
-            )
+        return VideoTimeseries(self._rec_dir, "Neon Scene Camera v1")
 
-        return self.streams["scene"]
-
-    @property
+    @cached_property
     def eye(self) -> VideoTimeseries:
-        if self.streams["eye"] is None:
-            self.streams["eye"] = VideoTimeseries(
-                self._rec_dir, "Neon Sensor Module v1"
-            )
-
-        return self.streams["eye"]
+        return VideoTimeseries(self._rec_dir, "Neon Sensor Module v1")
 
     @cached_property
     def events(self) -> Events:
