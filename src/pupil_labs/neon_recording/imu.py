@@ -127,9 +127,13 @@ class IMU(ArrayLike[IMURecord]):
                 self._data[key, 9:13],
             )
             return record
+        elif isinstance(key, slice):
+            return IMU(
+                self._time_data[key],
+                self._data[key],
+            )
         else:
-            # TODO
-            raise NotImplementedError
+            raise TypeError(f"Invalid argument type {type(key)}")
 
     def __iter__(self) -> Iterator[IMURecord]:
         for i in range(len(self)):
