@@ -41,12 +41,17 @@ def load_and_convert_tstamps(path: Path):
     return np.fromfile(str(path), dtype="<u8").astype(np.float64) * 1e-9
 
 
-def load_multipart_timestamps(files):
-    ts_buffer = b""
+def load_multipart_timestamps(files, concatenate=True):
+    # ts_buffer = b""
+    ts_buffer = []
     for time_file in files:
         with open(time_file, "rb") as f:
-            ts_buffer += f.read()
+            ts_buffer.append(f.read())
 
-    timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.float64) * 1e-9
+    timestamps = [
+        np.frombuffer(b, dtype="<u8").astype(np.float64) * 1e-9 for b in ts_buffer
+    ]
+    if concatenate:
+        timestamps = np.concatenate(timestamps)
 
     return timestamps
