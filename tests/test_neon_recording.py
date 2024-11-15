@@ -184,6 +184,23 @@ def test_scene(rec: nr.NeonRecording):
     assert np.mean(sensor[305].bgr) == target_305
 
 
+def test_audio(rec: nr.NeonRecording):
+    sensor = rec.audio
+    assert len(sensor) == 432
+
+    target_0 = 0.05233466625213623
+    a = sensor[0]
+    assert np.mean(a.to_ndarray()) == target_0
+
+    target_100 = -0.0004108241409994662
+    a = sensor[100]
+    assert np.mean(a.to_ndarray()) == target_100
+
+    target_431 = -0.0006783712888136506
+    a = sensor[431]
+    assert np.mean(a.to_ndarray()) == target_431
+
+
 def test_eye(rec: nr.NeonRecording):
     sensor = rec.eye
     assert len(sensor) == 1951
