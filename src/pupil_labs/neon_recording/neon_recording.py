@@ -130,7 +130,7 @@ class NeonRecording:
 
     @cached_property
     def events(self) -> Events:
-        return Events(self._rec_dir)
+        return Events.from_native_recording(self._rec_dir)
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:

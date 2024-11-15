@@ -17,15 +17,20 @@ class EventRecord(NamedTuple):
 
 
 class Events(ArrayLike[EventRecord]):
-    def __init__(self, rec_dir: Path):
+    def __init__(
+        self, time_data: npt.NDArray[np.int64], event_names: npt.NDArray[np.str_]
+    ):
+        self._time_data = time_data
+        self._event_names = event_names
+
+    @staticmethod
+    def from_native_recording(rec_dir: Path):
         events_file = rec_dir / "event.txt"
         time_file = events_file.with_suffix(".time")
-        if not events_file.exists or not time_file.exists():
-            raise FileNotFoundError("Event files not found")
-
-        self._event_names, self._time_data = load_multipart_data_time_pairs(
+        event_names, time_data = load_multipart_data_time_pairs(
             [(events_file, time_file)], "str", 1
         )
+        return Events(time_data, event_names)
 
     @property
     def timestamps(self) -> npt.NDArray[np.int64]:
@@ -51,9 +56,13 @@ class Events(ArrayLike[EventRecord]):
                 self._event_names[key],
             )
             return record
+        elif isinstance(key, slice):
+            return Events(
+                self._time_data[key],
+                self._event_names[key],
+            )
         else:
-            # TODO
-            raise NotImplementedError
+            raise TypeError(f"Invalid argument type {type(key)}")
 
     def __iter__(self) -> Iterator[EventRecord]:
         for i in range(len(self)):

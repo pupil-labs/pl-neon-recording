@@ -97,9 +97,10 @@ class EyeState(ArrayLike[EyeStateRecord]):
                 self._data[key, 11:14],
             )
             return record
+        elif isinstance(key, slice):
+            return EyeState(self._time_data[key], self._data[key])
         else:
-            # TODO
-            raise NotImplementedError
+            raise TypeError(f"Invalid argument type {type(key)}")
 
     def __iter__(self) -> Iterator[EyeStateRecord]:
         for i in range(len(self)):

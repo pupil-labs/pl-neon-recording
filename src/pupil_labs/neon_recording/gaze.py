@@ -69,8 +69,10 @@ class Gaze(ArrayLike[GazeRecord]):
     def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
         if isinstance(key, int):
             record = GazeRecord(self._time_data[key], *self._gaze_data[key])
-        else:
+        elif isinstance(key, slice):
             return Gaze(self._time_data[key], self._gaze_data[key])
+        else:
+            raise TypeError(f"Invalid argument type {type(key)}")
         return record
 
     def __iter__(self) -> Iterator[GazeRecord]:
