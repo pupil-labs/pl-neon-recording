@@ -12,6 +12,141 @@ def rec():
     return nr.load(rec_dir)
 
 
+def test_rec_info(rec: nr.NeonRecording):
+    assert rec.device_serial == "537468"
+    assert rec.wearer["name"] == "Fon "
+    assert rec.wearer["uuid"] == "ade59fa1-67d7-4750-86c0-29c1deb28f80"
+    assert rec.start_ts_ns == 1726825501543000000
+    assert rec.start_ts == 1726825501.5430002
+    assert rec.start_ts_ns * 1e-9 == rec.start_ts
+    assert rec.duration_ns == 11013000000
+    assert rec.duration == 11.013
+    assert rec.duration_ns * 1e-9 == rec.duration
+
+
+def test_calibration(rec: nr.NeonRecording):
+    assert rec.calibration["version"] == 1
+    assert rec.calibration["serial"] == b"537468"
+    assert rec.calibration["crc"] == 1321655662
+
+    assert np.all(rec.calibration["scene_extrinsics_affine_matrix"] == np.identity(4))
+    assert np.all(
+        rec.calibration["scene_camera_matrix"]
+        == np.array([
+            [890.2541925805483, 0.0, 816.7176454408117],
+            [0.0, 890.1577391451178, 608.4078485457237],
+            [0.0, 0.0, 1.0],
+        ])
+    )
+    assert np.all(
+        rec.calibration["scene_distortion_coefficients"]
+        == np.array([
+            -0.13103450220352034,
+            0.10895240491189562,
+            -0.00015433781774177186,
+            -0.0005697866263586703,
+            -0.0014725217669056382,
+            0.17010797384055418,
+            0.05205890097936363,
+            0.022873448454357646,
+        ])
+    )
+
+    assert np.all(
+        rec.calibration["right_extrinsics_affine_matrix"]
+        == np.array([
+            [
+                -0.8273937106132507,
+                0.16449101269245148,
+                0.5369938611984253,
+                16.68750762939453,
+            ],
+            [
+                0.05966874212026596,
+                0.9764820337295532,
+                -0.20717737078666687,
+                20.016399383544922,
+            ],
+            [
+                -0.5584436655044556,
+                -0.1393755078315735,
+                -0.8177500367164612,
+                -5.371044158935547,
+            ],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+    )
+
+    assert np.all(
+        rec.calibration["right_camera_matrix"]
+        == np.array([
+            [140.7630017613883, 0.0, 96.04486355572857],
+            [0.0, 140.54444033458333, 98.68308547789763],
+            [0.0, 0.0, 1.0],
+        ])
+    )
+
+    assert np.all(
+        rec.calibration["right_distortion_coefficients"]
+        == np.array([
+            0.049520260866990545,
+            -0.14946769630490422,
+            0.0007738053534014584,
+            -0.0017548805926566472,
+            -0.6116720215613785,
+            -0.0434681723871091,
+            0.05622047932455636,
+            -0.7332111896750039,
+        ])
+    )
+    assert np.all(
+        rec.calibration["left_extrinsics_affine_matrix"]
+        == np.array([
+            [
+                -0.8168811798095703,
+                -0.14754149317741394,
+                -0.5576168894767761,
+                -15.630786895751953,
+            ],
+            [
+                -0.04690315201878548,
+                0.9805216789245605,
+                -0.1907283067703247,
+                20.43899917602539,
+            ],
+            [
+                0.5748957991600037,
+                -0.1296483874320984,
+                -0.8078899383544922,
+                -5.829586029052734,
+            ],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+    )
+
+    assert np.all(
+        rec.calibration["left_camera_matrix"]
+        == np.array([
+            [141.46418641465175, 0.0, 96.80626440109076],
+            [0.0, 141.24269854555249, 95.59602892044403],
+            [0.0, 0.0, 1.0],
+        ])
+    )
+    assert np.all(
+        rec.calibration["left_distortion_coefficients"]
+        == np.array([
+            0.048437408587008554,
+            -0.14538599862965582,
+            6.740974611049842e-05,
+            0.0006890866531893396,
+            -0.6243335028719077,
+            -0.04281406478423455,
+            0.05087524945072823,
+            -0.7328426044602258,
+        ])
+    )
+
+
 def test_gaze(rec: nr.NeonRecording):
     sensor = rec.gaze
     assert len(sensor) == 1951
@@ -173,6 +308,8 @@ def test_events(rec: nr.NeonRecording):
 def test_scene(rec: nr.NeonRecording):
     sensor = rec.scene
     assert len(sensor) == 306
+    assert sensor.width == 1600
+    assert sensor.height == 1200
 
     target_0 = 150.85475729166666
     assert np.mean(sensor[0].bgr) == target_0
@@ -213,6 +350,8 @@ def test_audio(rec: nr.NeonRecording):
 def test_eye(rec: nr.NeonRecording):
     sensor = rec.eye
     assert len(sensor) == 1951
+    assert sensor.width == 384
+    assert sensor.height == 192
 
     target_0 = 122.28241644965277
     assert np.mean(sensor[0].bgr) == target_0
