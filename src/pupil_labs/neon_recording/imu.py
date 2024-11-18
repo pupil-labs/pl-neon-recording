@@ -39,6 +39,7 @@ class IMU(ArrayLike[IMURecord]):
     def from_native_recording(rec_dir: Path) -> "IMU":
         imu_files = find_sorted_multipart_files(rec_dir, "extimu")
         imu_data = []
+        ts_data = []
 
         for imu_file, _ in imu_files:
             with imu_file.open("rb") as raw_file:
@@ -66,8 +67,10 @@ class IMU(ArrayLike[IMURecord]):
                     y /= norms
                     z /= norms
 
+                    ts_data.append(
+                        packet.tsNs,
+                    )
                     imu_data.append((
-                        packet.tsNs * 1e-9,
                         packet.gyroData.x,
                         packet.gyroData.y,
                         packet.gyroData.z,
@@ -82,7 +85,8 @@ class IMU(ArrayLike[IMURecord]):
                     ))
 
         data = np.array(imu_data)
-        return IMU(data[:, 0], data[:, 1:])
+        ts = np.array(ts_data)
+        return IMU(ts, data)
 
     @property
     def timestamps(self) -> npt.NDArray[np.int64]:
