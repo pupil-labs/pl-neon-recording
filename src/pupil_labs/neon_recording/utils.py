@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Tuple
+from typing import Literal, Sequence, Tuple, overload
 
 import numpy as np
+import numpy.typing as npt
 
 
 def find_sorted_multipart_files(
@@ -32,25 +33,29 @@ def load_multipart_data_time_pairs(
     else:
         data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
 
-    timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.float64) * 1e-9
+    timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.int64)
 
     return data, timestamps
 
 
-def load_and_convert_tstamps(path: Path):
-    return np.fromfile(str(path), dtype="<u8").astype(np.float64) * 1e-9
-
-
-def load_multipart_timestamps(files, concatenate=True):
-    # ts_buffer = b""
+@overload
+def load_multipart_timestamps(
+    files: Sequence[Path], concatenate: Literal[False]
+) -> list[npt.NDArray[np.int64]]: ...
+@overload
+def load_multipart_timestamps(
+    files: Sequence[Path], concatenate: Literal[True]
+) -> npt.NDArray[np.int64]: ...
+def load_multipart_timestamps(
+    files: Sequence[Path], concatenate: bool
+) -> npt.NDArray[np.int64] | list[npt.NDArray[np.int64]]:
     ts_buffer = []
     for time_file in files:
         with open(time_file, "rb") as f:
             ts_buffer.append(f.read())
 
-    timestamps = [
-        np.frombuffer(b, dtype="<u8").astype(np.float64) * 1e-9 for b in ts_buffer
-    ]
+    timestamps = [np.frombuffer(b, dtype="<u8").astype(np.int64) for b in ts_buffer]
+
     if concatenate:
         timestamps = np.concatenate(timestamps)
 

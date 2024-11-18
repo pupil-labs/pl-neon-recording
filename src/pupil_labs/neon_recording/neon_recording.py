@@ -3,15 +3,14 @@ import pathlib
 from functools import cached_property
 from typing import Union
 
-from pupil_labs.video import AudioFrame, MultiReader, Reader, VideoFrame
-
 from . import structlog
 from .calib import Calibration
 from .events import Events
 from .eye_state import EyeState
+from .frame import AudioFrame, VideoFrame
 from .gaze import Gaze
 from .imu import IMU
-from .utils import find_sorted_multipart_files, load_multipart_timestamps
+from .video_reader import VideoReader
 
 log = structlog.get_logger(__name__)
 
@@ -95,38 +94,16 @@ class NeonRecording:
         return EyeState.from_native_recording(self._rec_dir)
 
     @cached_property
-    def scene(self) -> MultiReader[VideoFrame]:
-        video_files = find_sorted_multipart_files(
-            self._rec_dir, "Neon Scene Camera v1", ".mp4"
-        )
-        timestamps = load_multipart_timestamps(
-            [p[1] for p in video_files], concatenate=False
-        )
-        readers = [
-            Reader(p[0], timestamps=ts) for p, ts in zip(video_files, timestamps)
-        ]
-        return MultiReader(readers)
+    def scene(self) -> VideoReader[VideoFrame]:
+        return VideoReader.from_native_recording(self._rec_dir, "Neon Scene Camera v1")
 
     @property
-    def audio(self) -> MultiReader[AudioFrame]:
-        video_files = find_sorted_multipart_files(
-            self._rec_dir, "Neon Scene Camera v1", ".mp4"
-        )
-        readers = [Reader(p[0], stream="audio") for p in video_files]
-        return MultiReader(readers)
+    def audio(self) -> VideoReader[AudioFrame]:
+        return self.scene.audio
 
     @cached_property
-    def eye(self) -> MultiReader[VideoFrame]:
-        video_files = find_sorted_multipart_files(
-            self._rec_dir, "Neon Sensor Module v1", ".mp4"
-        )
-        timestamps = load_multipart_timestamps(
-            [p[1] for p in video_files], concatenate=False
-        )
-        readers = [
-            Reader(p[0], timestamps=ts) for p, ts in zip(video_files, timestamps)
-        ]
-        return MultiReader(readers)
+    def eye(self) -> VideoReader[VideoFrame]:
+        return VideoReader.from_native_recording(self._rec_dir, "Neon Sensor Module v1")
 
     @cached_property
     def events(self) -> Events:

@@ -17,21 +17,21 @@ def test_gaze(rec: nr.NeonRecording):
     assert len(sensor) == 1951
 
     target_0 = (
-        1726825502.652337,
+        1726825502652336840,
         740.6018676757812,
         685.78662109375,
     )
     assert sensor[0] == target_0
 
     target_100 = (
-        1726825503.3129618,
+        1726825503312961840,
         766.157958984375,
         705.6735229492188,
     )
     assert sensor[100] == target_100
 
     target_1950 = (
-        1726825512.576638,
+        1726825512576637840,
         1081.5859375,
         1174.9180908203125,
     )
@@ -43,7 +43,7 @@ def test_eye_state(rec: nr.NeonRecording):
     assert len(sensor) == 1754
 
     target_0 = (
-        1726825503.7984638,
+        1726825503798463840,
         5.107705593109131,
         -29.4140625,
         10.517578125,
@@ -62,7 +62,7 @@ def test_eye_state(rec: nr.NeonRecording):
     assert np.all(sensor[0].data == target_0)
 
     target_100 = (
-        1726825504.298967,
+        1726825504298966840,
         5.102882385253906,
         -29.677734375,
         10.625,
@@ -81,7 +81,7 @@ def test_eye_state(rec: nr.NeonRecording):
     assert np.all(sensor[100].data == target_100)
 
     target_1753 = (
-        1726825512.576638,
+        1726825512576637840,
         5.204510688781738,
         -28.88671875,
         10.771484375,
@@ -105,7 +105,7 @@ def test_imu(rec: nr.NeonRecording):
     assert len(sensor) == 1094
 
     target_0 = (
-        1726825503.025795,
+        1726825503025794840,
         -1.39617919921875,
         -5.626678466796875,
         2.2525787353515625,
@@ -123,7 +123,7 @@ def test_imu(rec: nr.NeonRecording):
     assert np.all(sensor[0].data == target_0)
 
     target_100 = (
-        1726825503.8969738,
+        1726825503896973840,
         -4.8770904541015625,
         -7.3375701904296875,
         -2.0809173583984375,
@@ -141,7 +141,7 @@ def test_imu(rec: nr.NeonRecording):
     assert np.all(sensor[100].data == target_100)
 
     target_1093 = (
-        1726825512.557629,
+        1726825512557628840,
         -7.07244873046875,
         3.467559814453125,
         -4.4002532958984375,
@@ -163,10 +163,10 @@ def test_events(rec: nr.NeonRecording):
     sensor = rec.events
     assert len(sensor) == 2
 
-    target_0 = (1726825501.5430002, "recording.begin")
+    target_0 = (1726825501543000000, "recording.begin")
     assert sensor[0] == target_0
 
-    target_1 = (1726825512.556, "recording.end")
+    target_1 = (1726825512556000000, "recording.end")
     assert sensor[1] == target_1
 
 
@@ -176,12 +176,18 @@ def test_scene(rec: nr.NeonRecording):
 
     target_0 = 150.85475729166666
     assert np.mean(sensor[0].bgr) == target_0
+    assert sensor[0].index == 0
+    assert sensor[0].timestamp == 1726825502345643840
 
     target_100 = 150.60516822916668
     assert np.mean(sensor[100].bgr) == target_100
+    assert sensor[100].index == 100
+    assert sensor[100].timestamp == 1726825505679888840
 
     target_305 = 146.23578055555555
     assert np.mean(sensor[305].bgr) == target_305
+    assert sensor[305].index == 305
+    assert sensor[305].timestamp == 1726825512515089840
 
 
 def test_audio(rec: nr.NeonRecording):
@@ -189,16 +195,19 @@ def test_audio(rec: nr.NeonRecording):
     assert len(sensor) == 432
 
     target_0 = 0.05233466625213623
-    a = sensor[0]
-    assert np.mean(a.to_ndarray()) == target_0
+    assert np.mean(sensor[0].to_ndarray()) == target_0
+    assert sensor[0].index == 0
+    assert sensor[0].timestamp == 1726825502345643840
 
     target_100 = -0.0004108241409994662
-    a = sensor[100]
-    assert np.mean(a.to_ndarray()) == target_100
+    assert np.mean(sensor[100].to_ndarray()) == target_100
+    assert sensor[100].index == 100
+    assert sensor[100].timestamp == 1726825504884954951
 
     target_431 = -0.0006783712888136506
-    a = sensor[431]
-    assert np.mean(a.to_ndarray()) == target_431
+    assert np.mean(sensor[431].to_ndarray()) == target_431
+    assert sensor[431].index == 431
+    assert sensor[431].timestamp == 1726825512569988284
 
 
 def test_eye(rec: nr.NeonRecording):
@@ -207,9 +216,15 @@ def test_eye(rec: nr.NeonRecording):
 
     target_0 = 122.28241644965277
     assert np.mean(sensor[0].bgr) == target_0
+    assert sensor[0].index == 0
+    assert sensor[0].timestamp == 1726825502652336840
 
     target_100 = 121.9274269386574
     assert np.mean(sensor[100].bgr) == target_100
+    assert sensor[100].index == 100
+    assert sensor[100].timestamp == 1726825503312961840
 
     target_1950 = 134.1152298538773
     assert np.mean(sensor[1950].bgr) == target_1950
+    assert sensor[1950].index == 1950
+    assert sensor[1950].timestamp == 1726825512576637840
