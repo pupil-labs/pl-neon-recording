@@ -42,7 +42,7 @@ class Gaze(ArrayLike[GazeRecord]):
         return Gaze(time_data, gaze_data)
 
     @property
-    def timestamps(self) -> npt.NDArray[np.float64]:
+    def timestamps(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
     ts = timestamps

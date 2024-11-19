@@ -10,7 +10,7 @@ from .eye_state import EyeState
 from .frame import AudioFrame, VideoFrame
 from .gaze import Gaze
 from .imu import IMU
-from .video_reader import VideoReader
+from .video_reader import NeonVideoReader
 
 log = structlog.get_logger(__name__)
 
@@ -94,16 +94,20 @@ class NeonRecording:
         return EyeState.from_native_recording(self._rec_dir)
 
     @cached_property
-    def scene(self) -> VideoReader[VideoFrame]:
-        return VideoReader.from_native_recording(self._rec_dir, "Neon Scene Camera v1")
+    def scene(self) -> NeonVideoReader[VideoFrame]:
+        return NeonVideoReader.from_native_recording(
+            self._rec_dir, "Neon Scene Camera v1", self.start_ts_ns
+        )
 
     @property
-    def audio(self) -> VideoReader[AudioFrame]:
+    def audio(self) -> NeonVideoReader[AudioFrame]:
         return self.scene.audio
 
     @cached_property
-    def eye(self) -> VideoReader[VideoFrame]:
-        return VideoReader.from_native_recording(self._rec_dir, "Neon Sensor Module v1")
+    def eye(self) -> NeonVideoReader[VideoFrame]:
+        return NeonVideoReader.from_native_recording(
+            self._rec_dir, "Neon Sensor Module v1", self.start_ts_ns
+        )
 
     @cached_property
     def events(self) -> Events:
