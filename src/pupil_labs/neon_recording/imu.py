@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
-from pupil_labs.matching import MatchedData, MatchingMethod
+from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.imu_pb2 import ImuPacket  # type: ignore
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import find_sorted_multipart_files
@@ -148,8 +148,8 @@ class IMU(NeonTimeseries[IMURecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
-    ) -> MatchedData:
-        return MatchedData(
+    ) -> SampledData:
+        return sample(
             timestamps,
             self,
             method=method,
