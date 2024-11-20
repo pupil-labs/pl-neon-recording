@@ -11,10 +11,12 @@ from pupil_labs.neon_recording.utils import (
 )
 from pupil_labs.video.array_like import ArrayLike
 
+from .neon_timeseries import NeonTimeseries
+
 
 class EyeStateRecord(NamedTuple):
     ts: int
-    pupil_diameter_left: npt.NDArray[np.float64]
+    pupil_diameter_left: float
     eyeball_center_left: npt.NDArray[np.float64]
     optical_axis_left: npt.NDArray[np.float64]
     pupil_diameter_right: float
@@ -33,12 +35,10 @@ class EyeStateRecord(NamedTuple):
         ])
 
 
-class EyeState(ArrayLike[EyeStateRecord]):
-    def __init__(
-        self, time_data: npt.NDArray[np.int64], eye_state_data: npt.NDArray[np.float64]
-    ):
-        self._time_data = time_data
-        self._data = eye_state_data.reshape(-1, 14)
+class EyeState(NeonTimeseries[EyeStateRecord]):
+    def __init__(self, time_data: ArrayLike[int], eye_state_data: ArrayLike[float]):
+        self._time_data = np.array(time_data)
+        self._data = np.array(eye_state_data)
 
     @staticmethod
     def from_native_recording(rec_dir: Path):
@@ -46,6 +46,7 @@ class EyeState(ArrayLike[EyeStateRecord]):
         eye_state_data, time_data = load_multipart_data_time_pairs(
             eye_state_files, "<f4", 2
         )
+        eye_state_data = eye_state_data.reshape(-1, 14)
         return EyeState(time_data, eye_state_data)
 
     @property
@@ -108,7 +109,7 @@ class EyeState(ArrayLike[EyeStateRecord]):
 
     def sample(
         self,
-        timestamps: npt.NDArray[np.float64],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
     ) -> MatchedIndividual:

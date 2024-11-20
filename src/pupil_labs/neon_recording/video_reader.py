@@ -1,19 +1,28 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Sequence, overload
+from typing import Optional, Sequence, overload
 
 import numpy as np
 import numpy.typing as npt
 
 import pupil_labs.video as plv
-from pupil_labs.video import Indexer, MultiReader, Reader, ReaderFrameType, ReaderLike
+from pupil_labs.matching import MatchedIndividual, MatchingMethod
+from pupil_labs.video import (
+    ArrayLike,
+    Indexer,
+    MultiReader,
+    Reader,
+    ReaderFrameType,
+    ReaderLike,
+)
 from pupil_labs.video.frame_slice import FrameSlice
 
 from .frame import AudioFrame, VideoFrame
+from .neon_timeseries import NeonTimeseries
 from .utils import find_sorted_multipart_files, load_multipart_timestamps
 
 
-class NeonVideoReader(MultiReader[ReaderFrameType]):
+class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameType]):
     def __init__(
         self,
         readers: Sequence[ReaderLike],
@@ -57,7 +66,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
 
         return NeonVideoReader(audio_readers, abs_audio_timestamps, self._rec_start)
 
-    @cached_property
+    @property
     def timestamps(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
@@ -123,3 +132,16 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
             return [self[int(i)] for i in key]
         else:
             raise TypeError(f"unsupported key type: {type(key)}")
+
+    def sample(
+        self,
+        timestamps: ArrayLike[int] | ArrayLike[float],
+        method: MatchingMethod = MatchingMethod.NEAREST,
+        tolerance: Optional[float] = None,
+    ) -> MatchedIndividual[ReaderFrameType]:
+        return MatchedIndividual(
+            timestamps,
+            self,
+            method=method,
+            tolerance=tolerance,
+        )

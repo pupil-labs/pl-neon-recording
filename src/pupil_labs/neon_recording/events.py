@@ -10,18 +10,18 @@ from pupil_labs.neon_recording.utils import (
 )
 from pupil_labs.video.array_like import ArrayLike
 
+from .neon_timeseries import NeonTimeseries
+
 
 class EventRecord(NamedTuple):
     ts: int
     event_name: str
 
 
-class Events(ArrayLike[EventRecord]):
-    def __init__(
-        self, time_data: npt.NDArray[np.int64], event_names: npt.NDArray[np.str_]
-    ):
-        self._time_data = time_data
-        self._event_names = event_names
+class Events(NeonTimeseries[EventRecord]):
+    def __init__(self, time_data: ArrayLike[int], event_names: ArrayLike[str]):
+        self._time_data = np.array(time_data)
+        self._event_names = np.array(event_names)
 
     @staticmethod
     def from_native_recording(rec_dir: Path):
@@ -70,7 +70,7 @@ class Events(ArrayLike[EventRecord]):
 
     def sample(
         self,
-        timestamps: npt.NDArray[np.float64],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
     ) -> MatchedIndividual:

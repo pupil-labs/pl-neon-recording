@@ -9,6 +9,7 @@ from pupil_labs.matching import MatchedIndividual, MatchingMethod
 from pupil_labs.video.array_like import ArrayLike
 
 from . import imu_pb2
+from .neon_timeseries import NeonTimeseries
 from .utils import find_sorted_multipart_files
 
 
@@ -30,10 +31,10 @@ class IMURecord(NamedTuple):
         ])
 
 
-class IMU(ArrayLike[IMURecord]):
-    def __init__(self, time_data: npt.NDArray[np.int64], data: npt.NDArray[np.float64]):
-        self._time_data = time_data
-        self._data = data
+class IMU(NeonTimeseries[IMURecord]):
+    def __init__(self, time_data: ArrayLike[int], data: ArrayLike[float]):
+        self._time_data = np.array(time_data)
+        self._data = np.array(data)
 
     @staticmethod
     def from_native_recording(rec_dir: Path) -> "IMU":
@@ -145,7 +146,7 @@ class IMU(ArrayLike[IMURecord]):
 
     def sample(
         self,
-        timestamps: npt.NDArray[np.float64],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
     ) -> MatchedIndividual:

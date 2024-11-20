@@ -9,7 +9,9 @@ from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
-from pupil_labs.video.array_like import ArrayLike
+from pupil_labs.video import ArrayLike
+
+from .neon_timeseries import NeonTimeseries
 
 
 class GazeRecord(NamedTuple):
@@ -22,7 +24,7 @@ class GazeRecord(NamedTuple):
         return self.x, self.y
 
 
-class Gaze(ArrayLike[GazeRecord]):
+class Gaze(NeonTimeseries[GazeRecord]):
     def __init__(self, time_data: ArrayLike[int], gaze_data: ArrayLike[float]):
         assert len(time_data) == len(gaze_data)
         self._time_data = np.array(time_data)
@@ -81,7 +83,7 @@ class Gaze(ArrayLike[GazeRecord]):
 
     def sample(
         self,
-        timestamps: ArrayLike[int] | ArrayLike[float],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
     ) -> MatchedIndividual:
@@ -91,40 +93,3 @@ class Gaze(ArrayLike[GazeRecord]):
             method=method,
             tolerance=tolerance,
         )
-
-
-# The issue with the below is that it doesn't suppored mixed data types
-class Gaze2(npt.NDArray[np.float64]):
-    def __new__(cls, rec_dir: Path):
-        gaze_200hz_file = rec_dir / "gaze_200hz.raw"
-        time_200hz_file = rec_dir / "gaze_200hz.time"
-        gaze_file_pairs = []
-        if gaze_200hz_file.exists() and time_200hz_file.exists():
-            gaze_file_pairs.append((gaze_200hz_file, time_200hz_file))
-        else:
-            gaze_file_pairs = find_sorted_multipart_files(rec_dir, "gaze")
-        gaze_data, time_data = load_multipart_data_time_pairs(gaze_file_pairs, "<f4", 2)
-        data = np.vstack([time_data, gaze_data.T]).T
-        return data.view(cls)
-
-    @property
-    def timestamps(self) -> npt.NDArray[np.int64]:
-        return self._index_data(0)
-
-    @property
-    def x(self) -> npt.NDArray[np.float64]:
-        return self._index_data(1)
-
-    @property
-    def y(self) -> npt.NDArray[np.float64]:
-        return self._index_data(2)
-
-    @property
-    def xy(self) -> npt.NDArray[np.float64]:
-        return self._index_data(slice(1, 3))
-
-    def _index_data(self, key: int | slice) -> npt.NDArray:
-        if len(self.shape) == 1:
-            return self[key]
-        else:
-            return self[:, key]
