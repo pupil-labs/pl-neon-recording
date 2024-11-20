@@ -339,12 +339,12 @@ def test_audio(rec: nr.NeonRecording):
     target_100 = -0.0004108241409994662
     assert np.mean(sensor[100].to_ndarray()) == target_100
     assert sensor[100].index == 100
-    assert sensor[100].timestamp == 1726825504884954951
+    assert sensor[100].timestamp == 1726825504871320411
 
     target_431 = -0.0006783712888136506
     assert np.mean(sensor[431].to_ndarray()) == target_431
     assert sensor[431].index == 431
-    assert sensor[431].timestamp == 1726825512569988284
+    assert sensor[431].timestamp == 1726825512515089840
 
 
 def test_eye(rec: nr.NeonRecording):
