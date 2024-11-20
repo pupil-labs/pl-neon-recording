@@ -246,7 +246,7 @@ wheels = [
 
 [package.optional-dependencies]
 toml = [
-    { name = "tomli", marker = "python_full_version == '3.11'" },
+    { name = "tomli", marker = "python_full_version <= '3.11'" },
 ]
 
 [[package]]
@@ -1081,7 +1081,8 @@ dev = [
     { name = "mkdocs-material", specifier = ">=9.5" },
     { name = "mkdocs-minify-plugin", specifier = ">=0.8" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.25" },
-    { name = "mypy", specifier = ">=0.991" },
+    { name = "mypy", specifier = ">=1.13.0" },
+    { name = "opencv-python", specifier = ">=4.10.0.84" },
     { name = "pre-commit", specifier = ">=2.20.0" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=4.0.0" },

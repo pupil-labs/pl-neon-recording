@@ -7,6 +7,7 @@
 Functionality for loading Neon recordings in the native recording format.
 
 ## Installation
+
 ```bash
 pip install pupil_labs-neon_recording
 ```
