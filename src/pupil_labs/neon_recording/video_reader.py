@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 import pupil_labs.video as plv
-from pupil_labs.matching import MatchedData, MatchingMethod
+from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
@@ -140,8 +140,8 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
         timestamps: ArrayLike[int] | ArrayLike[float],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
-    ) -> MatchedData[ReaderFrameType]:
-        return MatchedData(
+    ) -> SampledData[ReaderFrameType]:
+        return sample(
             timestamps,
             self,
             method=method,

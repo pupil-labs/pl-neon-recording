@@ -4,7 +4,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.matching import MatchedData, MatchingMethod
+from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
@@ -72,8 +72,8 @@ class Events(NeonTimeseries[EventRecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[float] = None,
-    ) -> MatchedData:
-        return MatchedData(
+    ) -> SampledData:
+        return sample(
             timestamps,
             self,
             method=method,
