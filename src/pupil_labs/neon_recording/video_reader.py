@@ -7,6 +7,12 @@ import numpy.typing as npt
 
 import pupil_labs.video as plv
 from pupil_labs.matching import MatchedIndividual, MatchingMethod
+from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
+from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
+from pupil_labs.neon_recording.utils import (
+    find_sorted_multipart_files,
+    load_multipart_timestamps,
+)
 from pupil_labs.video import (
     ArrayLike,
     Indexer,
@@ -16,10 +22,6 @@ from pupil_labs.video import (
     ReaderLike,
 )
 from pupil_labs.video.frame_slice import FrameSlice
-
-from .frame import AudioFrame, VideoFrame
-from .neon_timeseries import NeonTimeseries
-from .utils import find_sorted_multipart_files, load_multipart_timestamps
 
 
 class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameType]):

@@ -6,11 +6,10 @@ import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from pupil_labs.matching import MatchedIndividual, MatchingMethod
+from pupil_labs.neon_recording.imu_pb2 import ImuPacket  # type: ignore
+from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
+from pupil_labs.neon_recording.utils import find_sorted_multipart_files
 from pupil_labs.video.array_like import ArrayLike
-
-from . import imu_pb2
-from .neon_timeseries import NeonTimeseries
-from .utils import find_sorted_multipart_files
 
 
 class IMURecord(NamedTuple):
@@ -172,7 +171,7 @@ class IMU(NeonTimeseries[IMURecord]):
             packet_sizes.append(packet_size)
             packet_bytes = buffer[index : index + packet_size]
             index += packet_size
-            packet = imu_pb2.ImuPacket()
+            packet = ImuPacket()
             packet.ParseFromString(packet_bytes)
 
             yield packet

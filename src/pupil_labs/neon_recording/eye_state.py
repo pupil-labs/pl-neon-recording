@@ -5,13 +5,12 @@ import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.matching import MatchedIndividual, MatchingMethod
+from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
 from pupil_labs.video.array_like import ArrayLike
-
-from .neon_timeseries import NeonTimeseries
 
 
 class EyeStateRecord(NamedTuple):
