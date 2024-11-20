@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 import pupil_labs.neon_recording as nr
-from pupil_labs.matching import MatchedIndividual
+from pupil_labs.matching import MatchedData
 from pupil_labs.neon_recording.utils import GrayFrame
 from pupil_labs.video import Writer
 
@@ -34,8 +34,8 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         recording.eye.timestamps[0], recording.scene.timestamps[-1], 1 / fps
     )
     matched_data = zip(
-        MatchedIndividual(target_timestamps, recording.scene, tolerance=2 / fps),
-        MatchedIndividual(target_timestamps, recording.eye, tolerance=2 / fps),
+        MatchedData(target_timestamps, recording.scene, tolerance=2 / fps),
+        MatchedData(target_timestamps, recording.eye, tolerance=2 / fps),
     )
 
     with Writer(output_video_path) as video_writer:
