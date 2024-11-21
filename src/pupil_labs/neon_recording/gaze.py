@@ -90,7 +90,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-    ) -> SampledData:
+    ) -> SampledData[GazeRecord]:
         return sample(
             timestamps,
             self,
