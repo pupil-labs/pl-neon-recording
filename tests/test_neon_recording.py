@@ -26,7 +26,7 @@ def test_rec_info(rec: nr.NeonRecording):
 
 def test_calibration(rec: nr.NeonRecording):
     assert rec.calibration.version == 1
-    assert rec.calibration.serial == b"537468"
+    assert rec.calibration.serial == "537468"
     assert rec.calibration.crc == 1321655662
 
     assert np.all(rec.calibration.scene_extrinsics_affine_matrix == np.identity(4))

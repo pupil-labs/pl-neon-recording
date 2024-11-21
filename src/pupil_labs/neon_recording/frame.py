@@ -1,13 +1,33 @@
-from dataclasses import dataclass
+from typing import Any
+
+import av
+import av.audio.frame
+import av.video.frame
 
 import pupil_labs.video as plv
 
 
-@dataclass(frozen=True)
 class AudioFrame(plv.AudioFrame):
-    timestamp: int
+    def __init__(
+        self,
+        av_frame: av.audio.frame.AudioFrame,
+        time: float,
+        index: int,
+        source: Any,
+        timestamp: int,
+    ):
+        super().__init__(av_frame, time, index, source)
+        self.timestamp = timestamp
 
 
-@dataclass(frozen=True)
 class VideoFrame(plv.VideoFrame):
-    timestamp: int
+    def __init__(
+        self,
+        av_frame: av.video.frame.VideoFrame,
+        time: float,
+        index: int,
+        source: Any,
+        timestamp: int,
+    ):
+        super().__init__(av_frame, time, index, source)
+        self.timestamp = timestamp

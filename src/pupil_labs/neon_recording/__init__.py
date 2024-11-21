@@ -9,7 +9,7 @@ from .neon_recording import NeonRecording, load
 try:
     from importlib.metadata import version
 except ImportError:
-    from importlib_metadata import version
+    from importlib_metadata import version  # type: ignore
 
 with contextlib.suppress(ZeroDivisionError):
     __version__ = version("pupil_labs.neon_recording")

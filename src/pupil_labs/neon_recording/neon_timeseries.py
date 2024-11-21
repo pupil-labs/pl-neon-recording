@@ -4,12 +4,12 @@ import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.matching import MatchingMethod, SampledData, SampledDataGroups
-from pupil_labs.video import ArrayLike
+from pupil_labs.video.array_like import ArrayLike
 
-T = TypeVar("T", covariant=False)
+T = TypeVar("T", covariant=True)
 
 
-class NeonTimeseries(ArrayLike[T], Protocol):
+class NeonTimeseries(ArrayLike[T], Protocol[T]):
     @property
     def timestamps(self) -> npt.NDArray[np.int64]: ...
 

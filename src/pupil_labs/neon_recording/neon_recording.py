@@ -69,7 +69,7 @@ class NeonRecording:
 
         log.debug("NeonRecording: Loading calibration data")
         self.calibration = Calibration.from_file(self._rec_dir / "calibration.bin")
-        self.device_serial = self.calibration.serial.decode()
+        self.device_serial = self.calibration.serial
 
         self.streams = {
             "audio": None,

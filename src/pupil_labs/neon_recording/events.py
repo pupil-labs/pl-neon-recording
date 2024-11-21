@@ -24,7 +24,7 @@ class Events(NeonTimeseries[EventRecord]):
         self._event_names = np.array(event_names)
 
     @staticmethod
-    def from_native_recording(rec_dir: Path):
+    def from_native_recording(rec_dir: Path) -> "Events":
         events_file = rec_dir / "event.txt"
         time_file = events_file.with_suffix(".time")
         event_names, time_data = load_multipart_data_time_pairs(
