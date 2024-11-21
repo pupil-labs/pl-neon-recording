@@ -26,6 +26,7 @@ dependencies = [
     "structlog>=24.4.0",
     "scipy>=1.14.1",
     "pandas>=2.2.3",
+    "types-protobuf>=5.28.3.20241030",
 ]
 
 [project.urls]

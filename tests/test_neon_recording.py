@@ -25,13 +25,13 @@ def test_rec_info(rec: nr.NeonRecording):
 
 
 def test_calibration(rec: nr.NeonRecording):
-    assert rec.calibration["version"] == 1
-    assert rec.calibration["serial"] == b"537468"
-    assert rec.calibration["crc"] == 1321655662
+    assert rec.calibration.version == 1
+    assert rec.calibration.serial == b"537468"
+    assert rec.calibration.crc == 1321655662
 
-    assert np.all(rec.calibration["scene_extrinsics_affine_matrix"] == np.identity(4))
+    assert np.all(rec.calibration.scene_extrinsics_affine_matrix == np.identity(4))
     assert np.all(
-        rec.calibration["scene_camera_matrix"]
+        rec.calibration.scene_camera_matrix
         == np.array([
             [890.2541925805483, 0.0, 816.7176454408117],
             [0.0, 890.1577391451178, 608.4078485457237],
@@ -39,7 +39,7 @@ def test_calibration(rec: nr.NeonRecording):
         ])
     )
     assert np.all(
-        rec.calibration["scene_distortion_coefficients"]
+        rec.calibration.scene_distortion_coefficients
         == np.array([
             -0.13103450220352034,
             0.10895240491189562,
@@ -53,7 +53,7 @@ def test_calibration(rec: nr.NeonRecording):
     )
 
     assert np.all(
-        rec.calibration["right_extrinsics_affine_matrix"]
+        rec.calibration.right_extrinsics_affine_matrix
         == np.array([
             [
                 -0.8273937106132507,
@@ -78,7 +78,7 @@ def test_calibration(rec: nr.NeonRecording):
     )
 
     assert np.all(
-        rec.calibration["right_camera_matrix"]
+        rec.calibration.right_camera_matrix
         == np.array([
             [140.7630017613883, 0.0, 96.04486355572857],
             [0.0, 140.54444033458333, 98.68308547789763],
@@ -87,7 +87,7 @@ def test_calibration(rec: nr.NeonRecording):
     )
 
     assert np.all(
-        rec.calibration["right_distortion_coefficients"]
+        rec.calibration.right_distortion_coefficients
         == np.array([
             0.049520260866990545,
             -0.14946769630490422,
@@ -100,7 +100,7 @@ def test_calibration(rec: nr.NeonRecording):
         ])
     )
     assert np.all(
-        rec.calibration["left_extrinsics_affine_matrix"]
+        rec.calibration.left_extrinsics_affine_matrix
         == np.array([
             [
                 -0.8168811798095703,
@@ -125,7 +125,7 @@ def test_calibration(rec: nr.NeonRecording):
     )
 
     assert np.all(
-        rec.calibration["left_camera_matrix"]
+        rec.calibration.left_camera_matrix
         == np.array([
             [141.46418641465175, 0.0, 96.80626440109076],
             [0.0, 141.24269854555249, 95.59602892044403],
@@ -133,7 +133,7 @@ def test_calibration(rec: nr.NeonRecording):
         ])
     )
     assert np.all(
-        rec.calibration["left_distortion_coefficients"]
+        rec.calibration.left_distortion_coefficients
         == np.array([
             0.048437408587008554,
             -0.14538599862965582,
