@@ -3,6 +3,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
@@ -88,7 +89,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
         self,
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData:
         return sample(
             timestamps,
@@ -103,3 +104,6 @@ class Gaze(NeonTimeseries[GazeRecord]):
         y = np.interp(timestamps, self.timestamps, self.y)
         xy = np.column_stack((x, y))
         return Gaze(timestamps, xy)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(self._gaze_data, columns=["x", "y"], index=self._time_data)

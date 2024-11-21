@@ -3,6 +3,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
@@ -71,11 +72,20 @@ class Events(NeonTimeseries[EventRecord]):
         self,
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData:
         return sample(
             timestamps,
             self,
             method=method,
             tolerance=tolerance,
+        )
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            self._event_names,
+            columns=[
+                "event_name",
+            ],
+            index=self._time_data,
         )

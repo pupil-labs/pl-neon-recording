@@ -3,6 +3,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 from pupil_labs.matching import MatchingMethod, SampledData, sample
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
@@ -118,7 +119,7 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         self,
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData:
         return sample(
             timestamps,
@@ -150,3 +151,25 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
                     interp_data.append(interp_dim)
         interp_data = np.column_stack(interp_data)
         return EyeState(timestamps, interp_data)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            self._data,
+            columns=[
+                "pupil_diameter_left",
+                "eye_ball_center_left_x",
+                "eye_ball_center_left_y",
+                "eye_ball_center_left_z",
+                "optical_axis_left_x",
+                "optical_axis_left_y",
+                "optical_axis_left_z",
+                "pupil_diameter_right",
+                "eye_ball_center_right_x",
+                "eye_ball_center_right_y",
+                "eye_ball_center_right_z",
+                "optical_axis_right_x",
+                "optical_axis_right_y",
+                "optical_axis_right_z",
+            ],
+            index=self._time_data,
+        )

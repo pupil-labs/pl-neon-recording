@@ -17,5 +17,5 @@ class NeonTimeseries(ArrayLike[T], Protocol):
         self,
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData[T]: ...
