@@ -64,7 +64,7 @@ def load_multipart_timestamps(
 
 
 class GrayFrame:
-    def __init__(self, width, height) -> None:
+    def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
 

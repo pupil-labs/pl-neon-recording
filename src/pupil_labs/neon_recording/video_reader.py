@@ -50,8 +50,8 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
 
     @cached_property
     def audio(self) -> "NeonVideoReader[AudioFrame]":
-        audio_readers = []
-        abs_audio_timestamps = []
+        audio_readers: list[Reader[AudioFrame]] = []
+        abs_audio_timestamps: list[npt.NDArray[np.int64]] = []
         for reader, ts in zip(self.readers, self._timestamps):
             if reader.audio is None:
                 raise ValueError("not all readers have audio")
@@ -60,13 +60,17 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
             audio_container_ts = (reader.audio.container_timestamps * 1e9).astype(
                 np.int64
             )
-            abs_duration = ts[-1] - ts[0]
-            container_duration = audio_container_ts[-1] - audio_container_ts[0]
+            abs_duration: int = ts[-1] - ts[0]
+            container_duration: int = audio_container_ts[-1] - audio_container_ts[0]
             sacling_factor = abs_duration / container_duration
-            abs_ts = ts[0] + (audio_container_ts * sacling_factor).astype(np.int64)
+            abs_ts: npt.NDArray[np.int64] = ts[0] + (
+                audio_container_ts * sacling_factor
+            ).astype(np.int64)
             abs_audio_timestamps.append(abs_ts)
-
-        return NeonVideoReader(audio_readers, abs_audio_timestamps, self._rec_start)
+        audio_reader: NeonVideoReader[AudioFrame] = NeonVideoReader(
+            audio_readers, abs_audio_timestamps, self._rec_start
+        )
+        return audio_reader
 
     @property
     def timestamps(self) -> npt.NDArray[np.int64]:
@@ -160,6 +164,14 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
         *,
         return_groups: Literal[True],
     ) -> SampledDataGroups[ReaderFrameType]: ...
+    @overload
+    def sample(
+        self,
+        target_ts: ArrayLike[int],
+        method: MatchingMethod = MatchingMethod.NEAREST,
+        tolerance: Optional[int] = None,
+        return_groups: bool = False,
+    ) -> Union[SampledData[ReaderFrameType], SampledDataGroups[ReaderFrameType]]: ...
     def sample(
         self,
         target_ts: ArrayLike[int],

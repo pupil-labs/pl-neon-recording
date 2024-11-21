@@ -42,4 +42,18 @@ class Calibration(NamedTuple):
             ],
         )
         data = np.frombuffer(data_buffer, dtype)[0]
-        return Calibration(*data)
+        serial = data[1].item().decode()
+        return Calibration(
+            data[0],
+            serial,
+            data[2],
+            data[3],
+            data[4],
+            data[5],
+            data[6],
+            data[7],
+            data[8],
+            data[9],
+            data[10],
+            data[11],
+        )
