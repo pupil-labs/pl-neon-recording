@@ -19,8 +19,12 @@ class GazeRecord(NamedTuple):
     y: float
 
     @property
-    def xy(self) -> tuple[float, float]:
-        return self.x, self.y
+    def xy(self) -> npt.NDArray[np.float64]:
+        return np.array([self.x, self.y])
+
+    @property
+    def data(self) -> npt.NDArray[np.float64]:
+        return np.array([self.ts, self.x, self.y])
 
 
 class Gaze(NeonTimeseries[GazeRecord]):
@@ -92,3 +96,10 @@ class Gaze(NeonTimeseries[GazeRecord]):
             method=method,
             tolerance=tolerance,
         )
+
+    def interpolate(self, timestamps: ArrayLike[int]) -> "Gaze":
+        timestamps = np.array(timestamps)
+        x = np.interp(timestamps, self.timestamps, self.x)
+        y = np.interp(timestamps, self.timestamps, self.y)
+        xy = np.column_stack((x, y))
+        return Gaze(timestamps, xy)

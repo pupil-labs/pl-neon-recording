@@ -156,6 +156,24 @@ class IMU(NeonTimeseries[IMURecord]):
             tolerance=tolerance,
         )
 
+    def interpolate(self, timestamps: ArrayLike[int]) -> "IMU":
+        timestamps = np.array(timestamps)
+        interp_data = []
+
+        for key in [
+            "gyro",
+            "accel",
+            "euler",
+            "quaternion",
+        ]:
+            data_source = getattr(self, key)
+
+            for dim in range(data_source.shape[1]):
+                interp_dim = np.interp(timestamps, self.timestamps, data_source[:, dim])
+                interp_data.append(interp_dim)
+        interp_data = np.column_stack(interp_data)
+        return IMU(timestamps, interp_data)
+
     @staticmethod
     def _parse_neon_imu_raw_packets(buffer):
         index = 0

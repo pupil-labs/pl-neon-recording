@@ -172,6 +172,12 @@ def test_gaze(rec: nr.NeonRecording):
     )
     assert sensor[1950] == target_1950
 
+    interp_ts = (sensor.timestamps[0] + sensor.timestamps[1]) // 2
+    interp_data = sensor.interpolate([interp_ts])
+    assert len(interp_data) == 1
+    assert interp_data[0].ts == interp_ts
+    assert np.allclose(interp_data[0].data, (sensor[0].data + sensor[1].data) / 2)
+
 
 def test_eye_state(rec: nr.NeonRecording):
     sensor = rec.eye_state
@@ -234,6 +240,12 @@ def test_eye_state(rec: nr.NeonRecording):
     )
     assert np.all(sensor[1753].data == target_1753)
 
+    interp_ts = (sensor.timestamps[0] + sensor.timestamps[1]) // 2
+    interp_data = sensor.interpolate([interp_ts])
+    assert len(interp_data) == 1
+    assert interp_data[0].ts == interp_ts
+    assert np.allclose(interp_data[0].data, (sensor[0].data + sensor[1].data) / 2)
+
 
 def test_imu(rec: nr.NeonRecording):
     sensor = rec.imu
@@ -292,6 +304,12 @@ def test_imu(rec: nr.NeonRecording):
         0.36794311241431227,
     )
     assert np.all(sensor[1093].data == target_1093)
+
+    interp_ts = (sensor.timestamps[0] + sensor.timestamps[1]) // 2
+    interp_data = sensor.interpolate([interp_ts])
+    assert len(interp_data) == 1
+    assert interp_data[0].ts == interp_ts
+    assert np.allclose(interp_data[0].data, (sensor[0].data + sensor[1].data) / 2)
 
 
 def test_events(rec: nr.NeonRecording):

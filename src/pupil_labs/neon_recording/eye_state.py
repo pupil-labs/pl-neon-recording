@@ -59,6 +59,14 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         return self._data[:, [0, 7]]
 
     @property
+    def pupil_diameter_left(self) -> npt.NDArray[np.float64]:
+        return self._data[:, 0]
+
+    @property
+    def pupil_diameter_right(self) -> npt.NDArray[np.float64]:
+        return self._data[:, 7]
+
+    @property
     def eye_ball_center_left(self) -> npt.NDArray[np.float64]:
         return self._data[:, [1, 2, 3]]
 
@@ -118,3 +126,27 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
             method=method,
             tolerance=tolerance,
         )
+
+    def interpolate(self, timestamps: ArrayLike[int]) -> "EyeState":
+        timestamps = np.array(timestamps)
+        interp_data = []
+
+        for key in [
+            "pupil_diameter_left",
+            "eye_ball_center_left",
+            "optical_axis_left",
+            "pupil_diameter_right",
+            "eye_ball_center_right",
+            "optical_axis_right",
+        ]:
+            data_source = getattr(self, key)
+            if data_source.ndim == 1:
+                interp_data.append(np.interp(timestamps, self.timestamps, data_source))
+            else:
+                for dim in range(data_source.shape[1]):
+                    interp_dim = np.interp(
+                        timestamps, self.timestamps, data_source[:, dim]
+                    )
+                    interp_data.append(interp_dim)
+        interp_data = np.column_stack(interp_data)
+        return EyeState(timestamps, interp_data)
