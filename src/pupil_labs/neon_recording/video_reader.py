@@ -1,12 +1,12 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Optional, Sequence, overload
+from typing import Literal, Optional, Sequence, Union, overload
 
 import numpy as np
 import numpy.typing as npt
 
 import pupil_labs.video as plv
-from pupil_labs.matching import MatchingMethod, SampledData, sample
+from pupil_labs.matching import MatchingMethod, SampledData, SampledDataGroups, sample
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
@@ -135,15 +135,42 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
         else:
             raise TypeError(f"unsupported key type: {type(key)}")
 
+    @overload
     def sample(
         self,
-        timestamps: ArrayLike[int],
+        target_ts: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-    ) -> SampledData[ReaderFrameType]:
+        return_groups: Literal[False] = ...,
+    ) -> SampledData[ReaderFrameType]: ...
+    @overload
+    def sample(
+        self,
+        target_ts: ArrayLike[int],
+        method: MatchingMethod,
+        tolerance: Optional[int],
+        return_groups: Literal[True],
+    ) -> SampledDataGroups[ReaderFrameType]: ...
+    @overload
+    def sample(
+        self,
+        target_ts: ArrayLike[int],
+        method: MatchingMethod = MatchingMethod.NEAREST,
+        tolerance: Optional[int] = None,
+        *,
+        return_groups: Literal[True],
+    ) -> SampledDataGroups[ReaderFrameType]: ...
+    def sample(
+        self,
+        target_ts: ArrayLike[int],
+        method: MatchingMethod = MatchingMethod.NEAREST,
+        tolerance: Optional[int] = None,
+        return_groups: bool = False,
+    ) -> Union[SampledData[ReaderFrameType], SampledDataGroups[ReaderFrameType]]:
         return sample(
-            timestamps,
+            target_ts,
             self,
             method=method,
             tolerance=tolerance,
+            return_groups=return_groups,
         )

@@ -1,3 +1,4 @@
+from functools import cached_property
 from pathlib import Path
 from typing import Literal, Sequence, Tuple, overload
 
@@ -7,7 +8,7 @@ import numpy.typing as npt
 
 def find_sorted_multipart_files(
     recording_path: Path, basename: str, extension: str = ".raw"
-):
+) -> list[Tuple[Path, Path]]:
     file_pairs = []
     for raw_file in recording_path.glob(f"{basename} ps*{extension}"):
         time_file = raw_file.with_suffix(".time")
@@ -18,7 +19,7 @@ def find_sorted_multipart_files(
 
 
 def load_multipart_data_time_pairs(
-    file_pairs, dtype, field_count
+    file_pairs: list[Tuple[Path, Path]], dtype: str, field_count: int
 ) -> Tuple[np.ndarray, np.ndarray]:
     data_buffer = b""
     ts_buffer = b""
@@ -57,29 +58,20 @@ def load_multipart_timestamps(
     timestamps = [np.frombuffer(b, dtype="<u8").astype(np.int64) for b in ts_buffer]
 
     if concatenate:
-        timestamps = np.concatenate(timestamps)
-
-    return timestamps
+        return np.concatenate(timestamps)
+    else:
+        return timestamps
 
 
 class GrayFrame:
-    def __init__(self, width, height):
+    def __init__(self, width, height) -> None:
         self.width = width
         self.height = height
 
-        self._bgr = None
-        self._gray = None
+    @cached_property
+    def bgr(self) -> npt.NDArray[np.uint8]:
+        return (128 * np.ones([self.height, self.width, 3])).astype("uint8")
 
-    @property
-    def bgr(self):
-        if self._bgr is None:
-            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype="uint8")
-
-        return self._bgr
-
-    @property
-    def gray(self):
-        if self._gray is None:
-            self._gray = 128 * np.ones([self.height, self.width], dtype="uint8")
-
-        return self._gray
+    @cached_property
+    def gray(self) -> npt.NDArray[np.uint8]:
+        return (128 * np.ones([self.height, self.width])).astype("unit8")

@@ -1014,6 +1014,7 @@ dependencies = [
     { name = "pupil-labs-video" },
     { name = "scipy" },
     { name = "structlog" },
+    { name = "types-protobuf" },
 ]
 
 [package.dev-dependencies]
@@ -1048,6 +1049,7 @@ requires-dist = [
     { name = "pupil-labs-video", editable = "../pl-video" },
     { name = "scipy", specifier = ">=1.14.1" },
     { name = "structlog", specifier = ">=24.4.0" },
+    { name = "types-protobuf", specifier = ">=5.28.3.20241030" },
 ]
 
 [package.metadata.requires-dev]
@@ -1463,6 +1465,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/58/83/6ba9844a41128c62e810fddddd72473201f3eacde02046066142a2d96cc5/tqdm-4.66.5.tar.gz", hash = "sha256:e1020aef2e5096702d8a025ac7d16b1577279c9d63f8375b63083e9a5f0fcbad", size = 169504 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/5d/acf5905c36149bbaec41ccf7f2b68814647347b72075ac0b1fe3022fdc73/tqdm-4.66.5-py3-none-any.whl", hash = "sha256:90279a3770753eafc9194a0364852159802111925aa30eb3f9d85b0e805ac7cd", size = 78351 },
+]
+
+[[package]]
+name = "types-protobuf"
+version = "5.28.3.20241030"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/d4/d186e43cfb38ecefc91315ee9193d5722a88d7a3c8eac34a3ed603377407/types-protobuf-5.28.3.20241030.tar.gz", hash = "sha256:f7e6b45845d75393fb41c0b3ce82c46d775f9771fae2097414a1dbfe5b51a988", size = 54665 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/72/da/c261bb44799d3f4455fc881ca342c14f5b5b23878bef568a1cdcd324e62f/types_protobuf-5.28.3.20241030-py3-none-any.whl", hash = "sha256:f3dae16adf342d4fb5bb3673cabb22549a6252e5dd66fc52d8310b1a39c64ba9", size = 68781 },
 ]
 
 [[package]]
