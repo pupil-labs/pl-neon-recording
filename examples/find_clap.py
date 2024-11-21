@@ -17,11 +17,11 @@ def find_clap(recording_dir):
 
         if rms > max_rms:
             max_rms = rms
-            max_time = frame.ts
+            max_time = frame.timestamp
 
-    rel_time = max_time - recording.start_ts
+    rel_time = (max_time - recording.start_ts_ns) / 1e9
     print(
-        f"The loudest audio occurs at {max_time} (rel={rel_time}) "
+        f"The loudest audio occurs at {max_time} (rel={rel_time} sec) "
         f"with an rms = {max_rms}."
     )
 
