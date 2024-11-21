@@ -137,9 +137,9 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
 
     def sample(
         self,
-        timestamps: ArrayLike[int] | ArrayLike[float],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData[ReaderFrameType]:
         return sample(
             timestamps,

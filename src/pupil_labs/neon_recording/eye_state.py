@@ -120,7 +120,7 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-    ) -> SampledData:
+    ) -> SampledData[EyeStateRecord]:
         return sample(
             timestamps,
             self,

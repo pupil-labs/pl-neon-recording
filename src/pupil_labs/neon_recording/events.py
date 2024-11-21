@@ -73,7 +73,7 @@ class Events(NeonTimeseries[EventRecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-    ) -> SampledData:
+    ) -> SampledData[EventRecord]:
         return sample(
             timestamps,
             self,

@@ -150,7 +150,7 @@ class IMU(NeonTimeseries[IMURecord]):
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-    ) -> SampledData:
+    ) -> SampledData[IMURecord]:
         return sample(
             timestamps,
             self,
