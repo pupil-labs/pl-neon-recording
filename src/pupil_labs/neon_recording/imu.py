@@ -3,6 +3,7 @@ from typing import Iterator, NamedTuple, Optional, overload
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 from scipy.spatial.transform import Rotation
 
 from pupil_labs.matching import MatchingMethod, SampledData, sample
@@ -18,6 +19,7 @@ class IMURecord(NamedTuple):
     accel: npt.NDArray[np.float64]
     euler: npt.NDArray[np.float64]
     quaternion: npt.NDArray[np.float64]
+    "Quaternion in the order (w, x, y, z)"
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
@@ -147,7 +149,7 @@ class IMU(NeonTimeseries[IMURecord]):
         self,
         timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[float] = None,
+        tolerance: Optional[int] = None,
     ) -> SampledData:
         return sample(
             timestamps,
@@ -173,6 +175,27 @@ class IMU(NeonTimeseries[IMURecord]):
                 interp_data.append(interp_dim)
         interp_data = np.column_stack(interp_data)
         return IMU(timestamps, interp_data)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            self._data,
+            columns=[
+                "gyro_x",
+                "gyro_y",
+                "gyro_z",
+                "accel_x",
+                "accel_y",
+                "accel_z",
+                "euler_x",
+                "euler_y",
+                "euler_z",
+                "quaternion_w",
+                "quaternion_x",
+                "quaternion_y",
+                "quaternion_z",
+            ],
+            index=self._time_data,
+        )
 
     @staticmethod
     def _parse_neon_imu_raw_packets(buffer):
