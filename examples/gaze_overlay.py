@@ -28,11 +28,8 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     with Writer(output_video_path) as video_writer:
         for scene_frame, gaze_datum in tqdm(matched_data, total=len(output_timestamps)):
             if scene_frame is None:
-                frame_pixels = GrayFrame(
-                    recording.scene.width, recording.scene.height
-                ).bgr
-            else:
-                frame_pixels = scene_frame.bgr
+                scene_frame = GrayFrame(recording.scene.width, recording.scene.height)
+            frame_pixels = scene_frame.bgr
 
             if gaze_datum is not None:
                 frame_pixels = cv2.circle(
