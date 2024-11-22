@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
-from pupil_labs.matching import MatchingMethod, SampledData, sample
+from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -35,7 +35,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
         self._gaze_data = np.array(gaze_data)
 
     @staticmethod
-    def from_native_recording(rec_dir: Path):
+    def from_native_recording(rec_dir: Path) -> "Gaze":
         gaze_200hz_file = rec_dir / "gaze_200hz.raw"
         time_200hz_file = rec_dir / "gaze_200hz.time"
         gaze_file_pairs = []
@@ -91,7 +91,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
     ) -> SampledData[GazeRecord]:
-        return sample(
+        return SampledData.sample(
             timestamps,
             self,
             method=method,

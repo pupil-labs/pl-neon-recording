@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
-from pupil_labs.matching import MatchingMethod, SampledData, sample
+from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
@@ -74,7 +74,7 @@ class Events(NeonTimeseries[EventRecord]):
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
     ) -> SampledData[EventRecord]:
-        return sample(
+        return SampledData.sample(
             timestamps,
             self,
             method=method,

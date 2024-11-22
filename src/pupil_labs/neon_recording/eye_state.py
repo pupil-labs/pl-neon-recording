@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
-from pupil_labs.matching import MatchingMethod, SampledData, sample
+from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -41,7 +41,7 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         self._data = np.array(eye_state_data)
 
     @staticmethod
-    def from_native_recording(rec_dir: Path):
+    def from_native_recording(rec_dir: Path) -> "EyeState":
         eye_state_files = find_sorted_multipart_files(rec_dir, "eye_state")
         eye_state_data, time_data = load_multipart_data_time_pairs(
             eye_state_files, "<f4", 2
@@ -121,7 +121,7 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
     ) -> SampledData[EyeStateRecord]:
-        return sample(
+        return SampledData.sample(
             timestamps,
             self,
             method=method,
@@ -149,8 +149,8 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
                         timestamps, self.timestamps, data_source[:, dim]
                     )
                     interp_data.append(interp_dim)
-        interp_data = np.column_stack(interp_data)
-        return EyeState(timestamps, interp_data)
+        interp_arr = np.column_stack(interp_data)
+        return EyeState(timestamps, interp_arr)
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(
