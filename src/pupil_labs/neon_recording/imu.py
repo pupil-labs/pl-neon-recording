@@ -4,9 +4,9 @@ from typing import Iterator, NamedTuple, Optional, overload
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-from scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation  # type: ignore
 
-from pupil_labs.matching import MatchingMethod, SampledData, sample
+from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.imu_pb2 import ImuPacket  # type: ignore
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import find_sorted_multipart_files
@@ -151,7 +151,7 @@ class IMU(NeonTimeseries[IMURecord]):
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
     ) -> SampledData[IMURecord]:
-        return sample(
+        return SampledData.sample(
             timestamps,
             self,
             method=method,
@@ -173,8 +173,8 @@ class IMU(NeonTimeseries[IMURecord]):
             for dim in range(data_source.shape[1]):
                 interp_dim = np.interp(timestamps, self.timestamps, data_source[:, dim])
                 interp_data.append(interp_dim)
-        interp_data = np.column_stack(interp_data)
-        return IMU(timestamps, interp_data)
+        interp_arr = np.column_stack(interp_data)
+        return IMU(timestamps, interp_arr)
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(
@@ -198,7 +198,7 @@ class IMU(NeonTimeseries[IMURecord]):
         )
 
     @staticmethod
-    def _parse_neon_imu_raw_packets(buffer):
+    def _parse_neon_imu_raw_packets(buffer: bytes) -> Iterator[ImuPacket]:  # type: ignore
         index = 0
         packet_sizes = []
         while True:

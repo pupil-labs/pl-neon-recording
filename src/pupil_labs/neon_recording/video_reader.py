@@ -1,14 +1,13 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, Optional, Sequence, Union, overload
+from typing import Optional, Sequence, overload
 
 import numpy as np
 import numpy.typing as npt
 
 import pupil_labs.video as plv
-from pupil_labs.matching import MatchingMethod, SampledData, SampledDataGroups, sample
+from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
-from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_timestamps,
@@ -24,7 +23,8 @@ from pupil_labs.video import (
 from pupil_labs.video.frame_slice import FrameSlice
 
 
-class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameType]):
+# TODO: Make this a NeonTimeseries
+class NeonVideoReader(MultiReader[ReaderFrameType]):
     def __init__(
         self,
         readers: Sequence[ReaderLike],
@@ -50,7 +50,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
 
     @cached_property
     def audio(self) -> "NeonVideoReader[AudioFrame]":
-        audio_readers: list[Reader[AudioFrame]] = []
+        audio_readers: list[Reader[plv.AudioFrame]] = []
         abs_audio_timestamps: list[npt.NDArray[np.int64]] = []
         for reader, ts in zip(self.readers, self._timestamps):
             if reader.audio is None:
@@ -105,28 +105,28 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
         self, key: int | slice | npt.NDArray[np.int64]
     ) -> ReaderFrameType | FrameSlice[ReaderFrameType] | list[ReaderFrameType]:
         if isinstance(key, int):
-            frame = super().__getitem__(key)
+            plv_frame = super().__getitem__(key)
 
-            if isinstance(frame, plv.VideoFrame):
-                frame = VideoFrame(
-                    av_frame=frame.av_frame,
-                    time=frame.time,
-                    index=frame.index,
+            if isinstance(plv_frame, plv.VideoFrame):
+                video_frame = VideoFrame(
+                    av_frame=plv_frame.av_frame,
+                    time=plv_frame.time,
+                    index=plv_frame.index,
                     source=self,
                     timestamp=self.timestamps[key],
                 )
-                return frame
-            elif isinstance(frame, plv.AudioFrame):
-                frame = AudioFrame(
-                    av_frame=frame.av_frame,
-                    time=frame.time,
-                    index=frame.index,
+                return video_frame
+            elif isinstance(plv_frame, plv.AudioFrame):
+                audio_frame = AudioFrame(
+                    av_frame=plv_frame.av_frame,
+                    time=plv_frame.time,
+                    index=plv_frame.index,
                     source=self,
                     timestamp=self.timestamps[key],
                 )
-                return frame
+                return audio_frame
             else:
-                raise TypeError(f"unsupported frame type: {type(frame)}")
+                raise TypeError(f"unsupported frame type: {type(plv_frame)}")
         elif isinstance(key, slice):
             frameslice = FrameSlice[ReaderFrameType](
                 self, key, lazy_frame_slice_limit=self.lazy_frame_slice_limit
@@ -139,50 +139,15 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries[ReaderFrameTy
         else:
             raise TypeError(f"unsupported key type: {type(key)}")
 
-    @overload
     def sample(
         self,
-        target_ts: ArrayLike[int],
+        timestamps: ArrayLike[int],
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
-        return_groups: Literal[False] = ...,
-    ) -> SampledData[ReaderFrameType]: ...
-    @overload
-    def sample(
-        self,
-        target_ts: ArrayLike[int],
-        method: MatchingMethod,
-        tolerance: Optional[int],
-        return_groups: Literal[True],
-    ) -> SampledDataGroups[ReaderFrameType]: ...
-    @overload
-    def sample(
-        self,
-        target_ts: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-        *,
-        return_groups: Literal[True],
-    ) -> SampledDataGroups[ReaderFrameType]: ...
-    @overload
-    def sample(
-        self,
-        target_ts: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-        return_groups: bool = False,
-    ) -> Union[SampledData[ReaderFrameType], SampledDataGroups[ReaderFrameType]]: ...
-    def sample(
-        self,
-        target_ts: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-        return_groups: bool = False,
-    ) -> Union[SampledData[ReaderFrameType], SampledDataGroups[ReaderFrameType]]:
-        return sample(
-            target_ts,
+    ) -> SampledData[ReaderFrameType]:
+        return SampledData.sample(
+            timestamps,
             self,
             method=method,
             tolerance=tolerance,
-            return_groups=return_groups,
         )
