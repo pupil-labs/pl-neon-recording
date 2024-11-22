@@ -25,7 +25,7 @@ print("")
 print("First 10 gaze samples:")
 gaze_data = recording.gaze[:10]
 for gaze_datum in gaze_data:
-    print(f"\t{gaze_datum.ts:0.3f} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
+    print(f"\t{gaze_datum.ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
 
 
@@ -38,7 +38,7 @@ timestamps = np.arange(
 
 subsample = recording.gaze.interpolate(timestamps[:10])
 for gaze_datum in subsample:
-    print(f"\t{gaze_datum.ts:0.3f} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
+    print(f"\t{gaze_datum.ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
 
 

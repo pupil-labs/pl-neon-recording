@@ -45,17 +45,13 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         for scene_frame, eye_frame in tqdm(matched_data, total=len(target_timestamps)):
             if scene_frame is None:
                 # If no frame exists within the tolerance, replace it with a gray frame
-                frame_pixels = GrayFrame(
-                    recording.scene.width, recording.scene.height
-                ).bgr
-            else:
-                frame_pixels = scene_frame.bgr
+                scene_frame = GrayFrame(recording.scene.width, recording.scene.height)
+            frame_pixels = scene_frame.bgr
 
             if eye_frame is None:
                 # If no frame exists within the tolerance, replace it with a gray frame
-                eye_pixels = GrayFrame(recording.eye.width, recording.eye.height).bgr
-            else:
-                eye_pixels = eye_frame.bgr
+                eye_frame = GrayFrame(recording.eye.width, recording.eye.height)
+            eye_pixels = eye_frame.bgr
 
             overlay_image(frame_pixels, eye_pixels, 50, 50)
 
