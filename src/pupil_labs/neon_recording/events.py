@@ -60,6 +60,7 @@ class Events(NeonTimeseries[EventRecord]):
 
     @property
     def event_names(self) -> npt.NDArray[np.str_]:
+        """The event names."""
         return self._event_names
 
     def __len__(self) -> int:
