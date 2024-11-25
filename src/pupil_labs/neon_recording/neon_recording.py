@@ -16,29 +16,27 @@ log = structlog.get_logger(__name__)
 
 
 class NeonRecording:
-    """Class to handle the Neon Recording data
+    """Representation of a Neon recording."""
 
-    Attributes
-    ----------
-        * `info` (dict): Information loaded from info.json
-        * `start_ts_ns` (int): Start timestamp in nanoseconds
-        * `start_ts` (float): Start timestamp in seconds
-        * `wearer` (dict): Wearer information containing uuid and name
-        * `calibration` (Calibration): Camera calibration data
-        * `device_serial` (str): Serial number of the device
-        * `streams` (dict): data streams of the recording
-
-    """
+    info: dict
+    """Information loaded from info.json"""
+    start_ts: int
+    """Timestamp of the recording start in nanoseconds since epoch"""
+    duration_ns: int
+    """Duration of the recording in nanoseconds"""
+    wearer: dict
+    """ Wearer information containing uuid and name"""
+    calibration: Calibration
+    """Camera calibration data"""
+    device_serial: str
 
     def __init__(self, rec_dir: pathlib.Path | str):
         """Initialize the NeonRecording object
 
         Args:
-        ----
             rec_dir: Path to the recording directory.
 
         Raises:
-        ------
             FileNotFoundError: If the directory does not exist or is not valid.
 
         """
@@ -54,10 +52,8 @@ class NeonRecording:
         with open(self._rec_dir / "info.json") as f:
             self.info = json.load(f)
 
-        self.start_ts_ns = self.info["start_time"]
-        self.start_ts = self.start_ts_ns * 1e-9
+        self.start_ts = self.info["start_time"]
         self.duration_ns = self.info["duration"]
-        self.duration = self.duration_ns * 1e-9
 
         log.debug("NeonRecording: Loading wearer")
         self.wearer = {"uuid": "", "name": ""}
@@ -71,47 +67,49 @@ class NeonRecording:
         self.calibration = Calibration.from_file(self._rec_dir / "calibration.bin")
         self.device_serial = self.calibration.serial
 
-        self.streams = {
-            "audio": None,
-            "events": None,
-            "eye": None,
-            "eye_state": None,
-            # "gaze": None,
-            "imu": None,
-            "scene": None,
-        }
+    @property
+    def duration_sec(self) -> float:
+        """Duration of the recording in seconds"""
+        return self.duration_ns / 1e9
 
     @cached_property
     def gaze(self) -> Gaze:
-        return Gaze.from_native_recording(self._rec_dir, self.start_ts_ns)
+        """Gaze data of the recording"""
+        return Gaze.from_native_recording(self._rec_dir, self.start_ts)
 
     @cached_property
     def imu(self) -> IMU:
-        return IMU.from_native_recording(self._rec_dir, self.start_ts_ns)
+        """IMU data of the recording"""
+        return IMU.from_native_recording(self._rec_dir, self.start_ts)
 
     @cached_property
     def eye_state(self) -> EyeState:
-        return EyeState.from_native_recording(self._rec_dir, self.start_ts_ns)
+        """Eye state data of the recording"""
+        return EyeState.from_native_recording(self._rec_dir, self.start_ts)
 
     @cached_property
     def scene(self) -> NeonVideoReader[VideoFrame]:
+        """Scene video data of the recording"""
         return NeonVideoReader.from_native_recording(
-            self._rec_dir, "Neon Scene Camera v1", self.start_ts_ns
+            self._rec_dir, "Neon Scene Camera v1", self.start_ts
         )
 
     @property
     def audio(self) -> NeonVideoReader[AudioFrame]:
+        """Audio data of the recording"""
         return self.scene.audio
 
     @cached_property
     def eye(self) -> NeonVideoReader[VideoFrame]:
+        """Eye video data of the recording"""
         return NeonVideoReader.from_native_recording(
-            self._rec_dir, "Neon Sensor Module v1", self.start_ts_ns
+            self._rec_dir, "Neon Sensor Module v1", self.start_ts
         )
 
     @cached_property
     def events(self) -> Events:
-        return Events.from_native_recording(self._rec_dir, self.start_ts_ns)
+        """Events data of the recording"""
+        return Events.from_native_recording(self._rec_dir, self.start_ts)
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:
