@@ -77,6 +77,8 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
 
+    ts = timestamps
+
     @cached_property
     def rel_timestamps(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
