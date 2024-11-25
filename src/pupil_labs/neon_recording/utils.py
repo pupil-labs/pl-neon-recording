@@ -70,8 +70,8 @@ class GrayFrame:
 
     @cached_property
     def bgr(self) -> npt.NDArray[np.uint8]:
-        return (128 * np.ones([self.height, self.width, 3])).astype("uint8")
+        return (128 * np.ones([self.height, self.width, 3])).astype(np.uint8)
 
     @cached_property
     def gray(self) -> npt.NDArray[np.uint8]:
-        return (128 * np.ones([self.height, self.width])).astype("unit8")
+        return (128 * np.ones([self.height, self.width])).astype(np.uint8)
