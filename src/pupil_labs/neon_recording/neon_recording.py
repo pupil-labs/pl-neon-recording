@@ -83,15 +83,15 @@ class NeonRecording:
 
     @cached_property
     def gaze(self) -> Gaze:
-        return Gaze.from_native_recording(self._rec_dir)
+        return Gaze.from_native_recording(self._rec_dir, self.start_ts_ns)
 
     @cached_property
     def imu(self) -> IMU:
-        return IMU.from_native_recording(self._rec_dir)
+        return IMU.from_native_recording(self._rec_dir, self.start_ts_ns)
 
     @cached_property
     def eye_state(self) -> EyeState:
-        return EyeState.from_native_recording(self._rec_dir)
+        return EyeState.from_native_recording(self._rec_dir, self.start_ts_ns)
 
     @cached_property
     def scene(self) -> NeonVideoReader[VideoFrame]:
@@ -111,7 +111,7 @@ class NeonRecording:
 
     @cached_property
     def events(self) -> Events:
-        return Events.from_native_recording(self._rec_dir)
+        return Events.from_native_recording(self._rec_dir, self.start_ts_ns)
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:

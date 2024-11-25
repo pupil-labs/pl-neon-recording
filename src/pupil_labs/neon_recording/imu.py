@@ -1,3 +1,4 @@
+from functools import cached_property
 from pathlib import Path
 from typing import Iterator, NamedTuple, Optional, overload
 
@@ -10,16 +11,20 @@ from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.imu_pb2 import ImuPacket  # type: ignore
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import find_sorted_multipart_files
-from pupil_labs.video.array_like import ArrayLike
+from pupil_labs.video import ArrayLike, Indexer
 
 
 class IMURecord(NamedTuple):
-    ts: int
+    timestamp: int
     gyro: npt.NDArray[np.float64]
     accel: npt.NDArray[np.float64]
     euler: npt.NDArray[np.float64]
     quaternion: npt.NDArray[np.float64]
     "Quaternion in the order (w, x, y, z)"
+
+    @property
+    def ts(self) -> int:
+        return self.timestamp
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
@@ -33,12 +38,15 @@ class IMURecord(NamedTuple):
 
 
 class IMU(NeonTimeseries[IMURecord]):
-    def __init__(self, time_data: ArrayLike[int], data: ArrayLike[float]):
+    def __init__(
+        self, time_data: ArrayLike[int], data: ArrayLike[float], rec_start: int = 0
+    ):
         self._time_data = np.array(time_data)
         self._data = np.array(data)
+        self._rec_start = rec_start
 
     @staticmethod
-    def from_native_recording(rec_dir: Path) -> "IMU":
+    def from_native_recording(rec_dir: Path, rec_start: int) -> "IMU":
         imu_files = find_sorted_multipart_files(rec_dir, "extimu")
         imu_data = []
         ts_data = []
@@ -88,11 +96,26 @@ class IMU(NeonTimeseries[IMURecord]):
 
         data = np.array(imu_data)
         ts = np.array(ts_data)
-        return IMU(ts, data)
+        return IMU(ts, data, rec_start)
 
     @property
     def timestamps(self) -> npt.NDArray[np.int64]:
         return self._time_data
+
+    ts = timestamps
+
+    @cached_property
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+        """Relative timestamps in seconds in relation to the recording beginning."""
+        return (self.timestamps - self._rec_start) / 1e9
+
+    @property
+    def by_abs_timestamp(self) -> Indexer[IMURecord]:
+        return Indexer(self.timestamps, self)
+
+    @property
+    def by_rel_timestamp(self) -> Indexer[IMURecord]:
+        return Indexer(self.rel_timestamps, self)
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
@@ -134,10 +157,7 @@ class IMU(NeonTimeseries[IMURecord]):
             )
             return record
         elif isinstance(key, slice):
-            return IMU(
-                self._time_data[key],
-                self._data[key],
-            )
+            return IMU(self._time_data[key], self._data[key], self._rec_start)
         else:
             raise TypeError(f"Invalid argument type {type(key)}")
 
@@ -174,7 +194,7 @@ class IMU(NeonTimeseries[IMURecord]):
                 interp_dim = np.interp(timestamps, self.timestamps, data_source[:, dim])
                 interp_data.append(interp_dim)
         interp_arr = np.column_stack(interp_data)
-        return IMU(timestamps, interp_arr)
+        return IMU(timestamps, interp_arr, self._rec_start)
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(

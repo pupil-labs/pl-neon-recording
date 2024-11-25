@@ -19,6 +19,10 @@ class AudioFrame(plv.AudioFrame):
         super().__init__(av_frame, time, index, source)
         self.timestamp = timestamp
 
+    @property
+    def ts(self) -> int:
+        return self.timestamp
+
 
 class VideoFrame(plv.VideoFrame):
     def __init__(
@@ -31,3 +35,7 @@ class VideoFrame(plv.VideoFrame):
     ):
         super().__init__(av_frame, time, index, source)
         self.timestamp = timestamp
+
+    @property
+    def ts(self) -> int:
+        return self.timestamp

@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.matching import MatchingMethod, SampledData
-from pupil_labs.video.array_like import ArrayLike
+from pupil_labs.video import ArrayLike, Indexer
 
 T = TypeVar("T", covariant=True)
 
@@ -19,3 +19,9 @@ class NeonTimeseries(ArrayLike[T], Protocol[T]):
         method: MatchingMethod = MatchingMethod.NEAREST,
         tolerance: Optional[int] = None,
     ) -> SampledData[T]: ...
+
+    @property
+    def by_abs_timestamp(self) -> Indexer[T]: ...
+
+    @property
+    def by_rel_timestamp(self) -> Indexer[T]: ...

@@ -79,7 +79,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
 
     @cached_property
     def rel_timestamps(self) -> npt.NDArray[np.float64]:
-        """Relative timestamps in seconds in relation to the recording  beginning."""
+        """Relative timestamps in seconds in relation to the recording beginning."""
         return (self.timestamps - self._rec_start) / 1e9
 
     @property
