@@ -16,13 +16,18 @@ from pupil_labs.video import ArrayLike, Indexer
 
 
 class GazeRecord(NamedTuple):
-    timestamp: int
+    abs_timestamp: int
+    rel_timestamp: float
     x: float
     y: float
 
     @property
-    def ts(self) -> int:
-        return self.timestamp
+    def abs_ts(self) -> int:
+        return self.abs_timestamp
+
+    @property
+    def rel_ts(self) -> float:
+        return self.rel_timestamp
 
     @property
     def xy(self) -> npt.NDArray[np.float64]:
@@ -30,7 +35,7 @@ class GazeRecord(NamedTuple):
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
-        return np.array([self.ts, self.x, self.y])
+        return np.array([self.abs_ts, self.x, self.y])
 
 
 class Gaze(NeonTimeseries[GazeRecord]):
@@ -60,15 +65,19 @@ class Gaze(NeonTimeseries[GazeRecord]):
         )
 
     @property
-    def timestamps(self) -> npt.NDArray[np.int64]:
+    def abs_timestamp(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
-    ts = timestamps
+    abs_ts = abs_timestamp
 
     @cached_property
-    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+    def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording  beginning."""
-        return (self.timestamps - self._rec_start) / 1e9
+        return (self.abs_timestamp - self._rec_start) / 1e9
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        return self.rel_timestamp
 
     @property
     def xy(self) -> npt.NDArray[np.float64]:
@@ -82,6 +91,13 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def y(self) -> npt.NDArray[np.float64]:
         return self._gaze_data[:, 1]
 
+    @property
+    def data(self) -> npt.NDArray[np.float64]:
+        return np.column_stack((
+            self.abs_timestamp.astype(np.float64),
+            self._gaze_data,
+        ))
+
     def __len__(self) -> int:
         return len(self._time_data)
 
@@ -91,7 +107,11 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def __getitem__(self, key: slice, /) -> "Gaze": ...
     def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
         if isinstance(key, int):
-            record = GazeRecord(self._time_data[key], *self._gaze_data[key])
+            record = GazeRecord(
+                self.abs_timestamp[key],
+                self.rel_timestamp[key],
+                *self._gaze_data[key],
+            )
         elif isinstance(key, slice):
             return Gaze(self._time_data[key], self._gaze_data[key], self._rec_start)
         else:
@@ -117,18 +137,18 @@ class Gaze(NeonTimeseries[GazeRecord]):
 
     def interpolate(self, timestamps: ArrayLike[int]) -> "Gaze":
         timestamps = np.array(timestamps)
-        x = np.interp(timestamps, self.timestamps, self.x)
-        y = np.interp(timestamps, self.timestamps, self.y)
+        x = np.interp(timestamps, self.abs_timestamp, self.x)
+        y = np.interp(timestamps, self.abs_timestamp, self.y)
         xy = np.column_stack((x, y))
         return Gaze(timestamps, xy, self._rec_start)
 
     @property
     def by_abs_timestamp(self) -> Indexer[GazeRecord]:
-        return Indexer(self.timestamps, self)
+        return Indexer(self.abs_timestamp, self)
 
     @property
     def by_rel_timestamp(self) -> Indexer[GazeRecord]:
-        return Indexer(self.rel_timestamps, self)
+        return Indexer(self.rel_timestamp, self)
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self._gaze_data, columns=["x", "y"], index=self._time_data)

@@ -15,7 +15,8 @@ from pupil_labs.video import ArrayLike, Indexer
 
 
 class IMURecord(NamedTuple):
-    timestamp: int
+    abs_timestamp: int
+    rel_timestamp: float
     gyro: npt.NDArray[np.float64]
     accel: npt.NDArray[np.float64]
     euler: npt.NDArray[np.float64]
@@ -23,13 +24,17 @@ class IMURecord(NamedTuple):
     "Quaternion in the order (w, x, y, z)"
 
     @property
-    def ts(self) -> int:
-        return self.timestamp
+    def abs_ts(self) -> int:
+        return self.abs_timestamp
+
+    @property
+    def rel_ts(self) -> float:
+        return self.rel_timestamp
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
         return np.concatenate([
-            [self.ts],
+            [self.abs_ts],
             self.gyro,
             self.accel,
             self.euler,
@@ -99,29 +104,33 @@ class IMU(NeonTimeseries[IMURecord]):
         return IMU(ts, data, rec_start)
 
     @property
-    def timestamps(self) -> npt.NDArray[np.int64]:
+    def abs_timestamp(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
-    ts = timestamps
+    abs_ts = abs_timestamp
 
     @cached_property
-    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+    def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
-        return (self.timestamps - self._rec_start) / 1e9
+        return (self.abs_timestamp - self._rec_start) / 1e9
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        return self.rel_timestamp
 
     @property
     def by_abs_timestamp(self) -> Indexer[IMURecord]:
-        return Indexer(self.timestamps, self)
+        return Indexer(self.abs_timestamp, self)
 
     @property
     def by_rel_timestamp(self) -> Indexer[IMURecord]:
-        return Indexer(self.rel_timestamps, self)
+        return Indexer(self.rel_timestamp, self)
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
         return self._data
 
-    ts = timestamps
+    abs_ts = abs_timestamp
 
     @property
     def gyro(self) -> npt.NDArray[np.float64]:
@@ -149,7 +158,8 @@ class IMU(NeonTimeseries[IMURecord]):
     def __getitem__(self, key: int | slice) -> "IMURecord | IMU":
         if isinstance(key, int):
             record = IMURecord(
-                self._time_data[key],
+                self.abs_timestamp[key],
+                self.rel_timestamp[key],
                 self._data[key, 0:3],
                 self._data[key, 3:6],
                 self._data[key, 6:9],
@@ -191,7 +201,9 @@ class IMU(NeonTimeseries[IMURecord]):
             data_source = getattr(self, key)
 
             for dim in range(data_source.shape[1]):
-                interp_dim = np.interp(timestamps, self.timestamps, data_source[:, dim])
+                interp_dim = np.interp(
+                    timestamps, self.abs_timestamp, data_source[:, dim]
+                )
                 interp_data.append(interp_dim)
         interp_arr = np.column_stack(interp_data)
         return IMU(timestamps, interp_arr, self._rec_start)

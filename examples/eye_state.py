@@ -73,8 +73,8 @@ def make_eye_state_video(recording_dir, output_video_path):
 
             for dim, plot_meta in plot_metas.items():
                 min_ts = eye_frame.timestamp - plot_duration
-                time_frame = (min_ts < recording.eye_state.timestamps) & (
-                    recording.eye_state.timestamps <= eye_frame.timestamp
+                time_frame = (min_ts < recording.eye_state.abs_timestamp) & (
+                    recording.eye_state.abs_timestamp <= eye_frame.timestamp
                 )
                 plot_data = recording.eye_state.optical_axis_left[time_frame, dim]
                 plot(

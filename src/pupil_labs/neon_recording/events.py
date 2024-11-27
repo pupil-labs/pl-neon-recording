@@ -15,12 +15,17 @@ from pupil_labs.video import ArrayLike, Indexer
 
 
 class EventRecord(NamedTuple):
-    timestamp: int
+    abs_timestamp: int
+    rel_timestamp: float
     event_name: str
 
     @property
-    def ts(self) -> int:
-        return self.timestamp
+    def abs_ts(self) -> int:
+        return self.abs_timestamp
+
+    @property
+    def rel_ts(self) -> float:
+        return self.rel_timestamp
 
 
 class Events(NeonTimeseries[EventRecord]):
@@ -41,25 +46,29 @@ class Events(NeonTimeseries[EventRecord]):
         return Events(time_data, event_names, rec_start)
 
     @property
-    def timestamps(self) -> npt.NDArray[np.int64]:
+    def abs_timestamp(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
-    ts = timestamps
+    abs_ts = abs_timestamp
 
     @cached_property
-    def rel_timestamps(self) -> npt.NDArray[np.float64]:
-        return (self.timestamps - self._rec_start) / 1e9
+    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+        return (self.abs_timestamp - self._rec_start) / 1e9
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        return self.rel_timestamp
 
     @property
     def by_abs_timestamp(self) -> Indexer[EventRecord]:
-        return Indexer(self.timestamps, self)
+        return Indexer(self.abs_timestamp, self)
 
     @property
     def by_rel_timestamp(self) -> Indexer[EventRecord]:
-        return Indexer(self.rel_timestamps, self)
+        return Indexer(self.rel_timestamp, self)
 
     @property
-    def event_names(self) -> npt.NDArray[np.str_]:
+    def event_name(self) -> npt.NDArray[np.str_]:
         """The event names."""
         return self._event_names
 
@@ -73,7 +82,8 @@ class Events(NeonTimeseries[EventRecord]):
     def __getitem__(self, key: int | slice) -> "EventRecord | Events":
         if isinstance(key, int):
             record = EventRecord(
-                self._time_data[key],
+                self.abs_timestamp[key],
+                self.rel_timestamp[key],
                 self._event_names[key],
             )
             return record
