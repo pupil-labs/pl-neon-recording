@@ -4,7 +4,7 @@ site_url: "https://pupil-labs.github.io/pl-neon-recording"
 repo_url: "https://github.com/pupil-labs/pl-neon-recording"
 repo_name: "pupil-labs/pl-neon-recording"
 site_dir: "site"
-watch: [mkdocs.yml, README.md, CONTRIBUTING.md, src/pupil_labs/neon]
+watch: [mkdocs.yml, README.md, CONTRIBUTING.md, src/pupil_labs/neon_recording]
 edit_uri: edit/main/docs/
 
 validation:

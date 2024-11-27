@@ -1,1 +1,1 @@
-::: pupil_labs.neon
+::: pupil_labs.neon_recording
