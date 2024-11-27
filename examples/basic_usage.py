@@ -14,7 +14,7 @@ recording = nr.load(sys.argv[1])
 
 # get basic info
 print("Recording Info:")
-print(f"\tStart time (ns): {recording.start_ts_ns}")
+print(f"\tStart time (ns): {recording.start_ts}")
 print(f"\tWearer         : {recording.wearer['name']}")
 print(f"\tDevice serial  : {recording.device_serial}")
 print(f"\tGaze samples   : {len(recording.gaze)}")
@@ -25,7 +25,7 @@ print("")
 print("First 10 gaze samples:")
 gaze_data = recording.gaze[:10]
 for gaze_datum in gaze_data:
-    print(f"\t{gaze_datum.ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
+    print(f"\t{gaze_datum.abs_ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
 
 
@@ -33,20 +33,20 @@ print("")
 print("First 10 gaze samples @ 30Hz:")
 fps = 30
 timestamps = np.arange(
-    recording.gaze.ts[0], recording.gaze.ts[-1], 1e9 / fps, dtype=int
+    recording.gaze.abs_ts[0], recording.gaze.abs_ts[-1], 1e9 / fps, dtype=int
 )
 
 subsample = recording.gaze.interpolate(timestamps[:10])
 for gaze_datum in subsample:
-    print(f"\t{gaze_datum.ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
+    print(f"\t{gaze_datum.abs_ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
 
 
 # get closest gaze data to scene frame timestamps
-matched_gazes = recording.gaze.sample(recording.scene.timestamps)
+matched_gazes = recording.gaze.sample(recording.scene.abs_timestamp)
 
 # interpolate gaze data to scene frame timestamps
-interpolated_gazes = recording.gaze.interpolate(recording.scene.timestamps)
+interpolated_gazes = recording.gaze.interpolate(recording.scene.abs_timestamp)
 
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)

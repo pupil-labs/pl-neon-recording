@@ -73,21 +73,25 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
         return audio_reader
 
     @property
-    def timestamps(self) -> npt.NDArray[np.int64]:
+    def abs_timestamp(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
 
-    ts = timestamps
+    abs_ts = abs_timestamp
 
     @cached_property
-    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+    def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
-        return (self.timestamps - self._rec_start) / 1e9
+        return (self.abs_timestamp - self._rec_start) / 1e9
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        return self.rel_timestamp
 
     @property
     def by_abs_timestamp(self) -> Indexer[ReaderFrameType]:
         """Time-based access to video frames using absolute timestamps."""
-        return Indexer(self.timestamps, self)
+        return Indexer(self.abs_timestamp, self)
 
     @property
     def by_rel_timestamp(self) -> Indexer[ReaderFrameType]:
@@ -95,7 +99,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
 
         Timestamps are relative to the beginning of the recording.
         """
-        return Indexer(self.rel_timestamps, self)
+        return Indexer(self.rel_timestamp, self)
 
     @overload
     def __getitem__(self, key: int) -> ReaderFrameType: ...
@@ -115,7 +119,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    timestamp=self.timestamps[key],
+                    timestamp=self.abs_timestamp[key],
                 )
                 return video_frame
             elif isinstance(plv_frame, plv.AudioFrame):
@@ -124,7 +128,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    timestamp=self.timestamps[key],
+                    timestamp=self.abs_timestamp[key],
                 )
                 return audio_frame
             else:

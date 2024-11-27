@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 import pupil_labs.neon_recording as nr
+from pupil_labs.matching import SampledDataGroups
 from pupil_labs.neon_recording.utils import GrayFrame
 from pupil_labs.video import Writer
 
@@ -13,8 +14,8 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     recording = nr.load(recording_dir)
 
     output_timestamps = np.arange(
-        recording.scene.timestamps[0],
-        recording.scene.timestamps[-1],
+        recording.scene.abs_timestamp[0],
+        recording.scene.abs_timestamp[-1],
         1e9 / fps,
         dtype=int,
     )
@@ -22,8 +23,10 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     combined_data = zip(
         recording.scene.sample(output_timestamps, tolerance=tolerance),
         recording.gaze.sample(output_timestamps, tolerance=tolerance),
-        recording.audio.sample(
-            output_timestamps, tolerance=tolerance, return_groups=True
+        SampledDataGroups(
+            output_timestamps,
+            recording.audio,
+            tolerance=tolerance,
         ),
     )
 
