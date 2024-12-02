@@ -38,7 +38,7 @@ class Calibration(NamedTuple):
         dtype = np.dtype(
             [
                 ("version", "u1"),
-                ("serial", "6a"),
+                ("serial", "6S"),
                 ("scene_camera_matrix", "(3,3)d"),
                 ("scene_distortion_coefficients", "8d"),
                 ("scene_extrinsics_affine_matrix", "(4,4)d"),

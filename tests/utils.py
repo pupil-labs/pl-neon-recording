@@ -4,11 +4,16 @@ from functools import cached_property
 from pathlib import Path
 from typing import NamedTuple
 
+import av
+import av.video.frame
+import av.audio.frame
+
 import numpy as np
 import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from pupil_labs.neon_recording import imu_pb2
+from pupil_labs.video import MultiReader
 
 
 def load_info(rec_dir: Path):
@@ -70,6 +75,13 @@ class EventGroundTruth(NamedTuple):
     rel_timestamp: npt.NDArray[np.float64]
     rel_ts: npt.NDArray[np.float64]
     event_name: npt.NDArray[np.str_]
+
+
+class VideoGroundTruth(NamedTuple):
+    abs_timestamp: npt.NDArray[np.int64]
+    abs_ts: npt.NDArray[np.int64]
+    rel_timestamp: npt.NDArray[np.float64]
+    rel_ts: npt.NDArray[np.float64]
 
 
 class GroundTruth:
@@ -180,12 +192,14 @@ class GroundTruth:
                 for packet in imu_packets:
                     time_data.append(packet.tsNs)
 
-                    rotation = Rotation.from_quat([
-                        packet.rotVecData.x,
-                        packet.rotVecData.y,
-                        packet.rotVecData.z,
-                        packet.rotVecData.w,
-                    ])
+                    rotation = Rotation.from_quat(
+                        [
+                            packet.rotVecData.x,
+                            packet.rotVecData.y,
+                            packet.rotVecData.z,
+                            packet.rotVecData.w,
+                        ]
+                    )
 
                     euler = rotation.as_euler(seq="XZY", degrees=True)
 
@@ -200,19 +214,21 @@ class GroundTruth:
                     y /= norms
                     z /= norms
 
-                    imu_data.append((
-                        packet.gyroData.x,
-                        packet.gyroData.y,
-                        packet.gyroData.z,
-                        packet.accelData.x,
-                        packet.accelData.y,
-                        packet.accelData.z,
-                        *euler,
-                        w,
-                        x,
-                        y,
-                        z,
-                    ))
+                    imu_data.append(
+                        (
+                            packet.gyroData.x,
+                            packet.gyroData.y,
+                            packet.gyroData.z,
+                            packet.accelData.x,
+                            packet.accelData.y,
+                            packet.accelData.z,
+                            *euler,
+                            w,
+                            x,
+                            y,
+                            z,
+                        )
+                    )
 
             d = np.array(imu_data)
             t = np.array(time_data)
@@ -253,3 +269,32 @@ class GroundTruth:
             rel_ts=rel_timestamp,
             event_name=data,
         )
+
+    def _load_video(self, base_name: str):
+        video_paths = sorted(self.rec_dir.glob(f"{base_name} ps*.mp4"))
+        time_file_paths = sorted(self.rec_dir.glob(f"{base_name} ps*.time"))
+        assert len(video_paths) == len(time_file_paths)
+
+        reader = MultiReader(video_paths)
+
+        abs_timestamp = []
+        for time_file_path in time_file_paths:
+            abs_ts = np.fromfile(time_file_path, dtype="<u8").astype(np.int64)
+            abs_timestamp.append(abs_ts)
+        abs_timestamp = np.concatenate(abs_timestamp)
+        rel_timestamp = (abs_timestamp - self.info["start_time"]) / 1e9
+
+        return VideoGroundTruth(
+            abs_timestamp=abs_timestamp,
+            abs_ts=abs_timestamp,
+            rel_timestamp=rel_timestamp,
+            rel_ts=rel_timestamp,
+        )
+
+    @property
+    def eye(self) -> VideoGroundTruth:
+        return self._load_video("Neon Sensor Module v1")
+
+    @property
+    def scene(self) -> VideoGroundTruth:
+        return self._load_video("Neon Scene Camera v1")
