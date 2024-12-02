@@ -58,6 +58,9 @@ def pytest_generate_tests(metafunc: Any) -> None:
             ("eye_state", utils.EyeStateGroundTruth),
             ("imu", utils.IMUGroundTruth),
             ("events", utils.EventGroundTruth),
+            ("eye", utils.AVGroundTruth),
+            ("scene", utils.AVGroundTruth),
+            ("audio", utils.AVGroundTruth),
         ]
         values = [(sensor, field) for sensor, gt in pairings for field in gt._fields]
         metafunc.parametrize(

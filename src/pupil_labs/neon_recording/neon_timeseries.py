@@ -16,6 +16,11 @@ class NeonTimeseries(ArrayLike[T], Protocol[T]):
         """Absolute timestamps in nanoseconds since epoch"""
         ...
 
+    @property
+    def abs_ts(self) -> npt.NDArray[np.int64]:
+        """Alias for abs_timestamp"""
+        ...
+
     def sample(
         self,
         timestamps: ArrayLike[int],
@@ -35,6 +40,11 @@ class NeonTimeseries(ArrayLike[T], Protocol[T]):
     @cached_property
     def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
+        ...
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        """Alias for rel_timestamp"""
         ...
 
     @property

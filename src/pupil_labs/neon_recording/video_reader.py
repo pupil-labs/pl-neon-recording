@@ -8,6 +8,7 @@ import numpy.typing as npt
 import pupil_labs.video as plv
 from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
+from pupil_labs.neon_recording.frame_slice import FrameSlice
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_timestamps,
@@ -20,7 +21,6 @@ from pupil_labs.video import (
     ReaderFrameType,
     ReaderLike,
 )
-from pupil_labs.video.frame_slice import FrameSlice
 
 
 # TODO: Make this a NeonTimeseries
@@ -112,14 +112,14 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
     ) -> ReaderFrameType | FrameSlice[ReaderFrameType] | list[ReaderFrameType]:
         if isinstance(key, int):
             plv_frame = super().__getitem__(key)
-
             if isinstance(plv_frame, plv.VideoFrame):
                 video_frame = VideoFrame(
                     av_frame=plv_frame.av_frame,
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    timestamp=self.abs_timestamp[key],
+                    abs_timestamp=self.abs_timestamp[key],
+                    rel_timestamp=self.rel_timestamp[key],
                 )
                 return video_frame
             elif isinstance(plv_frame, plv.AudioFrame):
@@ -128,11 +128,13 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    timestamp=self.abs_timestamp[key],
+                    abs_timestamp=self.abs_timestamp[key],
+                    rel_timestamp=self.rel_timestamp[key],
                 )
                 return audio_frame
             else:
                 raise TypeError(f"unsupported frame type: {type(plv_frame)}")
+
         elif isinstance(key, slice):
             frameslice = FrameSlice[ReaderFrameType](
                 self, key, lazy_frame_slice_limit=self.lazy_frame_slice_limit

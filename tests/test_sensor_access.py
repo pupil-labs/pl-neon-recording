@@ -13,12 +13,15 @@ def assert_equal(a, b):
         assert a == b
 
 
-def test_tabular_data(
+def test_tabular_data(  # noqa: C901
     rec: nr.NeonRecording,
     sensor_selection: tuple[str, str],
     rec_ground_truth: GroundTruth,
 ):
     sensor_name, field = sensor_selection
+    if sensor_name == "audio":
+        pytest.xfail(reason="Not implemented")
+
     gt = getattr(rec_ground_truth, sensor_name)
     sensor = getattr(rec, sensor_name)
     assert len(sensor) == len(gt.abs_ts)
@@ -59,29 +62,46 @@ def test_tabular_data(
         slices.extend(s)
         for i, j in slices:
             v = sensor[i:j]
-            a = getattr(v, field)
-            b = getattr(gt, field)[i:j]
-            assert_equal(a, b)
+            if isinstance(v, list):
+                for a, b in zip(v, getattr(gt, field)[i:j]):
+                    assert_equal(getattr(a, field), b)
+            else:
+                a = getattr(v, field)
+                b = getattr(gt, field)[i:j]
+                assert_equal(a, b)
 
     indices = np.linspace(-len(sensor), len(sensor) - 1, 10).astype(int)
     for i in indices:
+        i = int(i)
         # Open end
         v = sensor[i:]
-        a = getattr(v, field)
-        b = getattr(gt, field)[i:]
-        assert_equal(a, b)
+        if isinstance(v, list):
+            for a, b in zip(v, getattr(gt, field)[i:]):
+                assert_equal(getattr(a, field), b)
+        else:
+            a = getattr(v, field)
+            b = getattr(gt, field)[i:]
+            assert_equal(a, b)
 
         # Open start
         v = sensor[:i]
-        a = getattr(v, field)
-        b = getattr(gt, field)[:i]
-        assert_equal(a, b)
+        if isinstance(v, list):
+            for a, b in zip(v, getattr(gt, field)[:i]):
+                assert_equal(getattr(a, field), b)
+        else:
+            a = getattr(v, field)
+            b = getattr(gt, field)[:i]
+            assert_equal(a, b)
 
     # Both open
     v = sensor[:]
-    a = getattr(v, field)
-    b = getattr(gt, field)[:]
-    assert_equal(a, b)
+    if isinstance(v, list):
+        for a, b in zip(v, getattr(gt, field)[:]):
+            assert_equal(getattr(a, field), b)
+    else:
+        a = getattr(v, field)
+        b = getattr(gt, field)[:]
+        assert_equal(a, b)
 
     # Time Indexing TODO
     # assert np.all(sensor.by_abs_timestamp[:].ts == gt.abs_ts)
