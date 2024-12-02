@@ -14,14 +14,20 @@ class AudioFrame(plv.AudioFrame):
         time: float,
         index: int,
         source: Any,
-        timestamp: int,
+        abs_timestamp: int,
+        rel_timestamp: float,
     ):
         super().__init__(av_frame, time, index, source)
-        self.timestamp = timestamp
+        self.abs_timestamp = abs_timestamp
+        self.rel_timestamp = rel_timestamp
 
     @property
-    def ts(self) -> int:
-        return self.timestamp
+    def abs_ts(self) -> int:
+        return self.abs_timestamp
+
+    @property
+    def rel_ts(self) -> float:
+        return self.rel_timestamp
 
 
 class VideoFrame(plv.VideoFrame):
@@ -31,11 +37,17 @@ class VideoFrame(plv.VideoFrame):
         time: float,
         index: int,
         source: Any,
-        timestamp: int,
+        abs_timestamp: int,
+        rel_timestamp: float,
     ):
         super().__init__(av_frame, time, index, source)
-        self.timestamp = timestamp
+        self.abs_timestamp = abs_timestamp
+        self.rel_timestamp = rel_timestamp
 
     @property
-    def ts(self) -> int:
-        return self.timestamp
+    def abs_ts(self) -> int:
+        return self.abs_timestamp
+
+    @property
+    def rel_ts(self) -> float:
+        return self.rel_timestamp
