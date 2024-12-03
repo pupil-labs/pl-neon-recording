@@ -72,14 +72,12 @@ class Events(NeonTimeseries[EventRecord]):
                 self._event_names[key],
             )
             return record
-        elif isinstance(key, slice):
+        else:
             return Events(
                 self._time_data[key],
                 self._event_names[key],
                 self._rec_start,
             )
-        else:
-            raise TypeError(f"Invalid argument type {type(key)}")
 
     def __iter__(self) -> Iterator[EventRecord]:
         for i in range(len(self)):

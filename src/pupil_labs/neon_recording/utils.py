@@ -9,7 +9,7 @@ import numpy.typing as npt
 def find_sorted_multipart_files(
     recording_path: Path, basename: str, extension: str = ".raw"
 ) -> list[Tuple[Path, Path]]:
-    file_pairs = []
+    file_pairs: list[tuple[Path, Path]] = []
     for raw_file in recording_path.glob(f"{basename} ps*{extension}"):
         time_file = raw_file.with_suffix(".time")
         if time_file.exists():
@@ -20,7 +20,7 @@ def find_sorted_multipart_files(
 
 def load_multipart_data_time_pairs(
     file_pairs: list[Tuple[Path, Path]], dtype: str, field_count: int
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[npt.NDArray[np.float64 | np.str_], npt.NDArray[np.int64]]:
     data_buffer = b""
     ts_buffer = b""
     for data_file, time_file in file_pairs:
@@ -50,7 +50,7 @@ def load_multipart_timestamps(
 def load_multipart_timestamps(
     files: Sequence[Path], concatenate: bool
 ) -> npt.NDArray[np.int64] | list[npt.NDArray[np.int64]]:
-    ts_buffer = []
+    ts_buffer: list[bytes] = []
     for time_file in files:
         with open(time_file, "rb") as f:
             ts_buffer.append(f.read())

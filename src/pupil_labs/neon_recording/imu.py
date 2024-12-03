@@ -149,10 +149,8 @@ class IMU(NeonTimeseries[IMURecord]):
                 self._data[key, 9:13],
             )
             return record
-        elif isinstance(key, slice):
-            return IMU(self._time_data[key], self._data[key], self._rec_start)
         else:
-            raise TypeError(f"Invalid argument type {type(key)}")
+            return IMU(self._time_data[key], self._data[key], self._rec_start)
 
     def __iter__(self) -> Iterator[IMURecord]:
         for i in range(len(self)):
@@ -160,16 +158,9 @@ class IMU(NeonTimeseries[IMURecord]):
 
     def interpolate(self, timestamps: ArrayLike[int]) -> "IMU":
         timestamps = np.array(timestamps)
-        interp_data = []
+        interp_data: list[npt.NDArray[np.float64]] = []
 
-        for key in [
-            "gyro",
-            "accel",
-            "euler",
-            "quaternion",
-        ]:
-            data_source = getattr(self, key)
-
+        for data_source in [self.gyro, self.accel, self.euler, self.quaternion]:
             for dim in range(data_source.shape[1]):
                 interp_dim = np.interp(
                     timestamps, self.abs_timestamps, data_source[:, dim]
