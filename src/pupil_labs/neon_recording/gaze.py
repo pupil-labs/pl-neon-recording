@@ -100,16 +100,15 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def __getitem__(self, key: slice, /) -> "Gaze": ...
     def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
         if isinstance(key, int):
-            result = GazeRecord(
+            return GazeRecord(
                 self.abs_timestamps[key],
                 self.rel_timestamps[key],
                 *self._gaze_data[key],
             )
         else:
-            result = Gaze(
+            return Gaze(
                 self._abs_timestamps[key], self._gaze_data[key], self._rec_start
             )
-        return result
 
     def __iter__(self) -> Iterator[GazeRecord]:
         for i in range(len(self)):
