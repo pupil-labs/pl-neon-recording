@@ -45,12 +45,12 @@ class Events(NeonTimeseries[EventRecord]):
         return Events(time_data, event_names, rec_start)
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
     @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
-        return (self.abs_timestamp - self._rec_start) / 1e9
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+        return (self.abs_timestamps - self._rec_start) / 1e9
 
     @property
     def event_name(self) -> npt.NDArray[np.str_]:
@@ -67,8 +67,8 @@ class Events(NeonTimeseries[EventRecord]):
     def __getitem__(self, key: int | slice) -> "EventRecord | Events":
         if isinstance(key, int):
             record = EventRecord(
-                self.abs_timestamp[key],
-                self.rel_timestamp[key],
+                self.abs_timestamps[key],
+                self.rel_timestamps[key],
                 self._event_names[key],
             )
             return record

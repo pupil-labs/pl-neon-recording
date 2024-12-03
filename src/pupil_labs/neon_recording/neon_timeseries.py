@@ -14,30 +14,30 @@ T = TypeVar("T", covariant=True)
 class NeonTimeseries(ArrayLike[T], ABC):
     @property
     @abstractmethod
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds since epoch"""
         ...
 
     @property
     def abs_ts(self) -> npt.NDArray[np.int64]:
         """Alias for abs_timestamp"""
-        return self.abs_timestamp
+        return self.abs_timestamps
 
     @cached_property
     @abstractmethod
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
         ...
 
     @property
     def rel_ts(self) -> npt.NDArray[np.float64]:
         """Alias for rel_timestamp"""
-        return self.rel_timestamp
+        return self.rel_timestamps
 
     @property
     def by_abs_timestamp(self) -> Indexer[T]:
         """Time-based access to video frames using absolute timestamps."""
-        return Indexer(self.abs_timestamp, self)
+        return Indexer(self.abs_timestamps, self)
 
     @property
     def by_rel_timestamp(self) -> Indexer[T]:
@@ -45,7 +45,7 @@ class NeonTimeseries(ArrayLike[T], ABC):
 
         Timestamps are relative to the beginning of the recording.
         """
-        return Indexer(self.rel_timestamp, self)
+        return Indexer(self.rel_timestamps, self)
 
     def sample(
         self,

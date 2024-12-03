@@ -19,16 +19,16 @@ class FrameSlice(plv_FrameSlice[plv_FrameType]):
         super().__init__(target, slice_value, lazy_frame_slice_limit)
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
-        return self.target.abs_timestamp[self.slice]
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
+        return self.target.abs_timestamps[self.slice]
 
     @property
     def abs_ts(self) -> npt.NDArray[np.int64]:
         return self.target.abs_ts[self.slice]
 
     @property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
-        return self.target.rel_timestamp[self.slice]
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+        return self.target.rel_timestamps[self.slice]
 
     @property
     def rel_ts(self) -> npt.NDArray[np.float64]:
