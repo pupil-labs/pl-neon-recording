@@ -1,17 +1,16 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Iterator, NamedTuple, Optional, overload
+from typing import Iterator, NamedTuple, overload
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from scipy.spatial.transform import Rotation  # type: ignore
 
-from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.imu_pb2 import ImuPacket  # type: ignore
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import find_sorted_multipart_files
-from pupil_labs.video import ArrayLike, Indexer
+from pupil_labs.video import ArrayLike
 
 
 class IMURecord(NamedTuple):
@@ -107,30 +106,14 @@ class IMU(NeonTimeseries[IMURecord]):
     def abs_timestamp(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
-    abs_ts = abs_timestamp
-
     @cached_property
     def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
         return (self.abs_timestamp - self._rec_start) / 1e9
 
     @property
-    def rel_ts(self) -> npt.NDArray[np.float64]:
-        return self.rel_timestamp
-
-    @property
-    def by_abs_timestamp(self) -> Indexer[IMURecord]:
-        return Indexer(self.abs_timestamp, self)
-
-    @property
-    def by_rel_timestamp(self) -> Indexer[IMURecord]:
-        return Indexer(self.rel_timestamp, self)
-
-    @property
     def data(self) -> npt.NDArray[np.float64]:
         return self._data
-
-    abs_ts = abs_timestamp
 
     @property
     def gyro(self) -> npt.NDArray[np.float64]:
@@ -174,19 +157,6 @@ class IMU(NeonTimeseries[IMURecord]):
     def __iter__(self) -> Iterator[IMURecord]:
         for i in range(len(self)):
             yield self[i]
-
-    def sample(
-        self,
-        timestamps: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-    ) -> SampledData[IMURecord]:
-        return SampledData.sample(
-            timestamps,
-            self,
-            method=method,
-            tolerance=tolerance,
-        )
 
     def interpolate(self, timestamps: ArrayLike[int]) -> "IMU":
         timestamps = np.array(timestamps)

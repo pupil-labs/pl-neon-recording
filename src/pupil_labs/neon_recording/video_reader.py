@@ -1,21 +1,19 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Optional, Sequence, overload
+from typing import Sequence, overload
 
 import numpy as np
 import numpy.typing as npt
 
 import pupil_labs.video as plv
-from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
 from pupil_labs.neon_recording.frame_slice import FrameSlice
+from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_timestamps,
 )
 from pupil_labs.video import (
-    ArrayLike,
-    Indexer,
     MultiReader,
     Reader,
     ReaderFrameType,
@@ -24,7 +22,7 @@ from pupil_labs.video import (
 
 
 # TODO: Make this a NeonTimeseries
-class NeonVideoReader(MultiReader[ReaderFrameType]):
+class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries):
     def __init__(
         self,
         readers: Sequence[ReaderLike],
@@ -77,29 +75,10 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
 
-    abs_ts = abs_timestamp
-
     @cached_property
     def rel_timestamp(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
         return (self.abs_timestamp - self._rec_start) / 1e9
-
-    @property
-    def rel_ts(self) -> npt.NDArray[np.float64]:
-        return self.rel_timestamp
-
-    @property
-    def by_abs_timestamp(self) -> Indexer[ReaderFrameType]:
-        """Time-based access to video frames using absolute timestamps."""
-        return Indexer(self.abs_timestamp, self)
-
-    @property
-    def by_rel_timestamp(self) -> Indexer[ReaderFrameType]:
-        """Time-based access to video frames using relative timestamps.
-
-        Timestamps are relative to the beginning of the recording.
-        """
-        return Indexer(self.rel_timestamp, self)
 
     @overload
     def __getitem__(self, key: int) -> ReaderFrameType: ...
@@ -146,16 +125,3 @@ class NeonVideoReader(MultiReader[ReaderFrameType]):
             return [self[int(i)] for i in key]
         else:
             raise TypeError(f"unsupported key type: {type(key)}")
-
-    def sample(
-        self,
-        timestamps: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-    ) -> SampledData[ReaderFrameType]:
-        return SampledData.sample(
-            timestamps,
-            self,
-            method=method,
-            tolerance=tolerance,
-        )

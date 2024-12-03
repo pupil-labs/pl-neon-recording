@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Optional, Protocol, TypeVar
+from typing import Optional, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -10,8 +11,9 @@ from pupil_labs.video import ArrayLike, Indexer
 T = TypeVar("T", covariant=True)
 
 
-class NeonTimeseries(ArrayLike[T], Protocol[T]):
+class NeonTimeseries(ArrayLike[T], ABC):
     @property
+    @abstractmethod
     def abs_timestamp(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds since epoch"""
         ...
@@ -19,7 +21,31 @@ class NeonTimeseries(ArrayLike[T], Protocol[T]):
     @property
     def abs_ts(self) -> npt.NDArray[np.int64]:
         """Alias for abs_timestamp"""
+        return self.abs_timestamp
+
+    @cached_property
+    @abstractmethod
+    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+        """Relative timestamps in seconds in relation to the recording beginning."""
         ...
+
+    @property
+    def rel_ts(self) -> npt.NDArray[np.float64]:
+        """Alias for rel_timestamp"""
+        return self.rel_timestamp
+
+    @property
+    def by_abs_timestamp(self) -> Indexer[T]:
+        """Time-based access to video frames using absolute timestamps."""
+        return Indexer(self.abs_timestamp, self)
+
+    @property
+    def by_rel_timestamp(self) -> Indexer[T]:
+        """Time-based access to video frames using relative timestamps.
+
+        Timestamps are relative to the beginning of the recording.
+        """
+        return Indexer(self.rel_timestamp, self)
 
     def sample(
         self,
@@ -35,27 +61,9 @@ class NeonTimeseries(ArrayLike[T], Protocol[T]):
             tolerance: The maximum time difference in nanoseconds for matching.
 
         """
-        ...
-
-    @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
-        """Relative timestamps in seconds in relation to the recording beginning."""
-        ...
-
-    @property
-    def rel_ts(self) -> npt.NDArray[np.float64]:
-        """Alias for rel_timestamp"""
-        ...
-
-    @property
-    def by_abs_timestamp(self) -> Indexer[T]:
-        """Time-based access to video frames using absolute timestamps."""
-        ...
-
-    @property
-    def by_rel_timestamp(self) -> Indexer[T]:
-        """Time-based access to video frames using relative timestamps.
-
-        Timestamps are relative to the beginning of the recording.
-        """
-        ...
+        return SampledData.sample(
+            timestamps,
+            self,
+            method=method,
+            tolerance=tolerance,
+        )
