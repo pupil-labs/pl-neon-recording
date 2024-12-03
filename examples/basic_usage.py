@@ -43,10 +43,10 @@ print("")
 
 
 # get closest gaze data to scene frame timestamps
-matched_gazes = recording.gaze.sample(recording.scene.abs_timestamp)
+matched_gazes = recording.gaze.sample(recording.scene.abs_timestamps)
 
 # interpolate gaze data to scene frame timestamps
-interpolated_gazes = recording.gaze.interpolate(recording.scene.abs_timestamp)
+interpolated_gazes = recording.gaze.interpolate(recording.scene.abs_timestamps)
 
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)

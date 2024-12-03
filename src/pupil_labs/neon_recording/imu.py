@@ -103,13 +103,13 @@ class IMU(NeonTimeseries[IMURecord]):
         return IMU(ts, data, rec_start)
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
     @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
-        return (self.abs_timestamp - self._rec_start) / 1e9
+        return (self.abs_timestamps - self._rec_start) / 1e9
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
@@ -141,8 +141,8 @@ class IMU(NeonTimeseries[IMURecord]):
     def __getitem__(self, key: int | slice) -> "IMURecord | IMU":
         if isinstance(key, int):
             record = IMURecord(
-                self.abs_timestamp[key],
-                self.rel_timestamp[key],
+                self.abs_timestamps[key],
+                self.rel_timestamps[key],
                 self._data[key, 0:3],
                 self._data[key, 3:6],
                 self._data[key, 6:9],
@@ -172,7 +172,7 @@ class IMU(NeonTimeseries[IMURecord]):
 
             for dim in range(data_source.shape[1]):
                 interp_dim = np.interp(
-                    timestamps, self.abs_timestamp, data_source[:, dim]
+                    timestamps, self.abs_timestamps, data_source[:, dim]
                 )
                 interp_data.append(interp_dim)
         interp_arr = np.column_stack(interp_data)

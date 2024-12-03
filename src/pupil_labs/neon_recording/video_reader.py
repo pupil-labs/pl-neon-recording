@@ -71,14 +71,14 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries):
         return audio_reader
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
 
     @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording beginning."""
-        return (self.abs_timestamp - self._rec_start) / 1e9
+        return (self.abs_timestamps - self._rec_start) / 1e9
 
     @overload
     def __getitem__(self, key: int) -> ReaderFrameType: ...
@@ -97,8 +97,8 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries):
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    abs_timestamp=self.abs_timestamp[key],
-                    rel_timestamp=self.rel_timestamp[key],
+                    abs_timestamp=self.abs_timestamps[key],
+                    rel_timestamp=self.rel_timestamps[key],
                 )
                 return video_frame
             elif isinstance(plv_frame, plv.AudioFrame):
@@ -107,8 +107,8 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries):
                     time=plv_frame.time,
                     index=plv_frame.index,
                     source=self,
-                    abs_timestamp=self.abs_timestamp[key],
-                    rel_timestamp=self.rel_timestamp[key],
+                    abs_timestamp=self.abs_timestamps[key],
+                    rel_timestamp=self.rel_timestamps[key],
                 )
                 return audio_frame
             else:

@@ -13,7 +13,7 @@ def main(rec_dir):
 
     # All data streams feature timestamps. `ts` is an alias for `timestamps`.
     # Timestamps are absolute nanosecond integers since the unix epoch.
-    timestamps = rec.gaze.abs_timestamp
+    timestamps = rec.gaze.abs_timestamps
     timestamps2 = rec.gaze.abs_ts
     assert np.all(timestamps == timestamps2)
 
@@ -25,7 +25,7 @@ def main(rec_dir):
     assert len(g2) == 10
 
     # Alternatively, data can be sliced by time as well
-    ts = rec.gaze.abs_timestamp[0]
+    ts = rec.gaze.abs_timestamps[0]
     g3 = rec.gaze.by_abs_timestamp[ts]
     assert g3 == g
 
@@ -34,7 +34,7 @@ def main(rec_dir):
     # In addtion to the absolute timestamps, relative timestamps are also available
     # These are timestamps in floating point seconds since the beginning of the
     # recording.
-    ts = rec.gaze.rel_timestamp[0]
+    ts = rec.gaze.rel_timestamps[0]
     rec.gaze.by_rel_timestamp[ts]
     rec.gaze.by_rel_timestamp[ts : ts + 1.0]
 

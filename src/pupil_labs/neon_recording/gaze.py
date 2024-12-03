@@ -64,13 +64,13 @@ class Gaze(NeonTimeseries[GazeRecord]):
         )
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         return self._abs_timestamps
 
     @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
         """Relative timestamps in seconds in relation to the recording  beginning."""
-        return (self.abs_timestamp - self._rec_start) / 1e9
+        return (self.abs_timestamps - self._rec_start) / 1e9
 
     @property
     def xy(self) -> npt.NDArray[np.float64]:
@@ -87,7 +87,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
     @property
     def data(self) -> npt.NDArray[np.float64]:
         return np.column_stack((
-            self.abs_timestamp.astype(np.float64),
+            self.abs_timestamps.astype(np.float64),
             self._gaze_data,
         ))
 
@@ -101,8 +101,8 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
         if isinstance(key, int):
             record = GazeRecord(
-                self.abs_timestamp[key],
-                self.rel_timestamp[key],
+                self.abs_timestamps[key],
+                self.rel_timestamps[key],
                 *self._gaze_data[key],
             )
         elif isinstance(key, slice):
@@ -119,8 +119,8 @@ class Gaze(NeonTimeseries[GazeRecord]):
 
     def interpolate(self, timestamps: ArrayLike[int]) -> "Gaze":
         timestamps = np.array(timestamps)
-        x = np.interp(timestamps, self.abs_timestamp, self.x)
-        y = np.interp(timestamps, self.abs_timestamp, self.y)
+        x = np.interp(timestamps, self.abs_timestamps, self.x)
+        y = np.interp(timestamps, self.abs_timestamps, self.y)
         xy = np.column_stack((x, y))
         return Gaze(timestamps, xy, self._rec_start)
 

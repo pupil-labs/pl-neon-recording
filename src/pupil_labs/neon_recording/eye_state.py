@@ -65,12 +65,12 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
         return EyeState(time_data, eye_state_data, rec_start)
 
     @property
-    def abs_timestamp(self) -> npt.NDArray[np.int64]:
+    def abs_timestamps(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
     @cached_property
-    def rel_timestamp(self) -> npt.NDArray[np.float64]:
-        return (self.abs_timestamp - self._rec_start) / 1e9
+    def rel_timestamps(self) -> npt.NDArray[np.float64]:
+        return (self.abs_timestamps - self._rec_start) / 1e9
 
     @property
     def pupil_diameters(self) -> npt.NDArray[np.float64]:
@@ -114,8 +114,8 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
     def __getitem__(self, key: int | slice) -> "EyeStateRecord | EyeState":
         if isinstance(key, int):
             record = EyeStateRecord(
-                self.abs_timestamp[key],
-                self.rel_timestamp[key],
+                self.abs_timestamps[key],
+                self.rel_timestamps[key],
                 self._data[key, 0],
                 self._data[key, 1:4],
                 self._data[key, 4:7],
@@ -148,12 +148,12 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
             data_source = getattr(self, key)
             if data_source.ndim == 1:
                 interp_data.append(
-                    np.interp(timestamps, self.abs_timestamp, data_source)
+                    np.interp(timestamps, self.abs_timestamps, data_source)
                 )
             else:
                 for dim in range(data_source.shape[1]):
                     interp_dim = np.interp(
-                        timestamps, self.abs_timestamp, data_source[:, dim]
+                        timestamps, self.abs_timestamps, data_source[:, dim]
                     )
                     interp_data.append(interp_dim)
         interp_arr = np.column_stack(interp_data)

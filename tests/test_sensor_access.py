@@ -19,17 +19,21 @@ def test_tabular_data(  # noqa: C901
     rec_ground_truth: GroundTruth,
 ):
     sensor_name, field = sensor_selection
+    if field == "abs_timestamp":
+        field_plural = "abs_timestamps"
+    elif field == "rel_timestamp":
+        field_plural = "rel_timestamps"
+    else:
+        field_plural = field
+
     if sensor_name == "audio":
         pytest.xfail(reason="Not implemented")
 
     gt = getattr(rec_ground_truth, sensor_name)
     sensor = getattr(rec, sensor_name)
     assert len(sensor) == len(gt.abs_ts)
-    assert np.all(sensor.abs_timestamp == gt.abs_ts)
-    assert np.all(sensor.abs_ts == gt.abs_ts)
-    assert np.all(sensor.rel_timestamp == gt.rel_ts)
 
-    assert np.all(getattr(sensor, field) == getattr(gt, field))
+    assert np.all(getattr(sensor, field_plural) == getattr(gt, field))
 
     # Iteration
     for i, v in enumerate(sensor):
@@ -66,7 +70,7 @@ def test_tabular_data(  # noqa: C901
                 for a, b in zip(v, getattr(gt, field)[i:j]):
                     assert_equal(getattr(a, field), b)
             else:
-                a = getattr(v, field)
+                a = getattr(v, field_plural)
                 b = getattr(gt, field)[i:j]
                 assert_equal(a, b)
 
@@ -79,7 +83,7 @@ def test_tabular_data(  # noqa: C901
             for a, b in zip(v, getattr(gt, field)[i:]):
                 assert_equal(getattr(a, field), b)
         else:
-            a = getattr(v, field)
+            a = getattr(v, field_plural)
             b = getattr(gt, field)[i:]
             assert_equal(a, b)
 
@@ -89,7 +93,7 @@ def test_tabular_data(  # noqa: C901
             for a, b in zip(v, getattr(gt, field)[:i]):
                 assert_equal(getattr(a, field), b)
         else:
-            a = getattr(v, field)
+            a = getattr(v, field_plural)
             b = getattr(gt, field)[:i]
             assert_equal(a, b)
 
@@ -99,7 +103,7 @@ def test_tabular_data(  # noqa: C901
         for a, b in zip(v, getattr(gt, field)[:]):
             assert_equal(getattr(a, field), b)
     else:
-        a = getattr(v, field)
+        a = getattr(v, field_plural)
         b = getattr(gt, field)[:]
         assert_equal(a, b)
 

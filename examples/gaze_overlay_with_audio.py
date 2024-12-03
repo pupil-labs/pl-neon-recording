@@ -14,8 +14,8 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     recording = nr.load(recording_dir)
 
     output_timestamps = np.arange(
-        recording.scene.abs_timestamp[0],
-        recording.scene.abs_timestamp[-1],
+        recording.scene.abs_timestamps[0],
+        recording.scene.abs_timestamps[-1],
         1e9 / fps,
         dtype=int,
     )
