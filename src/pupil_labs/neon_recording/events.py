@@ -1,17 +1,16 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Iterator, NamedTuple, Optional, overload
+from typing import Iterator, NamedTuple, overload
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
-from pupil_labs.matching import MatchingMethod, SampledData
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
 )
-from pupil_labs.video import ArrayLike, Indexer
+from pupil_labs.video import ArrayLike
 
 
 class EventRecord(NamedTuple):
@@ -49,23 +48,9 @@ class Events(NeonTimeseries[EventRecord]):
     def abs_timestamp(self) -> npt.NDArray[np.int64]:
         return self._time_data
 
-    abs_ts = abs_timestamp
-
     @cached_property
     def rel_timestamp(self) -> npt.NDArray[np.float64]:
         return (self.abs_timestamp - self._rec_start) / 1e9
-
-    @property
-    def rel_ts(self) -> npt.NDArray[np.float64]:
-        return self.rel_timestamp
-
-    @property
-    def by_abs_timestamp(self) -> Indexer[EventRecord]:
-        return Indexer(self.abs_timestamp, self)
-
-    @property
-    def by_rel_timestamp(self) -> Indexer[EventRecord]:
-        return Indexer(self.rel_timestamp, self)
 
     @property
     def event_name(self) -> npt.NDArray[np.str_]:
@@ -99,19 +84,6 @@ class Events(NeonTimeseries[EventRecord]):
     def __iter__(self) -> Iterator[EventRecord]:
         for i in range(len(self)):
             yield self[i]
-
-    def sample(
-        self,
-        timestamps: ArrayLike[int],
-        method: MatchingMethod = MatchingMethod.NEAREST,
-        tolerance: Optional[int] = None,
-    ) -> SampledData[EventRecord]:
-        return SampledData.sample(
-            timestamps,
-            self,
-            method=method,
-            tolerance=tolerance,
-        )
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(
