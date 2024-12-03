@@ -50,7 +50,7 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def from_native_recording(rec_dir: Path, rec_start: int) -> "Gaze":
         gaze_200hz_file = rec_dir / "gaze_200hz.raw"
         time_200hz_file = rec_dir / "gaze_200hz.time"
-        gaze_file_pairs = []
+        gaze_file_pairs: list[tuple[Path, Path]] = []
         if gaze_200hz_file.exists() and time_200hz_file.exists():
             gaze_file_pairs.append((gaze_200hz_file, time_200hz_file))
         else:
@@ -100,18 +100,16 @@ class Gaze(NeonTimeseries[GazeRecord]):
     def __getitem__(self, key: slice, /) -> "Gaze": ...
     def __getitem__(self, key: int | slice) -> "GazeRecord | Gaze":
         if isinstance(key, int):
-            record = GazeRecord(
+            result = GazeRecord(
                 self.abs_timestamps[key],
                 self.rel_timestamps[key],
                 *self._gaze_data[key],
             )
-        elif isinstance(key, slice):
-            return Gaze(
+        else:
+            result = Gaze(
                 self._abs_timestamps[key], self._gaze_data[key], self._rec_start
             )
-        else:
-            raise TypeError(f"Invalid argument type {type(key)}")
-        return record
+        return result
 
     def __iter__(self) -> Iterator[GazeRecord]:
         for i in range(len(self)):

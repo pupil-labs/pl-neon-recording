@@ -124,10 +124,8 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
                 self._data[key, 11:14],
             )
             return record
-        elif isinstance(key, slice):
-            return EyeState(self._time_data[key], self._data[key], self._rec_start)
         else:
-            raise TypeError(f"Invalid argument type {type(key)}")
+            return EyeState(self._time_data[key], self._data[key], self._rec_start)
 
     def __iter__(self) -> Iterator[EyeStateRecord]:
         for i in range(len(self)):
@@ -135,21 +133,19 @@ class EyeState(NeonTimeseries[EyeStateRecord]):
 
     def interpolate(self, timestamps: ArrayLike[int]) -> "EyeState":
         timestamps = np.array(timestamps)
-        interp_data = []
+        interp_data: list[npt.NDArray[np.float64]] = []
 
-        for key in [
-            "pupil_diameter_left",
-            "eye_ball_center_left",
-            "optical_axis_left",
-            "pupil_diameter_right",
-            "eye_ball_center_right",
-            "optical_axis_right",
+        for data_source in [
+            self.pupil_diameter_left,
+            self.eyeball_center_left,
+            self.optical_axis_left,
+            self.pupil_diameter_right,
+            self.eyeball_center_right,
+            self.optical_axis_right,
         ]:
-            data_source = getattr(self, key)
             if data_source.ndim == 1:
-                interp_data.append(
-                    np.interp(timestamps, self.abs_timestamps, data_source)
-                )
+                d = np.interp(timestamps, self.abs_timestamps, data_source)
+                interp_data.append(d)
             else:
                 for dim in range(data_source.shape[1]):
                     interp_dim = np.interp(
