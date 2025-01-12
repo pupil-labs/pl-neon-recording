@@ -5,7 +5,6 @@ from typing import Iterator, NamedTuple, overload
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -34,14 +33,16 @@ class EyeStateRecord(NamedTuple):
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
-        return np.concatenate([
-            [self.abs_ts, self.pupil_diameter_left],
-            self.eyeball_center_left,
-            self.optical_axis_left,
-            [self.pupil_diameter_right],
-            self.eyeball_center_right,
-            self.optical_axis_right,
-        ])
+        return np.concatenate(
+            [
+                [self.abs_ts, self.pupil_diameter_left],
+                self.eyeball_center_left,
+                self.optical_axis_left,
+                [self.pupil_diameter_right],
+                self.eyeball_center_right,
+                self.optical_axis_right,
+            ]
+        )
 
 
 class EyeState(NeonTimeseries[EyeStateRecord]):

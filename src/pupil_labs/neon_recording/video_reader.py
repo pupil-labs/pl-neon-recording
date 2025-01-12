@@ -4,7 +4,6 @@ from typing import Sequence, overload
 
 import numpy as np
 import numpy.typing as npt
-
 import pupil_labs.video as plv
 from pupil_labs.neon_recording.frame import AudioFrame, VideoFrame
 from pupil_labs.neon_recording.frame_slice import FrameSlice
@@ -70,7 +69,7 @@ class NeonVideoReader(MultiReader[ReaderFrameType], NeonTimeseries):
         )
         return audio_reader
 
-    @property
+    @cached_property
     def abs_timestamps(self) -> npt.NDArray[np.int64]:
         """Absolute timestamps in nanoseconds."""
         return np.concatenate(self._timestamps)
