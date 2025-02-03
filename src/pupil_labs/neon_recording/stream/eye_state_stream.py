@@ -35,8 +35,13 @@ class EyeStateStream(Stream):
         eye_state_files = find_sorted_multipart_files(recording._rec_dir, "eye_state")
         eye_state_data, time_data = load_multipart_data_time_pairs(eye_state_files, "<f4", 2)
 
-        data = eye_state_data.reshape(-1, 14)
-        data = np.vstack([time_data, data.T])
+        if eye_state_data.size % 20 == 0:
+            data = eye_state_data.reshape(-1, 20)
+        elif eye_state_data.size % 14 == 0:
+            data = eye_state_data.reshape(-1, 14)
+        else:
+            raise ValueError("Unexpected eye state data size")
+        data = np.vstack([time_data, data.T[:14]])
         data = np.rec.fromarrays(
             data,
             names=[

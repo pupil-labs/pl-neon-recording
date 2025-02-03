@@ -1,22 +1,21 @@
 import json
 import pathlib
-from typing import Union
 
 from . import structlog
 from .calib import Calibration
-from .stream.gaze_stream import GazeStream
-from .stream.event_stream import EventStream
-from .stream.imu import IMUStream
-from .stream.eye_state_stream import EyeStateStream
-from .stream.av_stream.video_stream import VideoStream
 from .stream.av_stream.audio_stream import AudioStream
+from .stream.av_stream.video_stream import VideoStream
+from .stream.event_stream import EventStream
+from .stream.eye_state_stream import EyeStateStream
+from .stream.eyelid_stream import EyeLidStream
+from .stream.gaze_stream import GazeStream
+from .stream.imu import IMUStream
 
 log = structlog.get_logger(__name__)
 
 
 class NeonRecording:
-    """
-    Class to handle the Neon Recording data
+    """Class to handle the Neon Recording data
 
     Attributes:
         * `info` (dict): Information loaded from info.json
@@ -28,9 +27,8 @@ class NeonRecording:
         * `streams` (dict): data streams of the recording
     """
 
-    def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
-        """
-        Initialize the NeonRecording object
+    def __init__(self, rec_dir_in: pathlib.Path | str):
+        """Initialize the NeonRecording object
 
         Args:
             rec_dir_in: Path to the recording directory.
@@ -38,10 +36,11 @@ class NeonRecording:
         Raises:
             FileNotFoundError: If the directory does not exist or is not valid.
         """
-
         self._rec_dir = pathlib.Path(rec_dir_in).resolve()
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
-            raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
+            raise FileNotFoundError(
+                f"Directory not found or not valid: {self._rec_dir}"
+            )
 
         log.debug(f"NeonRecording: Loading recording from {rec_dir_in}")
 
@@ -69,6 +68,7 @@ class NeonRecording:
             "events": None,
             "eye": None,
             "eye_state": None,
+            "eyelid": None,
             "gaze": None,
             "imu": None,
             "scene": None,
@@ -76,8 +76,7 @@ class NeonRecording:
 
     @property
     def gaze(self) -> GazeStream:
-        """
-        2D gaze data in scene-camera space
+        """2D gaze data in scene-camera space
 
         Returns:
             GazeStream: Each record contains
@@ -92,8 +91,7 @@ class NeonRecording:
 
     @property
     def imu(self) -> IMUStream:
-        """
-        Motion and orientation data
+        """Motion and orientation data
 
         Returns:
             IMUStream:
@@ -105,8 +103,7 @@ class NeonRecording:
 
     @property
     def eye_state(self) -> EyeStateStream:
-        """
-        Eye state data
+        """Eye state data
 
         Returns:
             EyeStateStream
@@ -117,9 +114,20 @@ class NeonRecording:
         return self.streams["eye_state"]
 
     @property
-    def scene(self) -> VideoStream:
+    def eyelid(self) -> EyeLidStream:
+        """Eyelid's data
+
+        Returns:
+            EyeLidStream
         """
-        Frames of video from the scene camera
+        if self.streams["eyelid"] is None:
+            self.streams["eyelid"] = EyeLidStream(self)
+
+        return self.streams["eyelid"]
+
+    @property
+    def scene(self) -> VideoStream:
+        """Frames of video from the scene camera
 
         Returns:
             VideoStream
@@ -131,8 +139,7 @@ class NeonRecording:
 
     @property
     def eye(self) -> VideoStream:
-        """
-        Frames of video from the eye cameras
+        """Frames of video from the eye cameras
 
         Returns:
             VideoStream
@@ -144,8 +151,7 @@ class NeonRecording:
 
     @property
     def events(self) -> EventStream:
-        """
-        Event annotations
+        """Event annotations
 
         Returns:
             EventStream
@@ -157,8 +163,7 @@ class NeonRecording:
 
     @property
     def audio(self) -> AudioStream:
-        """
-        Audio from the scene video
+        """Audio from the scene video
 
         Returns:
             AudioStream
@@ -169,8 +174,6 @@ class NeonRecording:
         return self.streams["audio"]
 
 
-def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:
-    """
-    Load a :class:`.NeonRecording`
-    """
+def load(rec_dir_in: pathlib.Path | str) -> NeonRecording:
+    """Load a :class:`.NeonRecording`"""
     return NeonRecording(rec_dir_in)
