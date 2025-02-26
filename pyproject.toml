@@ -19,8 +19,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "av>=13.1.0",
-    "numpy>=2.1.2",
+    "av",
+    "numpy",
     "pupil-labs-video",
     "pupil-labs-matching",
     "structlog>=24.4.0",

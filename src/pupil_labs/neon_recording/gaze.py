@@ -5,6 +5,7 @@ from typing import Iterator, NamedTuple, overload
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+
 from pupil_labs.neon_recording.neon_timeseries import NeonTimeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -85,12 +86,10 @@ class Gaze(NeonTimeseries[GazeRecord]):
 
     @property
     def data(self) -> npt.NDArray[np.float64]:
-        return np.column_stack(
-            (
-                self.abs_timestamps.astype(np.float64),
-                self._gaze_data,
-            )
-        )
+        return np.column_stack((
+            self.abs_timestamps.astype(np.float64),
+            self._gaze_data,
+        ))
 
     def __len__(self) -> int:
         return len(self._abs_timestamps)
