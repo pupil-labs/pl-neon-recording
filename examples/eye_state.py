@@ -2,10 +2,10 @@ import sys
 
 import cv2
 import numpy as np
+from tqdm import tqdm
+
 import pupil_labs.neon_recording as nr
 from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame
-
-from tqdm import tqdm
 
 
 def overlay_image(img, img_overlay, x, y):
@@ -31,7 +31,10 @@ def plot(img, data, value_range, x_width, color, line_width=2):
     for idx in range(1, len(data)):
         x_values = [int(idx2 * x_width) for idx2 in [idx - 1, idx]]
 
-        y_norms = [(data[idx2] - value_range[0]) / (value_range[1] - value_range[0]) for idx2 in [idx - 1, idx]]
+        y_norms = [
+            (data[idx2] - value_range[0]) / (value_range[1] - value_range[0])
+            for idx2 in [idx - 1, idx]
+        ]
         y_values = [int(y_norm * img.shape[0]) for y_norm in y_norms]
 
         points = [[*v] for v in zip(x_values, y_values)]
@@ -46,13 +49,14 @@ def make_eye_state_video(recording_dir, output_video_path):
 
     video_writer = cv2.VideoWriter(
         str(output_video_path),
-        cv2.VideoWriter_fourcc(*'MJPG'),
+        cv2.VideoWriter_fourcc(*"MJPG"),
         fps,
-        (recording.eye.width, recording.eye.height)
+        (recording.eye.width, recording.eye.height),
     )
 
     output_timestamps = np.arange(recording.eye.ts[0], recording.eye.ts[-1], 1 / fps)
-
+    z = recording.eye_state[0]
+    o = z.pupil_diameter_left_mm
     eye_video_sampled = recording.eye.sample(output_timestamps)
     eye_state_sampled = recording.eye_state.sample(output_timestamps)
     combined_data = zip(
@@ -62,21 +66,19 @@ def make_eye_state_video(recording_dir, output_video_path):
     )
 
     plot_metas = {
-        'optical_axis_left_x': {
-            'color': [0, 0, 255]
+        "optical_axis_left_x": {"color": [0, 0, 255]},
+        "optical_axis_left_y": {
+            "color": [0, 255, 0],
         },
-        'optical_axis_left_y': {
-            'color': [0, 255, 0],
-        },
-        'optical_axis_left_z': {
-            'color': [255, 0, 0],
+        "optical_axis_left_z": {
+            "color": [255, 0, 0],
         },
     }
 
     for plot_name, plot_meta in plot_metas.items():
-        plot_meta['range'] = (
+        plot_meta["range"] = (
             np.min(recording.eye_state.data[plot_name]),
-            np.max(recording.eye_state.data[plot_name])
+            np.max(recording.eye_state.data[plot_name]),
         )
 
     plot_duration = 0.5
@@ -91,16 +93,24 @@ def make_eye_state_video(recording_dir, output_video_path):
 
         for plot_name, plot_meta in plot_metas.items():
             min_ts = ts - plot_duration
-            time_frame = (min_ts < eye_state_sampled.data.ts) & (eye_state_sampled.data.ts <= ts)
+            time_frame = (min_ts < eye_state_sampled.data.ts) & (
+                eye_state_sampled.data.ts <= ts
+            )
             plot_data = eye_state_sampled.data[time_frame][plot_name]
-            plot(eye_pixels, plot_data, plot_meta['range'], plot_x_width, plot_meta['color'])
+            plot(
+                eye_pixels,
+                plot_data,
+                plot_meta["range"],
+                plot_x_width,
+                plot_meta["color"],
+            )
 
         video_writer.write(eye_pixels)
-        cv2.imshow('Frame', eye_pixels)
+        cv2.imshow("Frame", eye_pixels)
         cv2.pollKey()
 
     video_writer.release()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     make_eye_state_video(sys.argv[1], "eye-state-output-video.avi")

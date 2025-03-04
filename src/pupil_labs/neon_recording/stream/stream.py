@@ -1,10 +1,14 @@
 from enum import Enum
+from typing import TYPE_CHECKING, Generic, SupportsIndex, TypeVar
 
 import numpy as np
+import numpy.typing as npt
 
-from .. import structlog
+from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
+from pupil_labs.neon_recording.stream.array_record import Array, RecordT, proxy
 
-log = structlog.get_logger(__name__)
+if TYPE_CHECKING:
+    from pupil_labs.neon_recording.neon_recording import NeonRecording
 
 
 class InterpolationMethod(Enum):
@@ -31,10 +35,10 @@ np.record.__bool__ = _record_truthiness
 
 
 class SimpleDataSampler:
-    sampler_class = None
+    _ts: npt.NDArray[np.int64]
+    _data: npt.NDArray
 
-    def __init__(self, data):
-        self._data = data
+    sampler_class = None
 
     def sample(self, tstamps=None, method=InterpolationMethod.NEAREST):
         if tstamps is None:
@@ -77,7 +81,9 @@ class SimpleDataSampler:
         result = np.zeros(len(sorted_ts), self.data.dtype)
 
         for key in self.data.dtype.names:
-            result[key] = np.interp(sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan)
+            result[key] = np.interp(
+                sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan
+            )
 
         return self.sampler_class(result)
 
@@ -86,7 +92,7 @@ class SimpleDataSampler:
             yield sample
 
     def __len__(self):
-        return len(self._data.ts)
+        return len(self.ts)
 
     def to_numpy(self):
         return self._data
@@ -97,14 +103,41 @@ class SimpleDataSampler:
 
     @property
     def ts(self):
-        return self._data['ts']
+        return self[TIMESTAMP_FIELD_NAME]
 
 
 SimpleDataSampler.sampler_class = SimpleDataSampler
 
 
-class Stream(SimpleDataSampler):
-    def __init__(self, name, recording, data):
-        super().__init__(data)
+class StreamProps:
+    ts = proxy[np.int64](TIMESTAMP_FIELD_NAME)
+    "The moment these data were recorded"
+
+    def keys(self):
+        return dir(self)
+
+
+class Stream(SimpleDataSampler, StreamProps):
+    def __init__(self, name, recording: "NeonRecording", data):
         self.name = name
         self.recording = recording
+        self._data = data
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}"
+            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
+        )
+
+    # TODO(dan): fix typing on rec.eye_state[0]
+    def __getitem__(self, key: SupportsIndex | list[str]):
+        return self._data[key]
+
+    def __getattr__(self, key):
+        return getattr(self._data, key)
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def keys(self):
+        return self._data.dtype.fields

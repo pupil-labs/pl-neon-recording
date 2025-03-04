@@ -4,12 +4,12 @@ from typing import Union
 
 from . import structlog
 from .calib import Calibration
-from .stream.gaze_stream import GazeStream
-from .stream.event_stream import EventStream
-from .stream.imu import IMUStream
-from .stream.eye_state_stream import EyeStateStream
-from .stream.av_stream.video_stream import VideoStream
 from .stream.av_stream.audio_stream import AudioStream
+from .stream.av_stream.video_stream import VideoStream
+from .stream.event_stream import EventStream
+from .stream.eye_state_stream import EyeStateStream
+from .stream.gaze_stream import GazeStream
+from .stream.imu import IMUStream
 
 log = structlog.get_logger(__name__)
 
@@ -41,7 +41,9 @@ class NeonRecording:
 
         self._rec_dir = pathlib.Path(rec_dir_in).resolve()
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
-            raise FileNotFoundError(f"Directory not found or not valid: {self._rec_dir}")
+            raise FileNotFoundError(
+                f"Directory not found or not valid: {self._rec_dir}"
+            )
 
         log.debug(f"NeonRecording: Loading recording from {rec_dir_in}")
 
@@ -73,6 +75,9 @@ class NeonRecording:
             "imu": None,
             "scene": None,
         }
+
+    def __repr__(self):
+        return f"NeonRecording({self._rec_dir})"
 
     @property
     def gaze(self) -> GazeStream:
