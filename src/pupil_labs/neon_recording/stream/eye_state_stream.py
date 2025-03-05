@@ -20,15 +20,6 @@ if TYPE_CHECKING:
 
 
 class EyeStateProps(StreamProps):
-    eyeball_center_left_xyz = proxy[np.float64](
-        [
-            "eyeball_center_left_x",
-            "eyeball_center_left_y",
-            "eyeball_center_left_z",
-        ]
-    )
-    "The xyz position in mm of the left eyeball relative to the scene camera"
-
     pupil_diameter_mm_left_right = proxy[np.float64](
         ["pupil_diameter_left_mm", "pupil_diameter_right_mm"]
     )
@@ -41,7 +32,7 @@ class EyeStateProps(StreamProps):
             "eyeball_center_left_z",
         ]
     )
-    "Eyeball center for left eye: (x, y, z)"
+    "The xyz position in mm of the left eyeball relative to the scene camera"
 
     eyeball_center_right_xyz = proxy[np.float64](
         [
@@ -89,7 +80,9 @@ class EyeStateProps(StreamProps):
     "Eyelid aperture in mm: (left, right)"
 
 
-class EyeStateRecord(Record, EyeStateProps): ...
+class EyeStateRecord(Record, EyeStateProps):
+    def keys(self):
+        return [x for x in EyeStateProps.__dict__.keys() if not x.startswith("_")]
 
 
 class EyeStateArray(Array[EyeStateRecord], EyeStateProps):
