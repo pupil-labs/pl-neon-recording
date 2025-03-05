@@ -1,14 +1,16 @@
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, SupportsIndex, TypeVar
+from typing import TYPE_CHECKING, Generic, SupportsIndex, TypeVar, overload
 
 import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
-from pupil_labs.neon_recording.stream.array_record import Array, RecordT, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, proxy
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
+
+RecordType = TypeVar("RecordType")
 
 
 class InterpolationMethod(Enum):
@@ -117,7 +119,7 @@ class StreamProps:
         return dir(self)
 
 
-class Stream(SimpleDataSampler, StreamProps):
+class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
     def __init__(self, name, recording: "NeonRecording", data):
         self.name = name
         self.recording = recording
@@ -129,8 +131,11 @@ class Stream(SimpleDataSampler, StreamProps):
             f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
         )
 
-    # TODO(dan): fix typing on rec.eye_state[0]
-    def __getitem__(self, key: SupportsIndex | list[str]):
+    @overload
+    def __getitem__(self, key: SupportsIndex) -> RecordType: ...
+    @overload
+    def __getitem__(self, key: slice | str) -> Array: ...
+    def __getitem__(self, key: SupportsIndex | slice | str) -> Array | RecordType:
         return self._data[key]
 
     def __getattr__(self, key):

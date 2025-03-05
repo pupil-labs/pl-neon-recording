@@ -15,14 +15,13 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
-from numpy.lib.recfunctions import structured_to_unstructured
 
 from pupil_labs.neon_recording.utils import unstructured
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.stream.stream import Stream
 
-RecordT = TypeVar("RecordT", bound=np.record)
+RecordType = TypeVar("RecordType", bound=np.record)
 ArraySource = str | Path | np.ndarray | bytes
 
 
@@ -66,7 +65,7 @@ class Record(np.record):
         return f"{self.__class__.__qualname__}({lines_string})"
 
 
-class Array(np.ndarray, Generic[RecordT]):
+class Array(np.ndarray, Generic[RecordType]):
     record_class: type = Record
     dtype: np.dtype | None = None
 
@@ -88,10 +87,10 @@ class Array(np.ndarray, Generic[RecordT]):
         return super().__array_finalize__(obj)
 
     @overload
-    def __getitem__(self, key: SupportsIndex) -> RecordT: ...
+    def __getitem__(self, key: SupportsIndex) -> RecordType: ...
     @overload
     def __getitem__(self, key: slice | str) -> "Array": ...
-    def __getitem__(self, key: SupportsIndex | slice | str) -> "Array | RecordT":
+    def __getitem__(self, key: SupportsIndex | slice | str) -> "Array | RecordType":
         result = super().__getitem__(key)
         if isinstance(result, np.void):
             if self.__class__.record_class:

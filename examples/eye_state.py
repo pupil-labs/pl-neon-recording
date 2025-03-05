@@ -55,8 +55,7 @@ def make_eye_state_video(recording_dir, output_video_path):
     )
 
     output_timestamps = np.arange(recording.eye.ts[0], recording.eye.ts[-1], 1 / fps)
-    z = recording.eye_state[0]
-    o = z.pupil_diameter_left_mm
+
     eye_video_sampled = recording.eye.sample(output_timestamps)
     eye_state_sampled = recording.eye_state.sample(output_timestamps)
     combined_data = zip(
