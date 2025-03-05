@@ -17,6 +17,8 @@ import numpy as np
 import numpy.typing as npt
 from numpy.lib.recfunctions import structured_to_unstructured
 
+from pupil_labs.neon_recording.utils import unstructured
+
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.stream.stream import Stream
 
@@ -42,12 +44,16 @@ class Record(np.record):
         return Array.load_arrays(source, cls.dtype)[0].view(cls)
 
     def items(self):
-        return [(k, self[k]) for k in self.dtype.fields]
+        return [(k, getattr(self, k)) for k in self.keys()]
+
+    def keys(self):
+        return self.dtype.fields
 
     def __repr__(self):
         lines = []
         pad = "    "
-        n = max(len(key) for key in self.dtype.fields)
+        keys = self.keys()
+        n = max(len(key) for key in keys)
         for k, v in self.items():
             v_repr_lines = repr(v).splitlines()
             lines.append(f"{pad}{k:>{n}} = {v_repr_lines[0]}")
@@ -84,8 +90,8 @@ class Array(np.ndarray, Generic[RecordT]):
     @overload
     def __getitem__(self, key: SupportsIndex) -> RecordT: ...
     @overload
-    def __getitem__(self, key: slice) -> "Array": ...
-    def __getitem__(self, key: SupportsIndex | slice) -> "Array | RecordT":
+    def __getitem__(self, key: slice | str) -> "Array": ...
+    def __getitem__(self, key: SupportsIndex | slice | str) -> "Array | RecordT":
         result = super().__getitem__(key)
         if isinstance(result, np.void):
             if self.__class__.record_class:
@@ -94,7 +100,13 @@ class Array(np.ndarray, Generic[RecordT]):
             return result
         elif isinstance(key, slice):
             return np.array(result).view(self.__class__)  # type: ignore
+        if isinstance(key, list) and isinstance(key[0], str):
+            return unstructured(result)
+
         return np.array(result)
+
+    def keys(self):
+        return self.dtype.fields
 
     @classmethod
     def load_array(cls, source: str | Path | np.ndarray | bytes, dtype: npt.DTypeLike):
@@ -222,7 +234,7 @@ class proxy(Generic[T]):
         elif isinstance(obj, (np.record, Record)):
             return np.array(tuple(obj[self.columns]))
 
-        return structured_to_unstructured(np.array(obj[self.columns]))  # type: ignore
+        return unstructured(obj[self.columns])  # type: ignore
 
     def __set__(self, obj, value):
         obj[self.columns] = value
