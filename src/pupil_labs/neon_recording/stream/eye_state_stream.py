@@ -20,67 +20,6 @@ if TYPE_CHECKING:
 
 
 class EyeStateProps(StreamProps):
-    pupil_diameter_left_mm = proxy[np.float32]("pupil_diameter_left_mm")
-    "The diameter of the left pupil in mm"
-
-    eyeball_center_left_x = proxy[np.float32]("eyeball_center_left_x")
-    "The x position in mm of the left eyeball relative to the scene camera"
-
-    eyeball_center_left_y = proxy[np.float32]("eyeball_center_left_y")
-    "The y position in mm of the left eyeball relative to the scene camera"
-
-    eyeball_center_left_z = proxy[np.float32]("eyeball_center_left_z")
-    "The z position in mm of the left eyeball relative to the scene camera"
-
-    optical_axis_left_x = proxy[np.float32]("optical_axis_left_x")
-    "The x component for forward direction of the left eye's optical axis"
-
-    optical_axis_left_y = proxy[np.float32]("optical_axis_left_y")
-    "The y component for forward direction of the left eye's optical axis"
-
-    optical_axis_left_z = proxy[np.float32]("optical_axis_left_z")
-    "The z component for forward direction of the left eye's optical axis"
-
-    pupil_diameter_right_mm = proxy[np.float32]("pupil_diameter_right_mm")
-    "The diameter of the right pupil in mm"
-
-    eyeball_center_right_x = proxy[np.float32]("eyeball_center_right_x")
-    "The x position in mm of the right eyeball relative to the scene camera"
-
-    eyeball_center_right_y = proxy[np.float32]("eyeball_center_right_y")
-    "The y position in mm of the right eyeball relative to the scene camera"
-
-    eyeball_center_right_z = proxy[np.float32]("eyeball_center_right_z")
-    "The z position in mm of the right eyeball relative to the scene camera"
-
-    optical_axis_right_x = proxy[np.float32]("optical_axis_right_x")
-    "The x component for forward direction of the right eye's optical axis"
-
-    optical_axis_right_y = proxy[np.float32]("optical_axis_right_y")
-    "The y component for forward direction of the right eye's optical axis"
-
-    optical_axis_right_z = proxy[np.float32]("optical_axis_right_z")
-    "The z component for forward direction of the right eye's optical axis"
-
-    eyelid_angle_top_left = proxy[np.float32]("eyelid_angle_top_left")
-    "Top left eyelid angle"
-
-    eyelid_angle_bottom_left = proxy[np.float32]("eyelid_angle_bottom_left")
-    "Bottom left eyelid angle"
-
-    eyelid_angle_top_right = proxy[np.float32]("eyelid_angle_top_right")
-    "Top Right eyelid angle"
-
-    eyelid_angle_bottom_right = proxy[np.float32]("eyelid_angle_bottom_right")
-    "Top Right eyelid angle"
-
-    eyelid_aperture_mm_left = proxy[np.float32]("eyelid_aperture_mm_left")
-    "Aperture (in mm) of left eyelid"
-
-    eyelid_aperture_mm_right = proxy[np.float32]("eyelid_aperture_mm_right")
-    "Aperture (in mm) of right eyelid"
-
-    # composite attributes
     eyeball_center_left_xyz = proxy[np.float64](
         [
             "eyeball_center_left_x",
@@ -90,10 +29,10 @@ class EyeStateProps(StreamProps):
     )
     "The xyz position in mm of the left eyeball relative to the scene camera"
 
-    pupil_diameter_left_right = proxy[np.float64](
+    pupil_diameter_mm_left_right = proxy[np.float64](
         ["pupil_diameter_left_mm", "pupil_diameter_right_mm"]
     )
-    "Pupil Diameter (in mm) for both eyes: (left, right)"
+    "Pupil diameter (in mm) for both eyes: (left, right)"
 
     eyeball_center_left_xyz = proxy[np.float64](
         [
@@ -141,7 +80,7 @@ class EyeStateProps(StreamProps):
     )
     "Eyelid angle: (top_left, bottom_left, top_right, bottom_right)"
 
-    eyelid_aperture_left_right_mm = proxy[np.float64](
+    eyelid_aperture_mm_left_right = proxy[np.float64](
         [
             "eyelid_aperture_mm_left",
             "eyelid_aperture_mm_right",
