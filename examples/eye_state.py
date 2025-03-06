@@ -82,8 +82,8 @@ def make_eye_state_video(recording_dir, output_video_path):
             np.max(recording.eye_state.data[plot_name]),
         )
 
-    plot_duration = 0.5
-    plot_point_count = plot_duration * fps
+    plot_duration_secs = 0.5
+    plot_point_count = plot_duration_secs * fps
     plot_x_width = recording.eye.width / plot_point_count
 
     for ts, eye_frame, eye_state in tqdm(combined_data, total=len(output_timestamps)):
@@ -93,7 +93,7 @@ def make_eye_state_video(recording_dir, output_video_path):
             eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr
 
         for plot_name, plot_meta in plot_metas.items():
-            min_ts = ts - plot_duration
+            min_ts = ts - plot_duration_secs * 1e9
             time_frame = (min_ts < eye_state_sampled.data.ts) & (
                 eye_state_sampled.data.ts <= ts
             )
