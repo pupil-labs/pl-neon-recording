@@ -54,7 +54,9 @@ def make_eye_state_video(recording_dir, output_video_path):
         (recording.eye.width, recording.eye.height),
     )
 
-    output_timestamps = np.arange(recording.eye.ts[0], recording.eye.ts[-1], 1 / fps)
+    output_timestamps = np.arange(
+        recording.eye.ts[0], recording.eye.ts[-1], int(1e9 / fps)
+    )
 
     eye_video_sampled = recording.eye.sample(output_timestamps)
     eye_state_sampled = recording.eye_state.sample(output_timestamps)
@@ -85,7 +87,7 @@ def make_eye_state_video(recording_dir, output_video_path):
     plot_x_width = recording.eye.width / plot_point_count
 
     for ts, eye_frame, eye_state in tqdm(combined_data, total=len(output_timestamps)):
-        if abs(eye_frame.ts - ts) < 2 / fps:
+        if abs(eye_frame.ts - ts) < 2e9 / fps:
             eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
         else:
             eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr

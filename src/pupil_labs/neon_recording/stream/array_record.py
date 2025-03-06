@@ -145,10 +145,10 @@ class Array(np.ndarray, Generic[RecordType]):
         parts = []
         parts_dtypes = set()
         for item in cls.expand_source_arguments(source):
-            merged = decoder(item)
-            parts_dtypes.add(tuple(merged.dtype.descr))
-            if len(merged):
-                parts.append(merged)
+            part_data = decoder(item)
+            parts_dtypes.add(tuple(part_data.dtype.descr))
+            if len(part_data):
+                parts.append(part_data)
 
         if len(set(parts_dtypes)) > 1:
             raise ValueError("found multiple dtypes")
@@ -156,8 +156,10 @@ class Array(np.ndarray, Generic[RecordType]):
             merged = parts[0]
         elif len(parts) > 1:
             merged = np.concatenate(parts)
-        else:
+        elif parts_dtypes:
             merged = np.array([], dtype=np.dtype(list(parts_dtypes.pop())))
+        else:
+            merged = np.array([])
         return merged
 
     @classmethod
