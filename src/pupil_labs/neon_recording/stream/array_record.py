@@ -46,7 +46,7 @@ class Record(np.record):
         return [(k, getattr(self, k)) for k in self.keys()]
 
     def keys(self):
-        return self.dtype.fields
+        return self.dtype.names
 
     def __repr__(self):
         lines = []
@@ -107,7 +107,7 @@ class Array(np.ndarray, Generic[RecordType]):
         return np.array(result)  # type: ignore
 
     def keys(self):
-        return self.dtype.fields
+        return self.dtype.names
 
     @classmethod
     def load_array(cls, source: str | Path | np.ndarray | bytes, dtype: npt.DTypeLike):

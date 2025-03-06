@@ -85,7 +85,6 @@ class SimpleDataSampler:
 
     def _sample_linear_interp(self, sorted_ts):
         result = np.zeros(len(sorted_ts), self.data.dtype)
-
         for key in self.data.dtype.names:
             result[key] = np.interp(
                 sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan
@@ -148,4 +147,4 @@ class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
         return iter(self._data)
 
     def keys(self):
-        return self._data.dtype.fields
+        return self._data.dtype.names
