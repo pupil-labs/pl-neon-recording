@@ -1,10 +1,9 @@
-import numpy as np
 import av
+import numpy as np
 
-from .base_av_stream import BaseAVStream, AVStreamPart
 from ... import structlog
 from ...utils import find_sorted_multipart_files, load_multipart_timestamps
-
+from .base_av_stream import AVStreamPart, BaseAVStream
 
 log = structlog.get_logger(__name__)
 
@@ -19,7 +18,8 @@ class AudioStreamPart(AVStreamPart):
             if packet.size == 0:
                 continue
             self._pts.append(packet.pts)
-            self.timestamps.append(float(packet.pts * packet.time_base) + start_ts)
+            abs_ts = int(float(packet.pts * packet.time_base)) + start_ts
+            self.timestamps.append(abs_ts)
 
         container.seek(0)
 
@@ -30,6 +30,7 @@ class AudioStream(BaseAVStream):
 
     Each item is a :class:`.TimestampedFrame`
     """
+
     def __init__(self, recording):
         self.name = "audio"
         self._base_name = "Neon Scene Camera v1"
@@ -39,11 +40,13 @@ class AudioStream(BaseAVStream):
 
         self.video_parts = []
 
-        video_files = find_sorted_multipart_files(self.recording._rec_dir, self._base_name, ".mp4")
+        video_files = find_sorted_multipart_files(
+            self.recording._rec_dir, self._base_name, ".mp4"
+        )
 
         timestamps = []
         file_ts = load_multipart_timestamps([video_files[0][1]])
-        for (video_file, _) in video_files:
+        for video_file, _ in video_files:
             container = av.open(str(video_file))
             part = AudioStreamPart(container, file_ts[0])
             self.video_parts.append(part)

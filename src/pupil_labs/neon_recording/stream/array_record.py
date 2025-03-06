@@ -97,12 +97,14 @@ class Array(np.ndarray, Generic[RecordType]):
                 self.__class__.record_class.dtype = result.dtype
                 return result.view(self.__class__.record_class)
             return result
-        elif isinstance(key, slice):
-            return np.array(result).view(self.__class__)  # type: ignore
-        if isinstance(key, list) and isinstance(key[0], str):
-            return unstructured(result)
 
-        return np.array(result)
+        if isinstance(key, slice):
+            return np.array(result).view(self.__class__)  # type: ignore
+        if isinstance(key, (np.ndarray, list)):
+            if isinstance(key[0], str):
+                return unstructured(result)
+            return np.array(result).view(self.__class__)
+        return np.array(result)  # type: ignore
 
     def keys(self):
         return self.dtype.fields

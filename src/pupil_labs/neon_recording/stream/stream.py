@@ -42,6 +42,9 @@ class SimpleDataSampler:
 
     sampler_class = None
 
+    def __init__(self, data):
+        self._data = data
+
     def sample(self, tstamps=None, method=InterpolationMethod.NEAREST):
         if tstamps is None:
             tstamps = self.ts
@@ -49,6 +52,7 @@ class SimpleDataSampler:
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
 
+        tstamps = np.array(tstamps).astype(np.int64)
         if method == InterpolationMethod.NEAREST:
             return self._sample_nearest(tstamps)
 
@@ -86,8 +90,7 @@ class SimpleDataSampler:
             result[key] = np.interp(
                 sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan
             )
-
-        return self.sampler_class(result)
+        return self.sampler_class(result.view(self.data.__class__))
 
     def __iter__(self):
         for sample in self.data:

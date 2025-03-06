@@ -28,13 +28,13 @@ def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
     else:
         data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
 
-    timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.float64) * 1e-9
+    timestamps = np.frombuffer(ts_buffer, dtype="<i8")
 
     return data, timestamps
 
 
 def load_and_convert_tstamps(path: Path):
-    return np.fromfile(str(path), dtype="<u8").astype(np.float64) * 1e-9
+    return np.fromfile(str(path), dtype="<i8")
 
 
 def load_multipart_timestamps(files):
@@ -42,7 +42,7 @@ def load_multipart_timestamps(files):
     for time_file in files:
         ts_buffer += open(time_file, "rb").read()
 
-    timestamps = np.frombuffer(ts_buffer, dtype="<u8").astype(np.float64) * 1e-9
+    timestamps = np.frombuffer(ts_buffer, dtype="<i8")
 
     return timestamps
 
