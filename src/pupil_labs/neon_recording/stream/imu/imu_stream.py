@@ -1,110 +1,92 @@
 import numpy as np
 
 from ... import structlog
-from ..stream import Stream, SimpleDataSampler
+from ..stream import Stream, StreamProps
 from ...utils import find_sorted_multipart_files
-from scipy.spatial.transform import Rotation
 from . import imu_pb2
+
+from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
+from pupil_labs.neon_recording.stream.array_record import (
+    Array,
+    Record,
+    join_struct_arrays,
+    proxy,
+)
 
 log = structlog.get_logger(__name__)
 
 
-class IMUStreamSampler(SimpleDataSampler):
-    def __init__(self, data):
-        # Ensure that quaternions are normalized
-        w = data['quaternion_w']
-        x = data['quaternion_x']
-        y = data['quaternion_y']
-        z = data['quaternion_z']
-        norms = np.sqrt(w**2 + x**2 + y**2 + z**2)
+class ImuProps(StreamProps):
+    gyro_xyz = proxy[np.float64](["gyro_x", "gyro_y", "gyro_z"])
+    "Gyroscope data"
 
-        data['quaternion_w'] /= norms
-        data['quaternion_x'] /= norms
-        data['quaternion_y'] /= norms
-        data['quaternion_z'] /= norms
+    accel_xyz = proxy[np.float64](["accel_x", "accel_y", "accel_z"])
+    "Acceleration data"
 
-        super().__init__(data)
+    quaternion = proxy[np.float64](["quaternion_w", "quaternion_x", "quaternion_y", "quaternion_z"])
+    "Orientation as a quaternion"
 
 
-IMUStreamSampler.sampler_class = IMUStreamSampler
+class ImuRecord(Record, ImuProps):
+    def keys(self):
+        return [x for x in ImuProps.__dict__.keys() if not x.startswith("_")]
+
+
+class ImuArray(Array[ImuRecord], ImuProps):
+    record_class = ImuRecord
 
 
 class IMUStream(Stream):
     """
         Motion and orientation data
-
-        Each record contains:
-            * `ts`: The moment these data were recorded
-            * Gyroscope data
-                * `gyro_x`
-                * `gyro_y`
-                * `gyro_z`
-            * Acceleration data
-                * `accel_x`
-                * `accel_y`
-                * `accel_z`
-            * Orientation in Euler angles (degrees)
-                * `pitch`
-                * `yaw`
-                * `roll`
-            * Orientation as a quaternion
-                * `quaternion_w`
-                * `quaternion_x`
-                * `quaternion_y`
-                * `quaternion_z`
     """
-    _DTYPE_RAW = np.dtype([
-        ("ts", "<f8"),
-        ("gyro_x", "<f4"),
-        ("gyro_y", "<f4"),
-        ("gyro_z", "<f4"),
-        ("accel_x", "<f4"),
-        ("accel_y", "<f4"),
-        ("accel_z", "<f4"),
-        ("pitch", "<f4"),
-        ("yaw", "<f4"),
-        ("roll", "<f4"),
-        ("quaternion_w", "<f4"),
-        ("quaternion_x", "<f4"),
-        ("quaternion_y", "<f4"),
-        ("quaternion_z", "<f4"),
-    ])
 
-    sampler_class = IMUStreamSampler
+    FALLBACK_DTYPE = np.dtype([
+        ("gyro_x", "float32"),
+        ("gyro_y", "float32"),
+        ("gyro_z", "float32"),
+        ("accel_x", "float32"),
+        ("accel_y", "float32"),
+        ("accel_z", "float32"),
+        ("quaternion_w", "float32"),
+        ("quaternion_x", "float32"),
+        ("quaternion_y", "float32"),
+        ("quaternion_z", "float32"),
+    ])
 
     def __init__(self, recording):
         log.debug("NeonRecording: Loading IMU data")
 
-        imu_files = find_sorted_multipart_files(recording._rec_dir, "extimu")
-        imu_data = []
+        imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "imu")
 
-        for imu_file, _ in imu_files:
-            with imu_file.open("rb") as raw_file:
-                raw_data = raw_file.read()
-                imu_packets = parse_neon_imu_raw_packets(raw_data)
+        if len(imu_file_pairs) > 0:
+            imu_data = Array(
+                [file for file, _ in imu_file_pairs],
+                fallback_dtype=np.dtype(IMUStream.FALLBACK_DTYPE)
+            )
+            imu_data.dtype.names = ["ts" if name == "timestamp_ns" else name for name in imu_data.dtype.names]
 
-                for packet in imu_packets:
-                    rotation = Rotation.from_quat(
-                        [
-                            packet.rotVecData.x,
-                            packet.rotVecData.y,
-                            packet.rotVecData.z,
-                            packet.rotVecData.w,
-                        ]
-                    )
+        else:
+            imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "extimu")
+            time_data = Array([file for _, file in imu_file_pairs], TIMESTAMP_DTYPE)
 
-                    euler = rotation.as_euler(seq="XZY", degrees=True)
+            records = []
+            for imu_file, _ in imu_file_pairs:
+                with imu_file.open("rb") as raw_file:
+                    raw_data = raw_file.read()
+                    imu_packets = parse_neon_imu_raw_packets(raw_data)
 
-                    imu_data.append((
-                        packet.tsNs * 1e-9,
-                        packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
-                        packet.accelData.x, packet.accelData.y, packet.accelData.z,
-                        *euler,
-                        packet.rotVecData.w, packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z,
-                    ))
+                    for packet in imu_packets:
+                        records.append((
+                            packet.gyroData.x, packet.gyroData.y, packet.gyroData.z,
+                            packet.accelData.x, packet.accelData.y, packet.accelData.z,
+                            packet.rotVecData.w, packet.rotVecData.x, packet.rotVecData.y, packet.rotVecData.z,
+                        ))
 
-        data = np.array(imu_data, dtype=IMUStream._DTYPE_RAW).view(np.recarray)
-        super().__init__("imu", recording, data)
+            imu_data = np.array(records, dtype=IMUStream.FALLBACK_DTYPE).view(np.recarray)
+            imu_data = join_struct_arrays([time_data, imu_data])
+
+        super().__init__("imu", recording, imu_data.view(ImuArray))
 
 
 def parse_neon_imu_raw_packets(buffer):
