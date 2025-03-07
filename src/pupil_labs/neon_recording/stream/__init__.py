@@ -1,1 +1,1 @@
-from .stream import Stream, InterpolationMethod
+from .stream import MatchMethod, Stream

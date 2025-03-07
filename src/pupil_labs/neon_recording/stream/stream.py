@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import TYPE_CHECKING, Generic, SupportsIndex, TypeVar, overload
+from typing import TYPE_CHECKING, Generic, Literal, SupportsIndex, TypeVar, overload
 
 import numpy as np
 import numpy.typing as npt
@@ -11,18 +10,7 @@ if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
 
 RecordType = TypeVar("RecordType")
-
-
-class InterpolationMethod(Enum):
-    NEAREST = "nearest"
-    NEAREST_BEFORE = "nearest_before"
-    LINEAR = "linear"
-
-    def __eq__(self, other):
-        if isinstance(other, str):
-            return self.value == other
-
-        return super().__eq__(other)
+MatchMethod = Literal["nearest", "before", "linear"]
 
 
 def _record_truthiness(self):
@@ -40,12 +28,10 @@ class SimpleDataSampler:
     _ts: npt.NDArray[np.int64]
     _data: npt.NDArray
 
-    sampler_class = None
-
     def __init__(self, data):
         self._data = data
 
-    def sample(self, tstamps=None, method=InterpolationMethod.NEAREST):
+    def sample(self, tstamps=None, method: MatchMethod = "nearest"):
         if tstamps is None:
             tstamps = self.ts
 
@@ -53,14 +39,12 @@ class SimpleDataSampler:
             tstamps = [tstamps]
 
         tstamps = np.array(tstamps).astype(np.int64)
-        if method == InterpolationMethod.NEAREST:
-            return self._sample_nearest(tstamps)
-
-        if method == InterpolationMethod.NEAREST_BEFORE:
-            return self._sample_nearest_before(tstamps)
-
-        elif method == InterpolationMethod.LINEAR:
-            return self._sample_linear_interp(tstamps)
+        sampler = {
+            "nearest": self._sample_nearest,
+            "before": self._sample_nearest_before,
+            "linear": self._sample_linear_interp,
+        }[method]
+        return sampler(tstamps)
 
     def _sample_nearest(self, ts):
         # Use searchsorted to get the insertion points
@@ -74,14 +58,14 @@ class SimpleDataSampler:
         # Determine whether the left or right value is closer
         idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
 
-        return self.sampler_class(self._data[idxs])
+        return self._data[idxs]
 
     def _sample_nearest_before(self, ts):
         last_idx = len(self._data) - 1
         idxs = np.searchsorted(self.ts, ts)
         idxs[idxs > last_idx] = last_idx
 
-        return self.sampler_class(self._data[idxs])
+        return self._data[idxs]
 
     def _sample_linear_interp(self, sorted_ts):
         result = np.zeros(len(sorted_ts), self.data.dtype)
@@ -89,7 +73,7 @@ class SimpleDataSampler:
             result[key] = np.interp(
                 sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan
             )
-        return self.sampler_class(result.view(self.data.__class__))
+        return result.view(self.data.__class__)
 
     def __iter__(self):
         for sample in self.data:
@@ -108,9 +92,6 @@ class SimpleDataSampler:
     @property
     def ts(self):
         return self[TIMESTAMP_FIELD_NAME]
-
-
-SimpleDataSampler.sampler_class = SimpleDataSampler
 
 
 class StreamProps:

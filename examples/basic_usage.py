@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 
 import pupil_labs.neon_recording as nr
-from pupil_labs.neon_recording.stream import InterpolationMethod
 
 if len(sys.argv) < 2:
     print("Usage:")
@@ -37,7 +36,7 @@ print("First 10 gaze samples @ 30Hz:")
 fps = 30
 timestamps = np.arange(recording.gaze.ts[0], recording.gaze.ts[-1], 1e9 / fps)
 
-subsample = recording.gaze.sample(timestamps[:10], InterpolationMethod.LINEAR)
+subsample = recording.gaze.sample(timestamps[:10], "linear")
 for gaze_datum in subsample:
     print(f"\t{gaze_datum.ts:0.3f} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
@@ -47,9 +46,7 @@ print("")
 matched_gazes = recording.gaze.sample(recording.scene.ts)
 
 # interpolate gaze data to scene frame timestamps
-interpolated_gazes = recording.gaze.sample(
-    recording.scene.ts, InterpolationMethod.LINEAR
-)
+interpolated_gazes = recording.gaze.sample(recording.scene.ts, "linear")
 
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)

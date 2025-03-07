@@ -169,7 +169,9 @@ class NeonRecording:
             AudioStream
         """
         if self.streams["audio"] is None:
-            self.streams["audio"] = AudioStream(self)
+            self.streams["audio"] = AudioStream(
+                "eye", "Neon Scene Camera v1", self, "audio"
+            )
 
         return self.streams["audio"]
 
