@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import numpy.typing as npt
 from numpy.lib.recfunctions import structured_to_unstructured
 
 
@@ -47,5 +48,7 @@ def load_multipart_timestamps(files):
     return timestamps
 
 
-def unstructured(arr):
+def unstructured(arr: npt.NDArray):
+    if not arr.dtype.fields:
+        return arr
     return structured_to_unstructured(np.array(arr))
