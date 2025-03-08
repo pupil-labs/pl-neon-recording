@@ -1,15 +1,10 @@
 import numpy as np
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
-from pupil_labs.neon_recording.stream.array_record import (
-    Array,
-    Record,
-    join_struct_arrays,
-    proxy,
-)
+from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
 
 from ... import structlog
-from ...utils import find_sorted_multipart_files
+from ...utils import find_sorted_multipart_files, join_struct_arrays
 from ..stream import Stream, StreamProps
 from . import imu_pb2
 
@@ -23,7 +18,7 @@ class ImuProps(StreamProps):
     accel_xyz = proxy[np.float64](["accel_x", "accel_y", "accel_z"])
     "Acceleration data"
 
-    quaternion = proxy[np.float64](
+    quaternion_wxyz = proxy[np.float64](
         ["quaternion_w", "quaternion_x", "quaternion_y", "quaternion_z"]
     )
     "Orientation as a quaternion"

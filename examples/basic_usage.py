@@ -15,7 +15,7 @@ recording = nr.load(sys.argv[1])
 
 # get basic info
 print("Recording Info:")
-print(f"\tStart time (ns): {recording.start_ts_ns}")
+print(f"\tStart time (ns): {recording.start_ts}")
 print(f"\tWearer         : {recording.wearer['name']}")
 print(f"\tDevice serial  : {recording.device_serial}")
 print(f"\tGaze samples   : {len(recording.gaze)}")

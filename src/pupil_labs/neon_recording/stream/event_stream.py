@@ -21,14 +21,13 @@ class EventStream(Stream):
 
         events_file = recording._rec_dir / "event.txt"
         time_file = events_file.with_suffix(".time")
+        file_pairs = []
         if events_file.exists and time_file.exists():
-            event_names, time_data = load_multipart_data_time_pairs([(events_file, time_file)], "str", 1)
-
-        data = np.rec.fromarrays(
-            [time_data, event_names],
-            names=["ts", "event"]
-        )
-
+            file_pairs = [(events_file, time_file)]
+        data = load_multipart_data_time_pairs(file_pairs, "str")
+        data.dtype.names = [
+            "event" if name == "text" else name for name in data.dtype.names
+        ]
         super().__init__("event", recording, data)
 
     def unique(self):

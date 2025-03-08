@@ -2,12 +2,10 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
-from pupil_labs.neon_recording.stream.array_record import (
-    Array,
-    Record,
-    join_struct_arrays,
-    proxy,
+from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.utils import (
+    find_sorted_multipart_files,
+    load_multipart_data_time_pairs,
 )
 
 from .. import structlog
@@ -98,13 +96,10 @@ class EyeStateStream(Stream[EyeStateRecord], EyeStateProps):
 
     def __init__(self, recording: "NeonRecording"):
         log.debug("NeonRecording: Loading eye state data")
-
-        time_data = Array(
-            recording._rec_dir.glob("eye_state ps*.time"), TIMESTAMP_DTYPE
-        )
-        eye_state_data = Array(
-            recording._rec_dir.glob("eye_state ps*.raw"),
-            fallback_dtype=np.dtype(
+        file_pairs = find_sorted_multipart_files(recording._rec_dir, "eye_state")
+        data = load_multipart_data_time_pairs(
+            file_pairs,
+            dtype=np.dtype(
                 [
                     ("pupil_diameter_left_mm", "float32"),
                     ("eyeball_center_left_x", "float32"),
@@ -123,5 +118,4 @@ class EyeStateStream(Stream[EyeStateRecord], EyeStateProps):
                 ]
             ),
         )
-        data = join_struct_arrays([time_data, eye_state_data]).view(EyeStateArray)
-        super().__init__("eye_state", recording, data)
+        super().__init__("eye_state", recording, data.view(EyeStateArray))

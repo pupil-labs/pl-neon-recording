@@ -1,8 +1,11 @@
 from pathlib import Path
+from typing import Sequence
 
 import numpy as np
 import numpy.typing as npt
-from numpy.lib.recfunctions import structured_to_unstructured
+
+from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
+from pupil_labs.neon_recording.stream.array_record import Array
 
 
 def find_sorted_multipart_files(
@@ -17,21 +20,26 @@ def find_sorted_multipart_files(
     return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
 
 
-def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
-    data_buffer = bytes()
-    ts_buffer = bytes()
-    for data_file, time_file in file_pairs:
-        data_buffer += open(data_file, "rb").read()
-        ts_buffer += open(time_file, "rb").read()
+def load_multipart_data_time_pairs(file_pairs, dtype):
+    ts_files = [time_file for _, time_file in file_pairs]
+    data_files = [data_file for data_file, _ in file_pairs]
+
+    time_data = Array(ts_files, TIMESTAMP_DTYPE)
+    if not len(time_data):
+        return np.array([], dtype=TIMESTAMP_DTYPE)
 
     if dtype == "str":
-        data = data_buffer.decode().rstrip("\n").split("\n")
+        item_data = np.array(
+            b"".join(open(data_file, "rb").read() for data_file in data_files)
+            .decode()
+            .splitlines()
+        )
+        item_data = item_data.view([("text", item_data.dtype)])
     else:
-        data = np.frombuffer(data_buffer, dtype).reshape([-1, field_count])
+        item_data = Array(data_files, fallback_dtype=dtype)
 
-    timestamps = np.frombuffer(ts_buffer, dtype="<i8")
-
-    return data, timestamps
+    merged = join_struct_arrays([time_data, item_data])
+    return merged
 
 
 def load_and_convert_tstamps(path: Path):
@@ -48,7 +56,11 @@ def load_multipart_timestamps(files):
     return timestamps
 
 
-def unstructured(arr: npt.NDArray):
-    if not arr.dtype.fields:
-        return arr
-    return structured_to_unstructured(np.array(arr))
+def join_struct_arrays(arrays: Sequence[npt.NDArray]):
+    newdtype = [desc for a in arrays for desc in a.dtype.descr]
+    newrecarray = np.empty(len(arrays[0]), dtype=newdtype)
+    for a in arrays:
+        assert a.dtype.names
+        for name in a.dtype.names:
+            newrecarray[name] = a[name]
+    return newrecarray

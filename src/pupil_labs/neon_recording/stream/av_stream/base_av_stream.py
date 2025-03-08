@@ -8,12 +8,11 @@ from pupil_labs.neon_recording.constants import (
     AV_INDEX_FIELD_NAME,
     TIMESTAMP_DTYPE,
 )
-from pupil_labs.neon_recording.stream.array_record import (
-    Array,
-    Record,
+from pupil_labs.neon_recording.stream.array_record import Array, Record
+from pupil_labs.neon_recording.utils import (
+    find_sorted_multipart_files,
     join_struct_arrays,
 )
-from pupil_labs.neon_recording.utils import find_sorted_multipart_files
 
 from ... import structlog
 from ..stream import Stream
@@ -74,7 +73,7 @@ class BaseAVStream(Stream):
         for av_file, time_file in av_files:
             if self.kind == "video":
                 part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)
-                container_timestamps = (part_ts["ts"] - recording.start_ts_ns) / 1e9
+                container_timestamps = (part_ts["ts"] - recording.start_ts) / 1e9
                 reader = plv.Reader(str(av_file), self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
             elif self.kind == "audio":

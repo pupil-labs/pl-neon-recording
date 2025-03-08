@@ -1,6 +1,11 @@
 import json
 import pathlib
+from functools import cached_property
 from typing import Union
+
+from pupil_labs.neon_recording.stream.blink_stream import BlinkStream
+from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
+from pupil_labs.neon_recording.stream.worn_stream import WornStream
 
 from . import structlog
 from .calib import Calibration
@@ -20,12 +25,10 @@ class NeonRecording:
 
     Attributes:
         * `info` (dict): Information loaded from info.json
-        * `start_ts_ns` (int): Start timestamp in nanoseconds
-        * `start_ts` (float): Start timestamp in seconds
+        * `start_ts` (int): Start timestamp in nanoseconds
         * `wearer` (dict): Wearer information containing uuid and name
         * `calibration` (Calibration): Camera calibration data
         * `device_serial` (str): Serial number of the device
-        * `streams` (dict): data streams of the recording
     """
 
     def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
@@ -51,8 +54,7 @@ class NeonRecording:
         with open(self._rec_dir / "info.json") as f:
             self.info = json.load(f)
 
-        self.start_ts_ns = self.info["start_time"]
-        self.start_ts = self.start_ts_ns * 1e-9
+        self.start_ts = self.info["start_time"]
 
         log.debug("NeonRecording: Loading wearer")
         self.wearer = {"uuid": "", "name": ""}
@@ -63,23 +65,13 @@ class NeonRecording:
         self.wearer["name"] = wearer_data["name"]
 
         log.debug("NeonRecording: Loading calibration data")
-        self.calibration = Calibration.from_file(self._rec_dir / "calibration.bin")
+        self.calibration = Calibration.from_file(str(self._rec_dir / "calibration.bin"))
         self.device_serial = self.calibration.serial.decode()
-
-        self.streams = {
-            "audio": None,
-            "events": None,
-            "eye": None,
-            "eye_state": None,
-            "gaze": None,
-            "imu": None,
-            "scene": None,
-        }
 
     def __repr__(self):
         return f"NeonRecording({self._rec_dir})"
 
-    @property
+    @cached_property
     def gaze(self) -> GazeStream:
         """
         2D gaze data in scene-camera space
@@ -90,12 +82,9 @@ class NeonRecording:
                 x:
                 y: The position of the gaze estimate
         """
-        if self.streams["gaze"] is None:
-            self.streams["gaze"] = GazeStream(self)
+        return GazeStream(self)
 
-        return self.streams["gaze"]
-
-    @property
+    @cached_property
     def imu(self) -> IMUStream:
         """
         Motion and orientation data
@@ -103,12 +92,9 @@ class NeonRecording:
         Returns:
             IMUStream:
         """
-        if self.streams["imu"] is None:
-            self.streams["imu"] = IMUStream(self)
+        return IMUStream(self)
 
-        return self.streams["imu"]
-
-    @property
+    @cached_property
     def eye_state(self) -> EyeStateStream:
         """
         Eye state data
@@ -116,12 +102,9 @@ class NeonRecording:
         Returns:
             EyeStateStream
         """
-        if self.streams["eye_state"] is None:
-            self.streams["eye_state"] = EyeStateStream(self)
+        return EyeStateStream(self)
 
-        return self.streams["eye_state"]
-
-    @property
+    @cached_property
     def scene(self) -> VideoStream:
         """
         Frames of video from the scene camera
@@ -129,12 +112,9 @@ class NeonRecording:
         Returns:
             VideoStream
         """
-        if self.streams["scene"] is None:
-            self.streams["scene"] = VideoStream("scene", "Neon Scene Camera v1", self)
+        return VideoStream("scene", "Neon Scene Camera v1", self)
 
-        return self.streams["scene"]
-
-    @property
+    @cached_property
     def eye(self) -> VideoStream:
         """
         Frames of video from the eye cameras
@@ -142,12 +122,9 @@ class NeonRecording:
         Returns:
             VideoStream
         """
-        if self.streams["eye"] is None:
-            self.streams["eye"] = VideoStream("eye", "Neon Sensor Module v1", self)
+        return VideoStream("eye", "Neon Sensor Module v1", self)
 
-        return self.streams["eye"]
-
-    @property
+    @cached_property
     def events(self) -> EventStream:
         """
         Event annotations
@@ -155,12 +132,29 @@ class NeonRecording:
         Returns:
             EventStream
         """
-        if self.streams["events"] is None:
-            self.streams["events"] = EventStream(self)
+        return EventStream(self)
 
-        return self.streams["events"]
+    @cached_property
+    def fixations(self) -> FixationStream:
+        """
+        Fixations
 
-    @property
+        Returns:
+            FixationStream
+        """
+        return FixationStream(self)
+
+    @cached_property
+    def blinks(self) -> BlinkStream:
+        """
+        Blinks
+
+        Returns:
+            BlinkStream
+        """
+        return BlinkStream(self)
+
+    @cached_property
     def audio(self) -> AudioStream:
         """
         Audio from the scene video
@@ -168,12 +162,17 @@ class NeonRecording:
         Returns:
             AudioStream
         """
-        if self.streams["audio"] is None:
-            self.streams["audio"] = AudioStream(
-                "eye", "Neon Scene Camera v1", self, "audio"
-            )
+        return AudioStream("audio", "Neon Scene Camera v1", self)
 
-        return self.streams["audio"]
+    @cached_property
+    def worn(self) -> WornStream:
+        """
+        Worn
+
+        Returns:
+            WornStream
+        """
+        return WornStream(self)
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:

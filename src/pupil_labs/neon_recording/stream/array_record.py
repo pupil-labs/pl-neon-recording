@@ -7,7 +7,6 @@ from typing import (
     Callable,
     Generic,
     Iterable,
-    Sequence,
     SupportsIndex,
     TypeVar,
     overload,
@@ -15,8 +14,7 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
-
-from pupil_labs.neon_recording.utils import unstructured
+from numpy.lib.recfunctions import structured_to_unstructured
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.stream.stream import Stream
@@ -43,7 +41,7 @@ class Record(np.record):
         return Array.load_arrays(source, cls.dtype)[0].view(cls)
 
     def items(self):
-        return [(k, getattr(self, k)) for k in self.keys()]
+        return [(k, getattr(self, k, None)) for k in self.keys()]
 
     def keys(self):
         return self.dtype.names
@@ -174,16 +172,6 @@ class Array(np.ndarray, Generic[RecordType]):
         return sorted(sources, key=natural_sort_key)
 
 
-def join_struct_arrays(arrays: Sequence[npt.NDArray]):
-    newdtype = [desc for a in arrays for desc in a.dtype.descr]
-    newrecarray = np.empty(len(arrays[0]), dtype=newdtype)
-    for a in arrays:
-        assert a.dtype.names
-        for name in a.dtype.names:
-            newrecarray[name] = a[name]
-    return newrecarray
-
-
 T = TypeVar("T")
 
 
@@ -235,9 +223,18 @@ class proxy(Generic[T]):
         if len(self.columns) < 2:
             return obj[self.columns[0]]  # type: ignore
         elif isinstance(obj, (np.record, Record)):
-            return np.array(tuple(obj[self.columns]))
+            try:
+                return np.array(tuple(obj[self.columns]))
+            except KeyError:
+                raise AttributeError(f"no attribute '{self.columns}'")
 
         return unstructured(obj[self.columns])  # type: ignore
 
     def __set__(self, obj, value):
         obj[self.columns] = value
+
+
+def unstructured(arr: npt.NDArray):
+    if not arr.dtype.fields:
+        return arr
+    return structured_to_unstructured(np.array(arr))
