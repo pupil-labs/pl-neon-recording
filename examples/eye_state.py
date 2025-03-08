@@ -94,10 +94,8 @@ def make_eye_state_video(recording_dir, output_video_path):
 
         for plot_name, plot_meta in plot_metas.items():
             min_ts = ts - plot_duration_secs * 1e9
-            time_frame = (min_ts < eye_state_sampled.data.ts) & (
-                eye_state_sampled.data.ts <= ts
-            )
-            plot_data = eye_state_sampled.data[time_frame][plot_name]
+            time_frame = (min_ts < eye_state_sampled.ts) & (eye_state_sampled.ts <= ts)
+            plot_data = eye_state_sampled[time_frame][plot_name]
             plot(
                 eye_pixels,
                 plot_data,
