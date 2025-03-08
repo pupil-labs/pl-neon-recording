@@ -1,14 +1,14 @@
-from scipy.spatial.transform import Rotation
-
 import sys
+
 import cv2
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr # noqa
+import pupil_labs.neon_recording as nr  # noqa
 
 if len(sys.argv) < 2:
     print("Usage:")
@@ -23,8 +23,11 @@ timestamps = np.arange(recording.imu.ts[0], recording.imu.ts[-1], 1e9 / fps)
 imu_data = recording.imu.sample(timestamps)
 
 # Use scipy to convert the quaternions to euler angles
-quaternions = np.array([s.quaternion for s in imu_data])
-rotations = Rotation.from_quat(quaternions, scalar_first=True).as_euler(seq="XZY", degrees=True) % 360
+quaternions = np.array([s.quaternion_wxyz for s in imu_data])
+rotations = (
+    Rotation.from_quat(quaternions, scalar_first=True).as_euler(seq="XZY", degrees=True)
+    % 360
+)
 
 # Combine the timestamps and eulers
 rotations_with_time = np.column_stack((timestamps, rotations))
@@ -34,17 +37,13 @@ timestamped_eulers = np.array(
         ("ts", np.int64),
         ("pitch", np.float64),
         ("yaw", np.float64),
-        ("roll", np.float64)
-    ]
+        ("roll", np.float64),
+    ],
 )
 
 # Display the angles
 frame_size = 512
-colors = {
-    "pitch": (0, 0, 255),
-    "yaw": (0, 255, 0),
-    "roll": (255, 0, 0)
-}
+colors = {"pitch": (0, 0, 255), "yaw": (0, 255, 0), "roll": (255, 0, 0)}
 
 for row in timestamped_eulers:
     # Create a blank image
@@ -58,7 +57,7 @@ for row in timestamped_eulers:
     for field, color in colors.items():
         pitch_end = (
             int(center[0] + radius * np.cos(np.deg2rad(row[field]))),
-            int(center[1] - radius * np.sin(np.deg2rad(row[field])))
+            int(center[1] - radius * np.sin(np.deg2rad(row[field]))),
         )
         cv2.line(frame, center, pitch_end, color, 2)
 
@@ -68,7 +67,9 @@ for row in timestamped_eulers:
             f"{field}: {row[field]:.2f}",
             (10, 30 + list(colors.keys()).index(field) * 30),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.7, color, 2
+            0.7,
+            color,
+            2,
         )
 
     # Display the image

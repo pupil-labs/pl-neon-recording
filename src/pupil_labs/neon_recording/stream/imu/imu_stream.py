@@ -23,7 +23,7 @@ class ImuProps(StreamProps):
     accel_xyz = proxy[np.float64](["accel_x", "accel_y", "accel_z"])
     "Acceleration data"
 
-    quaternion = proxy[np.float64](
+    quaternion_wxyz = proxy[np.float64](
         ["quaternion_w", "quaternion_x", "quaternion_y", "quaternion_z"]
     )
     "Orientation as a quaternion"
