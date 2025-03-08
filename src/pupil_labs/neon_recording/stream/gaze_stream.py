@@ -48,7 +48,7 @@ class GazeStream(Stream[GazeRecord], GazeProps):
     data: GazeArray
 
     def __init__(self, recording: "NeonRecording"):
-        log.debug("NeonRecording: Loading eye state data")
+        log.debug("NeonRecording: Loading gaze data")
 
         gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
         time_200hz_file = recording._rec_dir / "gaze_200hz.time"
