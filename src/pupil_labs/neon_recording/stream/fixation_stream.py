@@ -2,14 +2,11 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
-from pupil_labs.neon_recording.stream.array_record import (
-    Array,
-    Record,
-    join_struct_arrays,
-    proxy,
+from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.utils import (
+    find_sorted_multipart_files,
+    load_multipart_data_time_pairs,
 )
-from pupil_labs.neon_recording.utils import find_sorted_multipart_files
 
 from .. import structlog
 from .stream import Stream, StreamProps
@@ -70,14 +67,10 @@ class FixationStream(Stream[FixationRecord], FixationProps):
 
     def __init__(self, recording: "NeonRecording"):
         log.debug("NeonRecording: Loading fixation data")
-        fixation_file_pairs = find_sorted_multipart_files(
-            recording._rec_dir, "fixations"
-        )
-
-        time_data = Array([file for _, file in fixation_file_pairs], TIMESTAMP_DTYPE)
-        fixation_data = Array(
-            [file for file, _ in fixation_file_pairs],
-            fallback_dtype=np.dtype(
+        file_pairs = find_sorted_multipart_files(recording._rec_dir, "fixations")
+        data = load_multipart_data_time_pairs(
+            file_pairs,
+            np.dtype(
                 [
                     ("event_type", "int32"),
                     ("start_time_ns", "int64"),
@@ -95,5 +88,4 @@ class FixationStream(Stream[FixationRecord], FixationProps):
                 ]
             ),
         )
-        data = join_struct_arrays([time_data, fixation_data]).view(FixationArray)
-        super().__init__("fixation", recording, data)
+        super().__init__("fixation", recording, data.view(FixationArray))

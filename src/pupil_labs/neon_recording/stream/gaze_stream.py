@@ -2,14 +2,11 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
-from pupil_labs.neon_recording.stream.array_record import (
-    Array,
-    Record,
-    join_struct_arrays,
-    proxy,
+from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.utils import (
+    find_sorted_multipart_files,
+    load_multipart_data_time_pairs,
 )
-from pupil_labs.neon_recording.utils import find_sorted_multipart_files
 
 from .. import structlog
 from .stream import Stream, StreamProps
@@ -53,23 +50,21 @@ class GazeStream(Stream[GazeRecord], GazeProps):
         gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
         time_200hz_file = recording._rec_dir / "gaze_200hz.time"
 
-        gaze_file_pairs = []
+        file_pairs = []
         if gaze_200hz_file.exists() and time_200hz_file.exists():
             log.debug("NeonRecording: Using 200Hz gaze data")
-            gaze_file_pairs.append((gaze_200hz_file, time_200hz_file))
+            file_pairs.append((gaze_200hz_file, time_200hz_file))
         else:
             log.debug("NeonRecording: Using realtime gaze data")
-            gaze_file_pairs = find_sorted_multipart_files(recording._rec_dir, "gaze")
+            file_pairs = find_sorted_multipart_files(recording._rec_dir, "gaze")
 
-        time_data = Array([file for _, file in gaze_file_pairs], TIMESTAMP_DTYPE)
-        gaze_data = Array(
-            [file for file, _ in gaze_file_pairs],
-            fallback_dtype=np.dtype(
+        data = load_multipart_data_time_pairs(
+            file_pairs,
+            np.dtype(
                 [
                     ("x", "float32"),
                     ("y", "float32"),
                 ]
             ),
         )
-        data = join_struct_arrays([time_data, gaze_data]).view(GazeArray)
         super().__init__("gaze", recording, data)
