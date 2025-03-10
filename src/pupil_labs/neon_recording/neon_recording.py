@@ -10,6 +10,7 @@ from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
+from .stream.blink_stream import BlinkStream
 
 log = structlog.get_logger(__name__)
 
@@ -74,6 +75,7 @@ class NeonRecording:
             "gaze": None,
             "imu": None,
             "scene": None,
+            "blinks": None,
         }
 
     def __repr__(self):
@@ -172,6 +174,19 @@ class NeonRecording:
             self.streams["audio"] = AudioStream(self)
 
         return self.streams["audio"]
+
+    @property
+    def blinks(self) -> BlinkStream:
+        """
+        Blinks
+
+        Returns:
+            BlinkStreamStream
+        """
+        if self.streams["blinks"] is None:
+            self.streams["blinks"] = BlinkStream(self)
+
+        return self.streams["blinks"]
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:
