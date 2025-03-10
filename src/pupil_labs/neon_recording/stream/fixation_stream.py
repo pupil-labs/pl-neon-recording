@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -8,10 +9,9 @@ from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
 )
 
-from .. import structlog
 from .stream import Stream, StreamProps
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
@@ -70,22 +70,20 @@ class FixationStream(Stream[FixationRecord], FixationProps):
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "fixations")
         data = load_multipart_data_time_pairs(
             file_pairs,
-            np.dtype(
-                [
-                    ("event_type", "int32"),
-                    ("start_time_ns", "int64"),
-                    ("end_time_ns", "int64"),
-                    ("start_gaze_x", "float32"),
-                    ("start_gaze_y", "float32"),
-                    ("end_gaze_x", "float32"),
-                    ("end_gaze_y", "float32"),
-                    ("mean_gaze_x", "float32"),
-                    ("mean_gaze_y", "float32"),
-                    ("amplitude_pixels", "float32"),
-                    ("amplitude_angle_deg", "float32"),
-                    ("mean_velocity", "float32"),
-                    ("max_velocity", "float32"),
-                ]
-            ),
+            np.dtype([
+                ("event_type", "int32"),
+                ("start_time_ns", "int64"),
+                ("end_time_ns", "int64"),
+                ("start_gaze_x", "float32"),
+                ("start_gaze_y", "float32"),
+                ("end_gaze_x", "float32"),
+                ("end_gaze_y", "float32"),
+                ("mean_gaze_x", "float32"),
+                ("mean_gaze_y", "float32"),
+                ("amplitude_pixels", "float32"),
+                ("amplitude_angle_deg", "float32"),
+                ("mean_velocity", "float32"),
+                ("max_velocity", "float32"),
+            ]),
         )
         super().__init__("fixation", recording, data.view(FixationArray))

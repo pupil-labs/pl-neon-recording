@@ -1,4 +1,5 @@
 import json
+import logging
 import pathlib
 from functools import cached_property
 from typing import Union
@@ -7,7 +8,6 @@ from pupil_labs.neon_recording.stream.blink_stream import BlinkStream
 from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
 from pupil_labs.neon_recording.stream.worn_stream import WornStream
 
-from . import structlog
 from .calib import Calibration
 from .stream.av_stream.audio_stream import AudioStream
 from .stream.av_stream.video_stream import VideoStream
@@ -16,7 +16,7 @@ from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class NeonRecording:

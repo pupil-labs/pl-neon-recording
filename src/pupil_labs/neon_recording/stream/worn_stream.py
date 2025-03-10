@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -8,10 +9,9 @@ from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
 )
 
-from .. import structlog
 from .stream import Stream, StreamProps
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from ..neon_recording import NeonRecording

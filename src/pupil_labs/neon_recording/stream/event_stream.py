@@ -1,10 +1,9 @@
-import numpy as np
+import logging
 
-from .. import structlog
 from ..utils import load_multipart_data_time_pairs
 from .stream import Stream
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class EventStream(Stream):

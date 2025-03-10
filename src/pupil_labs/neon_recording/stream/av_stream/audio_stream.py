@@ -1,9 +1,10 @@
+import logging
+
 import pupil_labs.video as plv
 
-from ... import structlog
 from .base_av_stream import BaseAVStream, BaseAVStreamFrame
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AudioFrame(BaseAVStreamFrame):

@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -12,10 +13,9 @@ from pupil_labs.neon_recording.utils import (
     load_multipart_data_time_pairs,
 )
 
-from .. import structlog
 from .stream import Stream, StreamProps
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
@@ -50,11 +50,9 @@ class BlinkStream(Stream[BlinkRecord], BlinkProps):
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "blinks")
         data = load_multipart_data_time_pairs(
             file_pairs,
-            np.dtype(
-                [
-                    ("blink_start_ts_ns", "int64"),
-                    ("blink_end_ts_ns", "int64"),
-                ]
-            ),
+            np.dtype([
+                ("blink_start_ts_ns", "int64"),
+                ("blink_end_ts_ns", "int64"),
+            ]),
         )
         super().__init__("blink", recording, data.view(BlinkArray))

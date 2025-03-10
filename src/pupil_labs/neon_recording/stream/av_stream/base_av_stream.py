@@ -1,8 +1,9 @@
+import logging
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
-import plv
 
+import pupil_labs.video as plv
 from pupil_labs.neon_recording.constants import (
     AV_INDEX_DTYPE,
     AV_INDEX_FIELD_NAME,
@@ -14,7 +15,6 @@ from pupil_labs.neon_recording.utils import (
     join_struct_arrays,
 )
 
-from ... import structlog
 from ..stream import Stream
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 AVStreamKind = Literal["audio", "video"]
 
-log = structlog.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class BaseAVStreamFrame(Record):
