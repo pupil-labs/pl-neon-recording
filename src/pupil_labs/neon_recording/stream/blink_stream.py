@@ -16,10 +16,10 @@ log = structlog.get_logger(__name__)
 
 
 class BlinkProps(StreamProps):
-    blink_start_ts_ns = proxy[np.int64]("blink_start_ts_ns")
+    start_timestamp_ns = proxy[np.int64]("start_timestamp_ns")
     "Blink start time"
 
-    blink_end_ts_ns = proxy[np.int64]("blink_end_ts_ns")
+    end_timestamp_ns = proxy[np.int64]("end_timestamp_ns")
     "Blink end time"
 
 
@@ -47,8 +47,8 @@ class BlinkStream(Stream):
             [file for file, _ in blink_file_pairs],
             fallback_dtype=np.dtype(np.dtype([
                 ("event_type", "int32"),
-                ("blink_start_ts_ns", "int64"),
-                ("blink_end_ts_ns", "int64"),
+                ("start_timestamp_ns", "int64"),
+                ("end_timestamp_ns", "int64"),
             ]))
         )
 

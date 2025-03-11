@@ -10,6 +10,7 @@ from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
+from .stream.fixation_stream import FixationStream
 from .stream.blink_stream import BlinkStream
 
 log = structlog.get_logger(__name__)
@@ -75,6 +76,7 @@ class NeonRecording:
             "gaze": None,
             "imu": None,
             "scene": None,
+            "fixations": None,
             "blinks": None,
         }
 
@@ -176,12 +178,25 @@ class NeonRecording:
         return self.streams["audio"]
 
     @property
+    def fixations(self) -> FixationStream:
+        """
+        Fixations
+
+        Returns:
+            FixationStream
+        """
+        if self.streams["fixations"] is None:
+            self.streams["fixations"] = FixationStream(self)
+
+        return self.streams["fixations"]
+
+    @property
     def blinks(self) -> BlinkStream:
         """
         Blinks
 
         Returns:
-            BlinkStreamStream
+            BlinkStream
         """
         if self.streams["blinks"] is None:
             self.streams["blinks"] = BlinkStream(self)
