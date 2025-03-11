@@ -2,7 +2,10 @@ import logging
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
+from pupil_labs.neon_recording.constants import (
+    DTYPE_TIMESTAMP_FIELD_NAME,
+    TIMESTAMP_DTYPE,
+)
 from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
 
 from ...utils import find_sorted_multipart_files, join_struct_arrays
@@ -66,7 +69,7 @@ class IMUStream(Stream):
                 fallback_dtype=np.dtype(IMUStream.FALLBACK_DTYPE),
             )
             imu_data.dtype.names = [
-                "ts" if name == "timestamp_ns" else name
+                "ts" if name == DTYPE_TIMESTAMP_FIELD_NAME else name
                 for name in imu_data.dtype.names
             ]
 
