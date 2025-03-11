@@ -12,6 +12,7 @@ from .stream.gaze_stream import GazeStream
 from .stream.imu import IMUStream
 from .stream.fixation_stream import FixationStream
 from .stream.blink_stream import BlinkStream
+from .stream.worn_stream import WornStream
 
 log = structlog.get_logger(__name__)
 
@@ -78,6 +79,7 @@ class NeonRecording:
             "scene": None,
             "fixations": None,
             "blinks": None,
+            "worn": None,
         }
 
     def __repr__(self):
@@ -202,6 +204,19 @@ class NeonRecording:
             self.streams["blinks"] = BlinkStream(self)
 
         return self.streams["blinks"]
+
+    @property
+    def worn(self) -> WornStream:
+        """
+        Worn
+
+        Returns:
+            WornStream
+        """
+        if self.streams["worn"] is None:
+            self.streams["worn"] = WornStream(self)
+
+        return self.streams["worn"]
 
 
 def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:

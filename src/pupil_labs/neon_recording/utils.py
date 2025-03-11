@@ -10,11 +10,18 @@ def find_sorted_multipart_files(
 ):
     file_pairs = []
     for raw_file in recording_path.glob(f"{basename} ps*{extension}"):
-        time_file = raw_file.with_suffix(".time")
+        if basename == "worn":
+            # The `worn` sensor doesn't have its own .time file
+            gaze_time_stem = raw_file.stem.replace("worn ", "gaze ")
+            time_file = raw_file.parent / f"{gaze_time_stem}.time"
+
+        else:
+            time_file = raw_file.with_suffix(".time")
+
         if time_file.exists():
             file_pairs.append((raw_file, time_file))
 
-    return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
+    return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3:]))
 
 
 def load_multipart_data_time_pairs(file_pairs, dtype, field_count):
