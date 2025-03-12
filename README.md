@@ -18,5 +18,5 @@ pip install pupil-labs-neon-recording
 or
 
 ```bash
-pip install -e https://github.com/pupil-labs/pl-neon-recording
+pip install -e git+https://github.com/pupil-labs/pl-neon-recording.git
 ```
