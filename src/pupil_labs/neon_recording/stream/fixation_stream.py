@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 class FixationProps(StreamProps):
     event_type = fields[np.int32]("event_type")
-    "Fixation event kind (saccade / fixation)"
+    "Fixation event kind (0 = saccade / 1 = fixation)"
 
     start_ts = fields[np.int64]("start_timestamp_ns")
     "Start timestamp of fixation"
