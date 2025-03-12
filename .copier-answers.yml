@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier
+_commit: e1689a3
+_src_path: gh:pupil-labs/pl-template
+author_email: info@pupil-labs.com
+author_fullname: Pupil Labs GmbH
+author_username: pupil-labs
+copyright_license: MIT
+project_description: Functionality for loading Neon recordings in native recording
+    format
+project_name: Neon Recording
+python_package_distribution_name: pupil-labs-neon-recording
+python_package_import_name: neon_recording
+repository_name: pl-neon-recording
+repository_namespace: pupil-labs
+repository_provider: github.com
+
