@@ -12,7 +12,7 @@ class AudioFrame(BaseAVStreamFrame):
 
 
 class AudioStream(BaseAVStream, kind="audio"):
-    """Audio frames from a camera"""
+    """Audio frames stream"""
 
     @property
     def rate(self):

@@ -1,9 +1,14 @@
-import numpy as np
+"""Camera calibration utils"""
+
 import typing as T
+
+import numpy as np
 import numpy.typing as npt
 
 
 class Calibration(T.NamedTuple):
+    """Camera Calibration data"""
+
     dtype = np.dtype(
         [
             ("version", "u1"),
@@ -44,5 +49,5 @@ class Calibration(T.NamedTuple):
         return cls(*np.frombuffer(buffer, cls)[0])
 
     @classmethod
-    def from_file(cls, path: str):
+    def from_file(cls, path: str) -> "Calibration":
         return cls(*np.fromfile(path, cls)[0])
