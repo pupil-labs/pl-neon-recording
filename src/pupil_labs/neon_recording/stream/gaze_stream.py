@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -18,13 +18,13 @@ if TYPE_CHECKING:
 
 
 class GazeProps(StreamProps):
-    x = proxy[np.float64]("x")
+    x = fields[np.float64]("x")
     "Gaze x coordinate in pixels"
 
-    y = proxy[np.float64]("y")
+    y = fields[np.float64]("y")
     "Gaze y coordinate in pixels"
 
-    xy = proxy[np.float64](["x", "y"])
+    xy = fields[np.float64](["x", "y"])
     "Gaze xy coordinates in pixels"
 
 

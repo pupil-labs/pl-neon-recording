@@ -27,12 +27,10 @@ def natural_sort_key(word):
     if isinstance(word, Path):
         word = word.name
     if isinstance(word, str):
-        return tuple(
-            [
-                int(text) if text.isdigit() else text.lower()
-                for text in re_compile(r"(\d+)").split(word)
-            ]
-        )
+        return tuple([
+            int(text) if text.isdigit() else text.lower()
+            for text in re_compile(r"(\d+)").split(word)
+        ])
     return word
 
 
@@ -175,7 +173,7 @@ class Array(np.ndarray, Generic[RecordType]):
 T = TypeVar("T")
 
 
-class proxy(Generic[T]):
+class fields(Generic[T]):
     """
     Provides typed attribute access to key(s) on a numpy array class with IDE hints
 

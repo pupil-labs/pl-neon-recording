@@ -43,8 +43,6 @@ class BaseAVStreamFrame(Record):
 class BaseAVStream(Stream):
     """
     Frames from a media container
-
-    Each item is a :class:`.TimestampedFrame`
     """
 
     kind: AVStreamKind

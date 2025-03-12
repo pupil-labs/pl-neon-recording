@@ -10,7 +10,7 @@ from pupil_labs.neon_recording.constants import (
 from pupil_labs.neon_recording.stream.array_record import (
     Array,
     Record,
-    proxy,
+    fields,
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -26,10 +26,10 @@ if TYPE_CHECKING:
 
 
 class BlinkProps(StreamProps):
-    start_ts = proxy[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
+    start_ts = fields[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
     "Start timestamp of blink"
 
-    end_ts = proxy[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
+    end_ts = fields[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
     "End timestamp of blink"
 
 

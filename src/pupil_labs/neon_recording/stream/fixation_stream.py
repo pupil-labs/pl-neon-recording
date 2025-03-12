@@ -7,7 +7,7 @@ from pupil_labs.neon_recording.constants import (
     DTYPE_END_TIMESTAMP_FIELD_NAME,
     DTYPE_START_TIMESTAMP_FIELD_NAME,
 )
-from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -22,34 +22,34 @@ if TYPE_CHECKING:
 
 
 class FixationProps(StreamProps):
-    event_type = proxy[np.int32]("event_type")
+    event_type = fields[np.int32]("event_type")
     "Fixation event kind (saccade / fixation)"
 
-    start_ts = proxy[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
+    start_ts = fields[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
     "Start timestamp of fixation"
 
-    end_ts = proxy[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
+    end_ts = fields[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
     "Start timestamp of fixation"
 
-    start_gaze_xy = proxy[np.float32](["start_gaze_x", "start_gaze_y"])
+    start_gaze_xy = fields[np.float32](["start_gaze_x", "start_gaze_y"])
     "Start gaze position in pixels"
 
-    end_gaze_xy = proxy[np.float32](["end_gaze_x", "end_gaze_y"])
+    end_gaze_xy = fields[np.float32](["end_gaze_x", "end_gaze_y"])
     "End gaze position in pixels"
 
-    mean_gaze_xy = proxy[np.float32](["mean_gaze_x", "mean_gaze_y"])
+    mean_gaze_xy = fields[np.float32](["mean_gaze_x", "mean_gaze_y"])
     "Mean gaze position in pixels"
 
-    amplitude_pixels = proxy[np.float32]("amplitude_pixels")
+    amplitude_pixels = fields[np.float32]("amplitude_pixels")
     "Amplitude (pixels)"
 
-    amplitude_angle_deg = proxy[np.float32]("amplitude_angle_deg")
+    amplitude_angle_deg = fields[np.float32]("amplitude_angle_deg")
     "Amplitude angle (degrees)"
 
-    mean_velocity = proxy[np.float32]("mean_velocity")
+    mean_velocity = fields[np.float32]("mean_velocity")
     "Mean velocity of fixation (pixels/sec)"
 
-    max_velocity = proxy[np.float32]("max_velocity")
+    max_velocity = fields[np.float32]("max_velocity")
     "Max velocity of fixation (pixels/sec)"
 
 

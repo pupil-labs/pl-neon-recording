@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
-from pupil_labs.neon_recording.stream.array_record import Array, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, fields
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
@@ -89,13 +89,9 @@ class SimpleDataSampler:
     def data(self):
         return self._data
 
-    @property
-    def ts(self):
-        return self[TIMESTAMP_FIELD_NAME]
-
 
 class StreamProps:
-    ts = proxy[np.int64](TIMESTAMP_FIELD_NAME)
+    ts = fields[np.int64](TIMESTAMP_FIELD_NAME)
     "The moment these data were recorded"
 
     def keys(self):

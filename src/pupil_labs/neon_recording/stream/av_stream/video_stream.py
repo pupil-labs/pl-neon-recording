@@ -1,4 +1,7 @@
+from functools import cached_property
+
 import numpy as np
+import numpy.typing as npt
 
 import pupil_labs.video as plv
 
@@ -18,39 +21,30 @@ class VideoFrame(BaseAVStreamFrame):
 
 
 class VideoStream(BaseAVStream, kind="video"):
-    """
-    Video frames from a camera
-
-    Each item is a :class:`.TimestampedFrame`
-    """
+    """Video frames from a camera"""
 
     @property
-    def width(self):
+    def width(self) -> int | None:
+        """Width of image in stream"""
         return self.av_reader.width
 
     @property
-    def height(self):
+    def height(self) -> int | None:
+        """Height of image in stream"""
         return self.av_reader.height
 
 
 class GrayFrame:
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         self.width = width
         self.height = height
 
-        self._bgr = None
-        self._gray = None
+    @cached_property
+    def bgr(self) -> npt.NDArray[np.uint8]:
+        """Image in bgr format"""
+        return 128 * np.ones([self.height, self.width, 3], dtype="uint8")
 
-    @property
-    def bgr(self):
-        if self._bgr is None:
-            self._bgr = 128 * np.ones([self.height, self.width, 3], dtype="uint8")
-
-        return self._bgr
-
-    @property
-    def gray(self):
-        if self._gray is None:
-            self._gray = 128 * np.ones([self.height, self.width], dtype="uint8")
-
-        return self._gray
+    @cached_property
+    def gray(self) -> npt.NDArray[np.uint8]:
+        """Image in gray format"""
+        return 128 * np.ones([self.height, self.width], dtype="uint8")

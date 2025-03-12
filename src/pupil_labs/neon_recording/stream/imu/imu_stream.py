@@ -6,7 +6,7 @@ from pupil_labs.neon_recording.constants import (
     DTYPE_TIMESTAMP_FIELD_NAME,
     TIMESTAMP_DTYPE,
 )
-from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 
 from ...utils import find_sorted_multipart_files, join_struct_arrays
 from ..stream import Stream, StreamProps
@@ -16,13 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class ImuProps(StreamProps):
-    gyro_xyz = proxy[np.float64](["gyro_x", "gyro_y", "gyro_z"])
+    gyro_xyz = fields[np.float64](["gyro_x", "gyro_y", "gyro_z"])
     "Gyroscope data"
 
-    accel_xyz = proxy[np.float64](["accel_x", "accel_y", "accel_z"])
+    accel_xyz = fields[np.float64](["accel_x", "accel_y", "accel_z"])
     "Acceleration data"
 
-    quaternion_wxyz = proxy[np.float64]([
+    quaternion_wxyz = fields[np.float64]([
         "quaternion_w",
         "quaternion_x",
         "quaternion_y",

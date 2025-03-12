@@ -12,11 +12,7 @@ class AudioFrame(BaseAVStreamFrame):
 
 
 class AudioStream(BaseAVStream, kind="audio"):
-    """
-    Audio frames from a camera
-
-    Each item is a :class:`.TimestampedFrame`
-    """
+    """Audio frames from a camera"""
 
     @property
     def rate(self):

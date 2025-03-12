@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.stream.array_record import Array, Record, proxy
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class WornProps(StreamProps):
-    worn = proxy[np.float64]("worn")
+    worn = fields[np.float64]("worn")
     "Worn"
 
 
