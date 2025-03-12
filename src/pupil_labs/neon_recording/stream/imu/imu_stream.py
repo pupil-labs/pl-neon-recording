@@ -3,8 +3,8 @@ import logging
 import numpy as np
 
 from pupil_labs.neon_recording.constants import (
-    DTYPE_TIMESTAMP_FIELD_NAME,
     TIMESTAMP_DTYPE,
+    TIMESTAMP_FIELD_NAME,
 )
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 
@@ -69,7 +69,7 @@ class IMUStream(Stream):
                 fallback_dtype=np.dtype(IMUStream.FALLBACK_DTYPE),
             )
             imu_data.dtype.names = [
-                "ts" if name == DTYPE_TIMESTAMP_FIELD_NAME else name
+                TIMESTAMP_FIELD_NAME if name == "timestamp_ns" else name
                 for name in imu_data.dtype.names
             ]
 

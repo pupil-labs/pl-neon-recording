@@ -3,10 +3,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import (
-    DTYPE_END_TIMESTAMP_FIELD_NAME,
-    DTYPE_START_TIMESTAMP_FIELD_NAME,
-)
 from pupil_labs.neon_recording.stream.array_record import (
     Array,
     Record,
@@ -26,10 +22,10 @@ if TYPE_CHECKING:
 
 
 class BlinkProps(StreamProps):
-    start_ts = fields[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
+    start_ts = fields[np.int64]("start_timestamp_ns")
     "Start timestamp of blink"
 
-    end_ts = fields[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
+    end_ts = fields[np.int64]("end_timestamp_ns")
     "End timestamp of blink"
 
 
@@ -55,8 +51,8 @@ class BlinkStream(Stream[BlinkRecord], BlinkProps):
         data = load_multipart_data_time_pairs(
             file_pairs,
             np.dtype([
-                (DTYPE_START_TIMESTAMP_FIELD_NAME, "int64"),
-                (DTYPE_END_TIMESTAMP_FIELD_NAME, "int64"),
+                ("start_timestamp_ns", "int64"),
+                ("end_timestamp_ns", "int64"),
             ]),
         )
         super().__init__("blink", recording, data.view(BlinkArray))

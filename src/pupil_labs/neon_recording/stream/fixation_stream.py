@@ -3,10 +3,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import (
-    DTYPE_END_TIMESTAMP_FIELD_NAME,
-    DTYPE_START_TIMESTAMP_FIELD_NAME,
-)
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -25,10 +21,10 @@ class FixationProps(StreamProps):
     event_type = fields[np.int32]("event_type")
     "Fixation event kind (saccade / fixation)"
 
-    start_ts = fields[np.int64](DTYPE_START_TIMESTAMP_FIELD_NAME)
+    start_ts = fields[np.int64]("start_timestamp_ns")
     "Start timestamp of fixation"
 
-    end_ts = fields[np.int64](DTYPE_END_TIMESTAMP_FIELD_NAME)
+    end_ts = fields[np.int64]("end_timestamp_ns")
     "Start timestamp of fixation"
 
     start_gaze_xy = fields[np.float32](["start_gaze_x", "start_gaze_y"])
@@ -76,8 +72,8 @@ class FixationStream(Stream[FixationRecord], FixationProps):
             file_pairs,
             np.dtype([
                 ("event_type", "int32"),
-                (DTYPE_START_TIMESTAMP_FIELD_NAME, "int64"),
-                (DTYPE_END_TIMESTAMP_FIELD_NAME, "int64"),
+                ("start_timestamp_ns", "int64"),
+                ("end_timestamp_ns", "int64"),
                 ("start_gaze_x", "float32"),
                 ("start_gaze_y", "float32"),
                 ("end_gaze_x", "float32"),
