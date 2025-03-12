@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class EyeStateProps(StreamProps):
-    pupil_diameter_mm_left_right = fields[np.float64]([
+    pupil_diameter_left_right_mm = fields[np.float64]([
         "pupil_diameter_left_mm",
         "pupil_diameter_right_mm",
     ])
@@ -61,9 +60,9 @@ class EyeStateProps(StreamProps):
     ])
     "Eyelid angle: (top_left, bottom_left, top_right, bottom_right)"
 
-    eyelid_aperture_mm_left_right = fields[np.float64]([
-        "eyelid_aperture_mm_left",
-        "eyelid_aperture_mm_right",
+    eyelid_aperture_left_right_mm = fields[np.float64]([
+        "eyelid_aperture_left_mm",
+        "eyelid_aperture_right_mm",
     ])
     "Eyelid aperture in mm: (left, right)"
 
