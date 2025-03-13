@@ -98,7 +98,7 @@ class Array(np.ndarray, Generic[RecordType]):
             return np.array(result).view(self.__class__)  # type: ignore
         if isinstance(key, (np.ndarray, list)):
             if isinstance(key[0], str):
-                return unstructured(result)
+                return unstructured(result)  # type: ignore
             return np.array(result).view(self.__class__)
         return np.array(result)  # type: ignore
 
@@ -174,8 +174,7 @@ T = TypeVar("T")
 
 
 class fields(Generic[T]):
-    """
-    Provides typed attribute access to key(s) on a numpy array class with IDE hints
+    """Provides typed attribute access to key(s) on a numpy array class with IDE hints
 
     Usage:
 
@@ -223,8 +222,8 @@ class fields(Generic[T]):
         elif isinstance(obj, (np.record, Record)):
             try:
                 return np.array(tuple(obj[self.columns]))
-            except KeyError:
-                raise AttributeError(f"no attribute '{self.columns}'")
+            except KeyError as err:
+                raise AttributeError(f"no attribute '{self.columns}'") from err
 
         return unstructured(obj[self.columns])  # type: ignore
 

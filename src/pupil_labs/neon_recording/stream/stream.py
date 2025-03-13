@@ -13,15 +13,13 @@ RecordType = TypeVar("RecordType")
 MatchMethod = Literal["nearest", "before", "linear"]
 
 
-def _record_truthiness(self):
-    for field in self.dtype.names:
-        if np.isnan(self[field]):
-            return False
-
-    return True
+def _record_truthiness(self: np.record):
+    if not self.dtype.names:
+        return bool(self)
+    return all(not np.isnan(self[field]) for field in self.dtype.names)
 
 
-np.record.__bool__ = _record_truthiness
+np.record.__bool__ = _record_truthiness  # type: ignore
 
 
 class SimpleDataSampler:
@@ -76,8 +74,7 @@ class SimpleDataSampler:
         return result.view(self.data.__class__)
 
     def __iter__(self):
-        for sample in self.data:
-            yield sample
+        yield from self.data
 
     def __len__(self):
         return len(self.ts)
