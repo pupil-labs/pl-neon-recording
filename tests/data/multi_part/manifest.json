@@ -1,0 +1,102 @@
+[
+  { "name": "info.json", "size": 911, "crc": "d4e92b81" },
+  { "name": "wearer.json", "size": 62, "crc": "d8a9b0a5" },
+  { "name": "event.txt", "size": 30, "crc": "49b39f4f" },
+  { "name": "event.time", "size": 16, "crc": "78fd8e4a" },
+  { "name": "imu.proto", "size": 545, "crc": "3a1f5b48" },
+  {
+    "name": "Neon Scene Camera v1 ps1.mp4",
+    "size": 3881489,
+    "crc": "477e6409"
+  },
+  { "name": "Neon Scene Camera v1 ps1.time", "size": 1152, "crc": "72448b18" },
+  { "name": "extimu ps1.raw", "size": 39312, "crc": "32c0d766" },
+  {
+    "name": "Neon Scene Camera v1 ps1.time_aux",
+    "size": 1152,
+    "crc": "e80356ba"
+  },
+  { "name": "extimu ps1.time", "size": 4312, "crc": "60345fd9" },
+  { "name": "gaze_right ps1.raw", "size": 5112, "crc": "36f20e74" },
+  { "name": "worn ps1.raw", "size": 639, "crc": "76a327c9" },
+  { "name": "eye_state ps1.raw", "size": 35784, "crc": "ba1faae3" },
+  { "name": "gaze ps1.raw", "size": 5112, "crc": "420066a9" },
+  { "name": "calibration.bin", "size": 803, "crc": "2144df1c" },
+  { "name": "gaze_right ps1.time", "size": 5112, "crc": "cc75541c" },
+  { "name": "eye_state ps1.time", "size": 5112, "crc": "d6682e09" },
+  { "name": "gaze ps1.time", "size": 5112, "crc": "d6682e09" },
+  { "name": "template.json", "size": 482, "crc": "743eeb8d" },
+  {
+    "name": "Neon Scene Camera v1 ps2.mp4",
+    "size": 8517737,
+    "crc": "be6dd42a"
+  },
+  { "name": "Neon Scene Camera v1 ps2.time", "size": 2544, "crc": "57090afa" },
+  {
+    "name": "Neon Scene Camera v1 ps2.time_aux",
+    "size": 2544,
+    "crc": "cb2f131b"
+  },
+  { "name": "extimu ps2.raw", "size": 63012, "crc": "ec7f7c64" },
+  { "name": "extimu ps2.time", "size": 6912, "crc": "93d83320" },
+  { "name": "gaze_right ps2.raw", "size": 6776, "crc": "c0afaa97" },
+  { "name": "gaze ps2.raw", "size": 6776, "crc": "37a8d834" },
+  { "name": "eye_state ps2.raw", "size": 47432, "crc": "84348ab3" },
+  { "name": "worn ps2.raw", "size": 847, "crc": "cf2daa90" },
+  {
+    "name": "Neon Sensor Module v1 ps1.mp4",
+    "size": 2528521,
+    "crc": "dfa51a7b"
+  },
+  { "name": "gaze_right ps2.time", "size": 6776, "crc": "8f30c87a" },
+  { "name": "eye_state ps2.time", "size": 6776, "crc": "8794bc26" },
+  { "name": "gaze ps2.time", "size": 6776, "crc": "8794bc26" },
+  { "name": "Neon Sensor Module v1 ps1.time", "size": 6616, "crc": "b7aec1e9" },
+  {
+    "name": "Neon Sensor Module v1 ps1.time_aux",
+    "size": 6616,
+    "crc": "f33f48e6"
+  },
+  {
+    "name": "Neon Sensor Module v1_sae_log_1.bin",
+    "size": 1048576,
+    "crc": "a738ea1c"
+  },
+  {
+    "name": "Neon Scene Camera v1 ps3.mp4",
+    "size": 9580902,
+    "crc": "d54e55af"
+  },
+  { "name": "Neon Scene Camera v1 ps3.time", "size": 2800, "crc": "4791d7d7" },
+  {
+    "name": "Neon Scene Camera v1 ps3.time_aux",
+    "size": 2800,
+    "crc": "8768edd7"
+  },
+  { "name": "extimu ps3.raw", "size": 76019, "crc": "ab2c778e" },
+  { "name": "extimu ps3.time", "size": 8344, "crc": "a4b3ffcd" },
+  { "name": "gaze_right ps3.raw", "size": 9384, "crc": "96509ef3" },
+  { "name": "eye_state ps3.raw", "size": 65688, "crc": "ad8f8677" },
+  { "name": "gaze ps3.raw", "size": 9384, "crc": "9cfb7b6" },
+  { "name": "worn ps3.raw", "size": 1173, "crc": "9202bd7a" },
+  {
+    "name": "Neon Sensor Module v1 ps2.mp4",
+    "size": 2508625,
+    "crc": "d15cbc24"
+  },
+  { "name": "Neon Sensor Module v1 ps2.time", "size": 6472, "crc": "253b4d71" },
+  { "name": "gaze ps3.time", "size": 9384, "crc": "75e50178" },
+  { "name": "gaze_right ps3.time", "size": 9384, "crc": "3f48a93f" },
+  { "name": "eye_state ps3.time", "size": 9384, "crc": "75e50178" },
+  {
+    "name": "Neon Sensor Module v1 ps2.time_aux",
+    "size": 6472,
+    "crc": "2e0c93aa"
+  },
+  {
+    "name": "Neon Sensor Module v1_sae_log_2.bin",
+    "size": 1048576,
+    "crc": "a738ea1c"
+  },
+  { "name": "android.log.zip", "size": 95165, "crc": "7e4b0429" }
+]

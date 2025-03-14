@@ -1,0 +1,32 @@
+{
+  "recording_id": "1829668d-e7af-4219-b131-b30c70646cfb",
+  "workspace_id": "916f4ac1-d966-47e6-9c05-aa90b3958663",
+  "data_format_version": "2.3",
+  "app_version": "2.8.32-stage",
+  "start_time": 1728546105870000000,
+  "duration": 44946000000,
+  "android_device_id": "32d6b9d26d56cf64",
+  "android_device_name": "Neon Companion",
+  "android_device_model": "NE2213EEA",
+  "module_serial_number": "404641",
+  "wearer_id": "f46683b4-5516-4c7c-a374-3d221bd66cb6",
+  "template_data": {
+    "id": "3af96b92-d20b-44e3-b2e2-a32a6b8ee110",
+    "version": "2024-03-20T14:09:47.888937Z",
+    "recording_name": "2024-10-10_09:41:45",
+    "data": { "7def02af-3425-4efe-9688-dd7ef98a1d28": [""] }
+  },
+  "gaze_offset": [0.0, 0.0],
+  "calib_version": 1,
+  "pipeline_version": "2.7.0",
+  "os_version": "13",
+  "frame_id": "1",
+  "frame_name": "Just act natural",
+  "firmware_version": [24, 8],
+  "gaze_frequency": 200,
+  "wearer_ied": 63.0,
+  "developer_settings": {
+    "post_processing": ["pp_inextrinsics", "pp_filtering"],
+    "gaze_processor": "GPU"
+  }
+}
