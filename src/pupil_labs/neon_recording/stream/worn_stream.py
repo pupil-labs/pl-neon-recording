@@ -24,7 +24,8 @@ class WornProps(StreamProps):
 
 class WornRecord(Record, WornProps):
     def keys(self):
-        return [x for x in WornProps.__dict__.keys() if not x.startswith("_")]
+        keys = WornProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class WornArray(Array[WornRecord], WornProps):

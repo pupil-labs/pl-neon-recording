@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr  # noqa
+import pupil_labs.neon_recording as nr  # noqa: E402
 
 if len(sys.argv) < 2:
     print("Usage:")

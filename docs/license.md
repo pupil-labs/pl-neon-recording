@@ -1,6 +1,6 @@
 ---
 hide:
-- feedback
+    - feedback
 ---
 
 # License

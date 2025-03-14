@@ -26,9 +26,7 @@ log = logging.getLogger(__name__)
 
 
 class BaseAVStreamFrame(Record):
-    """
-    Base AVStreamFrame
-    """
+    """Base AVStreamFrame"""
 
     multi_video_reader: plv.MultiReader
 
@@ -41,9 +39,7 @@ class BaseAVStreamFrame(Record):
 
 
 class BaseAVStream(Stream):
-    """
-    Frames from a media container
-    """
+    """Frames from a media container"""
 
     kind: AVStreamKind
 
@@ -98,16 +94,16 @@ class BaseAVStream(Stream):
         BoundAVFrameClass = type(
             f"{self.name.capitalize()}Frame",
             (BaseAVStreamFrame,),
-            dict(dtype=data.dtype, multi_video_reader=self.av_reader),
+            {"dtype": data.dtype, "multi_video_reader": self.av_reader},
         )
         BoundAVFramesClass = type(
             f"{self.name.capitalize()}Frames",
             (Array,),
-            dict(
-                record_class=BoundAVFrameClass,
-                dtype=data.dtype,
-                multi_video_reader=self.av_reader,
-            ),
+            {
+                "record_class": BoundAVFrameClass,
+                "dtype": data.dtype,
+                "multi_video_reader": self.av_reader,
+            },
         )
 
         super().__init__(name, recording, data.view(BoundAVFramesClass))

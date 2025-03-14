@@ -23,7 +23,8 @@ class EventProps(StreamProps):
 
 class EventRecord(Record, EventProps):
     def keys(self):
-        return [x for x in EventProps.__dict__.keys() if not x.startswith("_")]
+        keys = EventProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class EventArray(Array[EventRecord], EventProps):

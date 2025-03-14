@@ -6,6 +6,6 @@ build:
 
 python:
   install:
-  - path: .
-    extra_requirements:
-      - docs
+    - path: .
+      extra_requirements:
+        - docs

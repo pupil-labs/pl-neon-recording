@@ -31,7 +31,8 @@ class BlinkProps(StreamProps):
 
 class BlinkRecord(Record, BlinkProps):
     def keys(self):
-        return [x for x in BlinkProps.__dict__.keys() if not x.startswith("_")]
+        keys = BlinkProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class BlinkArray(Array[BlinkRecord], BlinkProps):

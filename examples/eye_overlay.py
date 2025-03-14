@@ -8,13 +8,12 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr # noqa
-from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame # noqa
+import pupil_labs.neon_recording as nr  # noqa: E402, I001
+from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame  # noqa: E402
 
 
 def overlay_image(img, img_overlay, x, y):
     """Overlay `img_overlay` onto `img` at (x, y)."""
-
     # Image ranges
     y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
     x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
@@ -56,15 +55,18 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
 
     frame_idx = 0
     for ts, scene_frame, eye_frame in tqdm(combined_data, total=len(output_timestamps)):
-        frame_idx += 1
+        frame_idx += 1  # noqa: SIM113
+
         if abs(scene_frame.ts - ts) < 2e9 / fps:
-            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
+            # if the video frame timestamp is too far ahead or behind temporally,
+            # replace it with a gray frame
             frame_pixels = scene_frame.bgr
         else:
             frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
 
         if abs(eye_frame.ts - ts) < 2e9 / fps:
-            # if the video frame timestamp is too far ahead or behind temporally, replace it with a gray frame
+            # if the video frame timestamp is too far ahead or behind temporally,
+            # replace it with a gray frame
             eye_pixels = cv2.cvtColor(eye_frame.gray, cv2.COLOR_GRAY2BGR)
         else:
             eye_pixels = GrayFrame(eye_frame.width, eye_frame.height).bgr

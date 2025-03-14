@@ -69,7 +69,8 @@ class EyeStateProps(StreamProps):
 
 class EyeStateRecord(Record, EyeStateProps):
     def keys(self):
-        return [x for x in EyeStateProps.__dict__.keys() if not x.startswith("_")]
+        keys = EyeStateProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class EyeStateArray(Array[EyeStateRecord], EyeStateProps):
@@ -77,9 +78,7 @@ class EyeStateArray(Array[EyeStateRecord], EyeStateProps):
 
 
 class EyeStateStream(Stream[EyeStateRecord], EyeStateProps):
-    """
-    Eye state data
-    """
+    """Eye state data"""
 
     data: EyeStateArray
 

@@ -51,7 +51,8 @@ class FixationProps(StreamProps):
 
 class FixationRecord(Record, FixationProps):
     def keys(self):
-        return [x for x in FixationProps.__dict__.keys() if not x.startswith("_")]
+        keys = FixationProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class FixationArray(Array[FixationRecord], FixationProps):
@@ -59,9 +60,7 @@ class FixationArray(Array[FixationRecord], FixationProps):
 
 
 class FixationStream(Stream[FixationRecord], FixationProps):
-    """
-    Fixation data
-    """
+    """Fixation data"""
 
     data: FixationArray
 

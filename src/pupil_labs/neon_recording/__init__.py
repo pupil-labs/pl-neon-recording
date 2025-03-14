@@ -26,16 +26,16 @@ LOG_LEVEL = getattr(logging, level)
 
 
 __all__ = [
+    "AudioStream",
+    "BlinkStream",
+    "EventStream",
+    "EyeStateStream",
+    "FixationStream",
+    "GazeStream",
+    "IMUStream",
+    "NeonRecording",
+    "VideoStream",
+    "WornStream",
     "__version__",
     "load",
-    "NeonRecording",
-    "BlinkStream",
-    "EyeStateStream",
-    "GazeStream",
-    "WornStream",
-    "FixationStream",
-    "IMUStream",
-    "AudioStream",
-    "VideoStream",
-    "EventStream",
 ]

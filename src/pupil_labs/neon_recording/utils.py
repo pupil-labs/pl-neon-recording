@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -24,7 +24,7 @@ def find_sorted_multipart_files(
         if time_file.exists():
             file_pairs.append((raw_file, time_file))
 
-    return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3:]))
+    return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
 
 
 def load_multipart_data_time_pairs(file_pairs, dtype):
@@ -36,11 +36,12 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
         return np.array([], dtype=TIMESTAMP_DTYPE)
 
     if dtype == "str":
-        item_data = np.array(
-            b"".join(open(data_file, "rb").read() for data_file in data_files)
-            .decode()
-            .splitlines()
-        )
+        data_bytes = b""
+        for data_file in data_files:
+            with open(data_file, "rb") as f:
+                data_bytes += f.read()
+
+        item_data = np.array(data_bytes.decode().splitlines())
         item_data = item_data.view([("text", item_data.dtype)])
     else:
         item_data = Array(data_files, fallback_dtype=dtype)
@@ -54,9 +55,10 @@ def load_and_convert_tstamps(path: Path):
 
 
 def load_multipart_timestamps(files):
-    ts_buffer = bytes()
+    ts_buffer = b""
     for time_file in files:
-        ts_buffer += open(time_file, "rb").read()
+        with open(time_file, "rb") as f:
+            ts_buffer += f.read()
 
     timestamps = np.frombuffer(ts_buffer, dtype="<i8")
 

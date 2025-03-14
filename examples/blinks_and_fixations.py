@@ -1,14 +1,14 @@
 import sys
-from tqdm import tqdm
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr # noqa
+import pupil_labs.neon_recording as nr  # noqa: E402
 
 
 class EventTracker:
@@ -21,7 +21,9 @@ class EventTracker:
         if self.next_event is None:
             return False
 
-        return self.next_event.start_timestamp_ns < ts < self.next_event.end_timestamp_ns
+        return (
+            self.next_event.start_timestamp_ns < ts < self.next_event.end_timestamp_ns
+        )
 
     def step_to(self, ts):
         try:
@@ -41,7 +43,10 @@ def write_text(image, text, x, y):
         text,
         (x, y),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1, (0, 0, 255), 2, cv2.LINE_AA,
+        1,
+        (0, 0, 255),
+        2,
+        cv2.LINE_AA,
     )
 
 
@@ -74,9 +79,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
             text_y += 40
             if tracker.step_to(frame.ts):
                 frame_pixels = write_text(
-                    frame_pixels,
-                    f"{stream} {tracker.idx + 1}",
-                    0, text_y
+                    frame_pixels, f"{stream} {tracker.idx + 1}", 0, text_y
                 )
 
         video_writer.write(frame_pixels)

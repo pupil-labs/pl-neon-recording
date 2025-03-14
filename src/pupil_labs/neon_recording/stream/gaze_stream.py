@@ -30,7 +30,8 @@ class GazeProps(StreamProps):
 
 class GazeRecord(Record, GazeProps):
     def keys(self):
-        return [x for x in GazeProps.__dict__.keys() if not x.startswith("_")]
+        keys = GazeProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class GazeArray(Array[GazeRecord], GazeProps):
@@ -38,9 +39,7 @@ class GazeArray(Array[GazeRecord], GazeProps):
 
 
 class GazeStream(Stream[GazeRecord], GazeProps):
-    """
-    Gaze data
-    """
+    """Gaze data"""
 
     data: GazeArray
 

@@ -1,3 +1,3 @@
 """Streams module"""
 
-from .stream import MatchMethod, Stream
+from .stream import MatchMethod, Stream  # noqa: F401

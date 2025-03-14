@@ -1,15 +1,15 @@
 import sys
-from tqdm import tqdm
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr # noqa
-from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame  # noqa
+import pupil_labs.neon_recording as nr  # noqa: E402, I001
+from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame  # noqa: E402
 
 
 def make_overlaid_video(recording_dir, output_video_path, fps=None):

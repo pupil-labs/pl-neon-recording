@@ -33,7 +33,8 @@ class ImuProps(StreamProps):
 
 class ImuRecord(Record, ImuProps):
     def keys(self):
-        return [x for x in ImuProps.__dict__.keys() if not x.startswith("_")]
+        keys = ImuProps.__dict__.keys()
+        return [x for x in keys if not x.startswith("_")]
 
 
 class ImuArray(Array[ImuRecord], ImuProps):
@@ -41,9 +42,7 @@ class ImuArray(Array[ImuRecord], ImuProps):
 
 
 class IMUStream(Stream):
-    """
-    Motion and orientation data
-    """
+    """Motion and orientation data"""
 
     FALLBACK_DTYPE = np.dtype([
         ("gyro_x", "float32"),
@@ -83,8 +82,8 @@ class IMUStream(Stream):
                     raw_data = raw_file.read()
                     imu_packets = parse_neon_imu_raw_packets(raw_data)
 
-                    for packet in imu_packets:
-                        records.append((
+                    records.extend([
+                        (
                             packet.gyroData.x,
                             packet.gyroData.y,
                             packet.gyroData.z,
@@ -95,7 +94,9 @@ class IMUStream(Stream):
                             packet.rotVecData.x,
                             packet.rotVecData.y,
                             packet.rotVecData.z,
-                        ))
+                        )
+                        for packet in imu_packets
+                    ])
 
             imu_data = np.array(records, dtype=IMUStream.FALLBACK_DTYPE)
             imu_data = join_struct_arrays([time_data, imu_data])

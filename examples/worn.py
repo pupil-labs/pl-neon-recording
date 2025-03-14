@@ -1,14 +1,14 @@
 import sys
-from tqdm import tqdm
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr # noqa
+from pupil_labs import neon_recording as nr  # noqa: E402
 
 
 def write_text(image, text, x, y):
@@ -17,7 +17,10 @@ def write_text(image, text, x, y):
         text,
         (x, y),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1, (0, 0, 255), 2, cv2.LINE_AA,
+        1,
+        (0, 0, 255),
+        2,
+        cv2.LINE_AA,
     )
 
 

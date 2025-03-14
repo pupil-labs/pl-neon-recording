@@ -1,4 +1,5 @@
 from ast import literal_eval
+from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
 from re import compile as re_compile
@@ -6,7 +7,6 @@ from typing import (
     TYPE_CHECKING,
     Callable,
     Generic,
-    Iterable,
     SupportsIndex,
     TypeVar,
     overload,
