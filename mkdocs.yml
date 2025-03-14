@@ -121,6 +121,8 @@ plugins:
     - typeset
 
 extra:
+  version:
+    provider: mike
   social:
   - icon: fontawesome/brands/github
     link: https://github.com/pupil-labs
