@@ -1,4 +1,5 @@
 [project]
+
 name = "pupil-labs-neon-recording"
 description = "Functionality for loading Neon recordings in native recording format"
 authors = [{ name = "Pupil Labs GmbH", email = "info@pupil-labs.com" }]
@@ -21,10 +22,14 @@ classifiers = [
 dependencies = [
     "numpy",
     "protobuf",
-    "pandas",
     "scipy",
-    "av",
     "pupil-labs-video",
+]
+
+[project.optional-dependencies]
+examples = [
+    "opencv-python",
+    "tqdm",
 ]
 
 [project.urls]
