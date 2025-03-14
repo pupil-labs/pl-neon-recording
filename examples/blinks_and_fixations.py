@@ -60,8 +60,9 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     )
     eye_frames = recording.eye.sample(output_timestamps)
 
+    fixations_only = recording.fixations[recording.fixations["event_type"] == 1]
     event_trackers = {
-        "Fixation": EventTracker(recording.fixations),
+        "Fixation": EventTracker(fixations_only),
         "Blink": EventTracker(recording.blinks),
     }
 
