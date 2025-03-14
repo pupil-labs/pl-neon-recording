@@ -9,7 +9,7 @@ import numpy.typing as npt
 class Calibration(T.NamedTuple):
     """Camera Calibration data"""
 
-    dtype = np.dtype(
+    dtype = np.dtype(  # type: ignore
         [
             ("version", "u1"),
             ("serial", "6a"),

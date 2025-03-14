@@ -66,14 +66,14 @@ class BaseAVStream(Stream):
         video_readers = []
         for av_file, time_file in av_files:
             if self.kind == "video":
-                part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)
+                part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
                 container_timestamps = (part_ts["ts"] - recording.start_ts) / 1e9
                 reader = plv.Reader(str(av_file), self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
             elif self.kind == "audio":
-                reader = plv.Reader(str(av_file), self.kind)
-                part_ts = (
-                    recording.start_ts + (reader.container_timestamps * 1e9)
+                reader = plv.Reader(str(av_file), self.kind)  # type: ignore
+                part_ts = (  # type: ignore
+                    recording.start_ts + (reader.container_timestamps * 1e9)  # type: ignore
                 ).astype(TIMESTAMP_DTYPE)
             else:
                 raise RuntimeError(f"unknown av stream kind: {self.kind}")
@@ -85,7 +85,7 @@ class BaseAVStream(Stream):
 
         data = join_struct_arrays(
             [
-                parts_ts,
+                parts_ts,  # type: ignore
                 np.arange(len(parts_ts)).view(AV_INDEX_DTYPE),
             ],
         )

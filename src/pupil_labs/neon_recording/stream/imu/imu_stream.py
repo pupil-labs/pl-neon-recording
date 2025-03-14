@@ -63,18 +63,18 @@ class IMUStream(Stream):
         imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "imu")
 
         if len(imu_file_pairs) > 0:
-            imu_data = Array(
+            imu_data = Array(  # type: ignore
                 [file for file, _ in imu_file_pairs],
                 fallback_dtype=np.dtype(IMUStream.FALLBACK_DTYPE),
             )
-            imu_data.dtype.names = [
+            imu_data.dtype.names = [  # type: ignore
                 TIMESTAMP_FIELD_NAME if name == "timestamp_ns" else name
-                for name in imu_data.dtype.names
+                for name in imu_data.dtype.names  # type: ignore
             ]
 
         else:
             imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "extimu")
-            time_data = Array([file for _, file in imu_file_pairs], TIMESTAMP_DTYPE)
+            time_data = Array([file for _, file in imu_file_pairs], TIMESTAMP_DTYPE)  # type: ignore
 
             records = []
             for imu_file, _ in imu_file_pairs:
@@ -98,7 +98,7 @@ class IMUStream(Stream):
                         for packet in imu_packets
                     ])
 
-            imu_data = np.array(records, dtype=IMUStream.FALLBACK_DTYPE)
+            imu_data = np.array(records, dtype=IMUStream.FALLBACK_DTYPE)  # type: ignore
             imu_data = join_struct_arrays([time_data, imu_data])
 
         super().__init__("imu", recording, imu_data.view(ImuArray))
@@ -118,7 +118,7 @@ def parse_neon_imu_raw_packets(buffer):
         packet_sizes.append(packet_size)
         packet_bytes = buffer[index : index + packet_size]
         index += packet_size
-        packet = imu_pb2.ImuPacket()
+        packet = imu_pb2.ImuPacket()  # type: ignore
         packet.ParseFromString(packet_bytes)
 
         yield packet

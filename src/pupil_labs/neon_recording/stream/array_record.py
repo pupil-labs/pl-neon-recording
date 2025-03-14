@@ -36,7 +36,7 @@ def natural_sort_key(word):
 
 class Record(np.record):
     def __new__(cls, source: str | Path | np.ndarray | bytes):
-        return Array.load_arrays(source, cls.dtype)[0].view(cls)
+        return Array.load_arrays(source, cls.dtype)[0].view(cls)  # type: ignore
 
     def items(self):
         return [(k, getattr(self, k, None)) for k in self.keys()]
@@ -82,7 +82,7 @@ class Array(np.ndarray, Generic[RecordType]):
         self.dtype = obj.dtype
         return super().__array_finalize__(obj)
 
-    @overload
+    @overload  # type: ignore
     def __getitem__(self, key: SupportsIndex) -> RecordType: ...
     @overload
     def __getitem__(self, key: slice | str) -> "Array": ...
@@ -90,12 +90,12 @@ class Array(np.ndarray, Generic[RecordType]):
         result = super().__getitem__(key)
         if isinstance(result, np.void):
             if self.__class__.record_class:
-                self.__class__.record_class.dtype = result.dtype
-                return result.view(self.__class__.record_class)
-            return result
+                self.__class__.record_class.dtype = result.dtype  # type: ignore
+                return result.view(self.__class__.record_class)  # type: ignore
+            return result  # type: ignore
 
         if isinstance(key, slice):
-            return np.array(result).view(self.__class__)  # type: ignore
+            return np.array(result).view(self.__class__)
         if isinstance(key, (np.ndarray, list)):
             if isinstance(key[0], str):
                 return unstructured(result)  # type: ignore
@@ -103,7 +103,7 @@ class Array(np.ndarray, Generic[RecordType]):
         return np.array(result)  # type: ignore
 
     def keys(self):
-        return self.dtype.names
+        return self.dtype.names  # type: ignore
 
     @classmethod
     def load_array(cls, source: str | Path | np.ndarray | bytes, dtype: npt.DTypeLike):
@@ -164,7 +164,7 @@ class Array(np.ndarray, Generic[RecordType]):
         if isinstance(source, (str, Path, bytes, np.ndarray)):
             sources.append(source)
         elif isinstance(source, Iterable):
-            sources.extend(list(source))
+            sources.extend(list(source))  # type: ignore
         else:
             raise TypeError("unknown type")
         return sorted(sources, key=natural_sort_key)
@@ -213,12 +213,12 @@ class fields(Generic[T]):
     @overload
     def __get__(
         self, obj: "np.ndarray | Array | Stream", objtype=None
-    ) -> npt.NDArray[T]: ...
+    ) -> npt.NDArray[T]: ...  # type: ignore
     def __get__(
         self, obj: "np.record | np.ndarray | Record | Array | Stream", objtype=None
-    ) -> "T | Array[T] | npt.NDArray[T]":
+    ) -> "T | Array[T] | npt.NDArray[T]":  # type: ignore
         if len(self.columns) < 2:
-            return obj[self.columns[0]]  # type: ignore
+            return obj[self.columns[0]]
         elif isinstance(obj, (np.record, Record)):
             try:
                 return np.array(tuple(obj[self.columns]))

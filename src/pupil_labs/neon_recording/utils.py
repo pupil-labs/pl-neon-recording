@@ -31,7 +31,7 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
     ts_files = [time_file for _, time_file in file_pairs]
     data_files = [data_file for data_file, _ in file_pairs]
 
-    time_data = Array(ts_files, TIMESTAMP_DTYPE)
+    time_data = Array(ts_files, TIMESTAMP_DTYPE)  # type: ignore
     if not len(time_data):
         return np.array([], dtype=TIMESTAMP_DTYPE)
 

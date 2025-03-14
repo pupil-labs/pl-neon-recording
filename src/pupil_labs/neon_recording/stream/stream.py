@@ -31,7 +31,7 @@ class SimpleDataSampler:
 
     def sample(self, tstamps=None, method: MatchMethod = "nearest"):
         if tstamps is None:
-            tstamps = self.ts
+            tstamps = self.ts  # type: ignore
 
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
@@ -46,12 +46,12 @@ class SimpleDataSampler:
 
     def _sample_nearest(self, ts):
         # Use searchsorted to get the insertion points
-        idxs = np.searchsorted(self.ts, ts)
+        idxs = np.searchsorted(self.ts, ts)  # type: ignore
 
         # Ensure index bounds are valid
-        idxs = np.clip(idxs, 1, len(self.ts) - 1)
-        left = self.ts[idxs - 1]
-        right = self.ts[idxs]
+        idxs = np.clip(idxs, 1, len(self.ts) - 1)  # type: ignore
+        left = self.ts[idxs - 1]  # type: ignore
+        right = self.ts[idxs]  # type: ignore
 
         # Determine whether the left or right value is closer
         idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
@@ -60,8 +60,8 @@ class SimpleDataSampler:
 
     def _sample_nearest_before(self, ts):
         last_idx = len(self._data) - 1
-        idxs = np.searchsorted(self.ts, ts)
-        idxs[idxs > last_idx] = last_idx
+        idxs = np.searchsorted(self.ts, ts)  # type: ignore
+        idxs[idxs > last_idx] = last_idx  # type: ignore
 
         return self._data[idxs]
 
@@ -69,7 +69,11 @@ class SimpleDataSampler:
         result = np.zeros(len(sorted_ts), self.data.dtype)
         for key in self.data.dtype.names:
             result[key] = np.interp(
-                sorted_ts, self.ts, self.data[key], left=np.nan, right=np.nan
+                sorted_ts,
+                self.ts,  # type: ignore
+                self.data[key],
+                left=np.nan,
+                right=np.nan,
             )
         return result.view(self.data.__class__)
 
@@ -77,7 +81,7 @@ class SimpleDataSampler:
         yield from self.data
 
     def __len__(self):
-        return len(self.ts)
+        return len(self.ts)  # type: ignore
 
     def to_numpy(self):
         return self._data
@@ -112,7 +116,7 @@ class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
     @overload
     def __getitem__(self, key: slice | str) -> Array: ...
     def __getitem__(self, key: SupportsIndex | slice | str) -> Array | RecordType:
-        return self._data[key]
+        return self._data[key]  # type: ignore
 
     def __getattr__(self, key):
         return getattr(self._data, key)
