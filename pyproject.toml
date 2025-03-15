@@ -51,6 +51,7 @@ dev-dependencies = [
     # docs
     "markdown-callouts>=0.4",
     "markdown-exec>=1.8",
+    "mike",
     "mkdocs>=1.6",
     "mkdocs-coverage>=1.0",
     "mkdocs-gen-files>=0.5",
