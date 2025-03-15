@@ -7,7 +7,6 @@ from pathlib import Path
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.neon_recording.stream.imu import imu_pb2
 from pupil_labs.neon_recording.stream.imu.imu_stream import parse_neon_imu_raw_packets
 
 
