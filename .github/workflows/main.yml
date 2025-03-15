@@ -14,7 +14,6 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
-
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
@@ -38,7 +37,8 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
-
+        with:
+          lfs: "true"
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
         with:
@@ -50,11 +50,13 @@ jobs:
       - name: Check typing
         run: uv run mypy
 
-  check-docs:
+  docs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          lfs: "true"
 
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
@@ -62,5 +64,9 @@ jobs:
       - name: Run tests
         run: uv run python -m pytest tests --cov --cov-config=pyproject.toml --cov-report=html
 
-      - name: Check if documentation can be built
-        run: uv run mkdocs build -s
+      - name: Deploy latest docs
+        run: |
+          git fetch origin gh-pages --depth=1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          uv run mike deploy dev --push

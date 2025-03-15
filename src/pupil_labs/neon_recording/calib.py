@@ -1,15 +1,15 @@
 """Camera calibration utils"""
 
-import typing as T
-
 import numpy as np
 import numpy.typing as npt
 
+from pupil_labs.neon_recording.stream.array_record import Record, fields
 
-class Calibration(T.NamedTuple):
+
+class Calibration(Record):
     """Camera Calibration data"""
 
-    dtype = np.dtype(  # type: ignore
+    dtype: np.dtype = np.dtype(
         [
             ("version", "u1"),
             ("serial", "6a"),
@@ -27,27 +27,34 @@ class Calibration(T.NamedTuple):
     )
 
     version: int
-    serial: str
-    scene_camera_matrix: npt.NDArray[np.float64]
-    scene_distortion_coefficients: npt.NDArray[np.float64]
-    scene_extrinsics_affine_matrix: npt.NDArray[np.float64]
-    right_camera_matrix: npt.NDArray[np.float64]
-    right_distortion_coefficients: npt.NDArray[np.float64]
-    right_extrinsics_affine_matrix: npt.NDArray[np.float64]
-    left_camera_matrix: npt.NDArray[np.float64]
-    left_distortion_coefficients: npt.NDArray[np.float64]
-    left_extrinsics_affine_matrix: npt.NDArray[np.float64]
-    crc: int
-
-    def __getitem__(self, key):
-        if isinstance(key, str):
-            return getattr(self, key)
-        return self[key]
+    serial = fields[str]("serial", bytes.decode)
+    scene_camera_matrix = fields[npt.NDArray[np.float64]]("scene_camera_matrix")
+    scene_distortion_coefficients = fields[npt.NDArray[np.float64]](
+        "scene_distortion_coefficients"
+    )
+    scene_extrinsics_affine_matrix = fields[npt.NDArray[np.float64]](
+        "scene_extrinsics_affine_matrix"
+    )
+    right_camera_matrix = fields[npt.NDArray[np.float64]]("right_camera_matrix")
+    right_distortion_coefficients = fields[npt.NDArray[np.float64]](
+        "right_distortion_coefficients"
+    )
+    right_extrinsics_affine_matrix = fields[npt.NDArray[np.float64]](
+        "right_extrinsics_affine_matrix"
+    )
+    left_camera_matrix = fields[npt.NDArray[np.float64]]("left_camera_matrix")
+    left_distortion_coefficients = fields[npt.NDArray[np.float64]](
+        "left_distortion_coefficients"
+    )
+    left_extrinsics_affine_matrix = fields[npt.NDArray[np.float64]](
+        "left_extrinsics_affine_matrix"
+    )
+    crc = fields[int]("crc")
 
     @classmethod
     def from_buffer(cls, buffer: bytes):
-        return cls(*np.frombuffer(buffer, cls)[0])
+        return cls(buffer)
 
     @classmethod
     def from_file(cls, path: str) -> "Calibration":
-        return cls(*np.fromfile(path, cls)[0])
+        return cls(path)

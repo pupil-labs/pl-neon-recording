@@ -35,8 +35,12 @@ def natural_sort_key(word):
 
 
 class Record(np.record):
+    dtype: np.dtype
+
     def __new__(cls, source: str | Path | np.ndarray | bytes):
-        return Array.load_arrays(source, cls.dtype)[0].view(cls)  # type: ignore
+        return Array.load_arrays(source, partial(Array.load_array, dtype=cls.dtype))[
+            0
+        ].view(cls)
 
     def items(self):
         return [(k, getattr(self, k, None)) for k in self.keys()]
@@ -201,9 +205,9 @@ class fields(Generic[T]):
         array([100., 200.], dtype=float32)
     """
 
-    def __init__(self, columns, view: npt.DTypeLike = None):
+    def __init__(self, columns, converter: Callable | None = None):
         self.columns = [columns] if isinstance(columns, str) else columns
-        self.view = view
+        self.converter = converter
 
     def __set_name__(self, owner, property_name):
         self.property_name = property_name
@@ -218,14 +222,18 @@ class fields(Generic[T]):
         self, obj: "np.record | np.ndarray | Record | Array | Stream", objtype=None
     ) -> "T | Array[T] | npt.NDArray[T]":  # type: ignore
         if len(self.columns) < 2:
-            return obj[self.columns[0]]
+            result = obj[self.columns[0]]
         elif isinstance(obj, (np.record, Record)):
             try:
-                return np.array(tuple(obj[self.columns]))
+                result = np.array(tuple(obj[self.columns]))
             except KeyError as err:
                 raise AttributeError(f"no attribute '{self.columns}'") from err
+        else:
+            return unstructured(obj[self.columns])  # type: ignore
 
-        return unstructured(obj[self.columns])  # type: ignore
+        if self.converter:
+            result = self.converter(result)
+        return result
 
     def __set__(self, obj, value):
         obj[self.columns] = value

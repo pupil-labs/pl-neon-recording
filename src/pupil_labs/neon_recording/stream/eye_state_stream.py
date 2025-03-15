@@ -24,6 +24,12 @@ class EyeStateProps(StreamProps):
     ])
     "Pupil diameter (in mm) for both eyes: (left, right)"
 
+    pupil_diameter_left_mm = fields[np.float64](["pupil_diameter_left_mm"])
+    "Pupil diameter (in mm) for left eye"
+
+    pupil_diameter_right_mm = fields[np.float64](["pupil_diameter_right_mm"])
+    "Pupil diameter (in mm) for right eye"
+
     eyeball_center_left_xyz = fields[np.float64]([
         "eyeball_center_left_x",
         "eyeball_center_left_y",

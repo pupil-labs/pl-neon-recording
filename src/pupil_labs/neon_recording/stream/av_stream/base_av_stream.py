@@ -9,13 +9,13 @@ from pupil_labs.neon_recording.constants import (
     AV_INDEX_FIELD_NAME,
     TIMESTAMP_DTYPE,
 )
-from pupil_labs.neon_recording.stream.array_record import Array, Record
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     join_struct_arrays,
 )
 
-from ..stream import Stream
+from ..stream import Stream, StreamProps
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
@@ -23,6 +23,11 @@ if TYPE_CHECKING:
 AVStreamKind = Literal["audio", "video"]
 
 log = logging.getLogger(__name__)
+
+
+class AVStreamProps(StreamProps):
+    idx = fields[np.int32]("idx")
+    "Frame index in stream"
 
 
 class BaseAVStreamFrame(Record):
@@ -93,12 +98,12 @@ class BaseAVStream(Stream):
 
         BoundAVFrameClass = type(
             f"{self.name.capitalize()}Frame",
-            (BaseAVStreamFrame,),
+            (BaseAVStreamFrame, AVStreamProps),
             {"dtype": data.dtype, "multi_video_reader": self.av_reader},
         )
         BoundAVFramesClass = type(
             f"{self.name.capitalize()}Frames",
-            (Array,),
+            (Array, AVStreamProps),
             {
                 "record_class": BoundAVFrameClass,
                 "dtype": data.dtype,
