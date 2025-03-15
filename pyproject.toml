@@ -63,6 +63,7 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+log_format = '%(asctime)s %(levelname)7s %(name)-60s | %(message)-100s "%(pathname)s:%(lineno)s"'
 
 [tool.coverage.report]
 skip_empty = true
@@ -74,6 +75,7 @@ source = ["pupil_labs"]
 [tool.deptry.per_rule_ignores]
 DEP001 = ["pupil_labs", "cv2"]
 DEP002 = ["opencv-python"]
+DEP003 = ["pupil_labs", "typing_extensions"]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
