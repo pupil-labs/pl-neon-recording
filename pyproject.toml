@@ -72,7 +72,8 @@ branch = true
 source = ["pupil_labs"]
 
 [tool.deptry.per_rule_ignores]
-DEP001 = ["pupil_labs"]
+DEP001 = ["pupil_labs", "cv2"]
+DEP002 = ["opencv-python"]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
