@@ -7,9 +7,11 @@ from typing import (
     cast,
     overload,
 )
+from warnings import warn
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
@@ -19,7 +21,16 @@ if TYPE_CHECKING:
 
 ArrayType = TypeVar("ArrayType", bound=Array)
 RecordType = TypeVar("RecordType", bound=Record)
-MatchMethod = Literal["nearest", "before"]
+
+MatchMethod = Literal["nearest", "before", "after"]
+
+MATCHING_METHOD_TO_PANDAS_DIRECTION: dict[
+    MatchMethod, Literal["backward", "forward", "nearest"]
+] = {
+    "nearest": "nearest",
+    "before": "backward",
+    "after": "forward",
+}
 
 
 def _record_truthiness(self: np.record):
@@ -71,40 +82,66 @@ class Stream(StreamProps, Generic[ArrayType, RecordType]):
             return ["data"]
         return self._data.dtype.names
 
-    def sample(self, tstamps=None, method: MatchMethod = "nearest") -> ArrayType:
-        if tstamps is None:
-            tstamps = self.ts
+    def sample(
+        self,
+        start_or_timestamps: int | np.integer | None = None,
+        stop: int | np.integer | None = None,
+        tolerance: int | None = None,
+        method: MatchMethod = "nearest",
+    ):
+        if start_or_timestamps is None:
+            return self
 
-        if np.ndim(tstamps) == 0:
-            tstamps = [tstamps]
+        if method not in MATCHING_METHOD_TO_PANDAS_DIRECTION:
+            raise ValueError(
+                f"invalid matching method: {method!r}, must be one of: "
+                f"{' | '.join(MATCHING_METHOD_TO_PANDAS_DIRECTION.keys())}"
+            )
 
-        tstamps = np.array(tstamps).astype(np.int64)
-        sampler = {
-            "nearest": self._sample_nearest,
-            "before": self._sample_nearest_before,
-        }[method]
-        return cast(ArrayType, sampler(tstamps))
+        if isinstance(start_or_timestamps, (int, np.integer)):
+            # TODO: implement before/after
+            start = start_or_timestamps
+            if stop is not None:
+                start_idx, stop_idx = np.searchsorted(self.ts, np.array([start, stop]))
+                return self._data[start_idx:stop_idx]
+            timestamps = np.array([start])
+        else:
+            timestamps = start_or_timestamps
+            if isinstance(timestamps, set):
+                timestamps = sorted(timestamps)
+            if sorted(timestamps) != list(timestamps):
+                warn(
+                    (
+                        f"{self.__class__.sample.__qualname__} was called with unsorted"
+                        " timestamps, which can cause slower iteration for some streams"
+                    ),
+                    stacklevel=1,
+                )
 
-    def _sample_nearest(self, ts):
-        # Use searchsorted to get the insertion points
-        idxs = np.searchsorted(self.ts, ts)
+        if not len(self):
+            return self._data[0:0]
 
-        # Ensure index bounds are valid
-        idxs = np.clip(idxs, 1, len(self.ts) - 1)
-        left = self.ts[idxs - 1]
-        right = self.ts[idxs]
+        direction = MATCHING_METHOD_TO_PANDAS_DIRECTION[method]
 
-        # Determine whether the left or right value is closer
-        idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
+        target_ts = np.array(timestamps)
+        target_df = pd.DataFrame(target_ts, columns=["target_ts"])
+        target_df.index.name = "target"
+        target_df.reset_index(inplace=True)  # noqa: PD002
 
-        return self._data[idxs]
+        data_df = pd.DataFrame(self.ts.astype(np.int64), columns=["data_ts"])
+        data_df.index.name = "data"
+        data_df.reset_index(inplace=True)  # noqa: PD002
 
-    def _sample_nearest_before(self, ts):
-        last_idx = len(self._data) - 1
-        idxs = np.searchsorted(self.ts, ts)
-        idxs[idxs > last_idx] = last_idx
-
-        return self._data[idxs]
+        matching_df = pd.merge_asof(
+            target_df,
+            data_df,
+            left_on="target_ts",
+            right_on="data_ts",
+            direction=direction,
+            tolerance=tolerance,
+        )
+        closest_indices = matching_df["data"]
+        return self._data[closest_indices[closest_indices.notna()].to_numpy()]
 
     def __len__(self):
         return len(self.ts)

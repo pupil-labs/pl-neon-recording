@@ -1003,6 +1003,7 @@ name = "pupil-labs-neon-recording"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
+    { name = "pandas" },
     { name = "protobuf" },
     { name = "pupil-labs-video" },
     { name = "scipy" },
@@ -1011,7 +1012,6 @@ dependencies = [
 [package.optional-dependencies]
 examples = [
     { name = "opencv-python" },
-    { name = "pandas" },
     { name = "tqdm" },
 ]
 
@@ -1042,7 +1042,7 @@ dev = [
 requires-dist = [
     { name = "numpy" },
     { name = "opencv-python", marker = "extra == 'examples'" },
-    { name = "pandas", marker = "extra == 'examples'" },
+    { name = "pandas" },
     { name = "protobuf" },
     { name = "pupil-labs-video" },
     { name = "scipy" },
