@@ -75,18 +75,26 @@ class SimpleDataSampler:
         return self._data
 
     @property
-    def data(self):
+    def data(self) -> Array:
+        """Stream data as structured numpy array"""
         return self._data
+
+    @property
+    def pd(self):
+        """Stream data as a pandas DataFrame"""
+        return self.data.pd
 
     def interpolate(self, sorted_ts: npt.NDArray[np.int64]):
         """Interpolated stream data for `sorted_ts`"""
-        sorted_ts = np.array(sorted_ts)
+        assert self.data.dtype is not None
 
+        sorted_ts = np.array(sorted_ts)
         interpolated_dtype = np.dtype([
             (k, np.int64 if k == TIMESTAMP_FIELD_NAME else np.float64)
-            for k in self.data.dtype.names
+            for k in self.data.dtype.names or []
             if issubclass(self.data.dtype[k].type, (np.floating, np.integer))
         ])
+
         result = np.zeros(len(sorted_ts), interpolated_dtype)
         result[TIMESTAMP_FIELD_NAME] = sorted_ts
         for key in interpolated_dtype.names or []:
@@ -142,8 +150,3 @@ class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
         if not self._data.dtype:
             return ["data"]
         return self._data.dtype.names
-
-    @property
-    def pd(self):
-        """Return stream data as a pandas DataFrame"""
-        return self.data.pd
