@@ -23,15 +23,16 @@ np.record.__bool__ = _record_truthiness  # type: ignore
 
 
 class SimpleDataSampler:
-    _ts: npt.NDArray[np.int64]
     _data: Array
+    _ts: npt.NDArray[np.int64]
+    ts: npt.NDArray[np.int64]
 
     def __init__(self, data):
         self._data = data
 
     def sample(self, tstamps=None, method: MatchMethod = "nearest"):
         if tstamps is None:
-            tstamps = self.ts  # type: ignore
+            tstamps = self.ts
 
         if np.ndim(tstamps) == 0:
             tstamps = [tstamps]
@@ -45,12 +46,12 @@ class SimpleDataSampler:
 
     def _sample_nearest(self, ts):
         # Use searchsorted to get the insertion points
-        idxs = np.searchsorted(self.ts, ts)  # type: ignore
+        idxs = np.searchsorted(self.ts, ts)
 
         # Ensure index bounds are valid
-        idxs = np.clip(idxs, 1, len(self.ts) - 1)  # type: ignore
-        left = self.ts[idxs - 1]  # type: ignore
-        right = self.ts[idxs]  # type: ignore
+        idxs = np.clip(idxs, 1, len(self.ts) - 1)
+        left = self.ts[idxs - 1]
+        right = self.ts[idxs]
 
         # Determine whether the left or right value is closer
         idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
@@ -59,8 +60,8 @@ class SimpleDataSampler:
 
     def _sample_nearest_before(self, ts):
         last_idx = len(self._data) - 1
-        idxs = np.searchsorted(self.ts, ts)  # type: ignore
-        idxs[idxs > last_idx] = last_idx  # type: ignore
+        idxs = np.searchsorted(self.ts, ts)
+        idxs[idxs > last_idx] = last_idx
 
         return self._data[idxs]
 
@@ -68,7 +69,7 @@ class SimpleDataSampler:
         yield from self.data
 
     def __len__(self):
-        return len(self.ts)  # type: ignore
+        return len(self.ts)
 
     def to_numpy(self):
         return self._data
@@ -92,7 +93,7 @@ class SimpleDataSampler:
                 continue
             result[key] = np.interp(
                 sorted_ts,
-                self.ts,  # type: ignore
+                self.ts,
                 value,
                 left=np.nan,
                 right=np.nan,
@@ -101,7 +102,7 @@ class SimpleDataSampler:
 
 
 class StreamProps:
-    ts = fields[np.int64](TIMESTAMP_FIELD_NAME)
+    ts: npt.NDArray[np.int64] = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
     "The moment these data were recorded"
 
     def keys(self):
