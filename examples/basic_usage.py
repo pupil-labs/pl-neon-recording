@@ -36,7 +36,7 @@ print("First 10 gaze samples @ 30Hz:")
 fps = 30
 timestamps = np.arange(recording.gaze.ts[0], recording.gaze.ts[-1], 1e9 / fps)
 
-subsample = recording.gaze.sample(timestamps[:10], "linear")
+subsample = recording.gaze.interpolate(timestamps[:10])
 for gaze_datum in subsample:
     print(f"\t{gaze_datum.ts:0.3f} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
 print("")
@@ -46,7 +46,7 @@ print("")
 matched_gazes = recording.gaze.sample(recording.scene.ts)
 
 # interpolate gaze data to scene frame timestamps
-interpolated_gazes = recording.gaze.sample(recording.scene.ts, "linear")
+interpolated_gazes = recording.gaze.interpolate(recording.scene.ts)
 
 # visualize both
 scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)

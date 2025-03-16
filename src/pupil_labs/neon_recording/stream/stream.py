@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
 
 RecordType = TypeVar("RecordType")
-MatchMethod = Literal["nearest", "before", "linear"]
+MatchMethod = Literal["nearest", "before"]
 
 
 def _record_truthiness(self: np.record):
@@ -40,7 +40,6 @@ class SimpleDataSampler:
         sampler = {
             "nearest": self._sample_nearest,
             "before": self._sample_nearest_before,
-            "linear": self._sample_linear_interp,
         }[method]
         return sampler(tstamps)
 
@@ -65,18 +64,6 @@ class SimpleDataSampler:
 
         return self._data[idxs]
 
-    def _sample_linear_interp(self, sorted_ts):
-        result = np.zeros(len(sorted_ts), self.data.dtype)
-        for key in self.data.dtype.names:
-            result[key] = np.interp(
-                sorted_ts,
-                self.ts,  # type: ignore
-                self.data[key],
-                left=np.nan,
-                right=np.nan,
-            )
-        return result.view(self.data.__class__)
-
     def __iter__(self):
         yield from self.data
 
@@ -89,6 +76,28 @@ class SimpleDataSampler:
     @property
     def data(self):
         return self._data
+
+    def interpolate(self, sorted_ts: npt.NDArray[np.int64]):
+        """Interpolated stream data for `sorted_ts`"""
+        sorted_ts = np.array(sorted_ts)
+        result = np.zeros(len(sorted_ts), self.data.dtype)
+        result[TIMESTAMP_FIELD_NAME] = sorted_ts
+        for key in self.data.dtype.names:
+            if key == TIMESTAMP_FIELD_NAME:
+                continue
+            value = self.data[key]
+            if issubclass(value.dtype.type, np.integer):
+                value = value.astype(np.float64)
+            elif not issubclass(value.dtype.type, np.floating):
+                continue
+            result[key] = np.interp(
+                sorted_ts,
+                self.ts,  # type: ignore
+                value,
+                left=np.nan,
+                right=np.nan,
+            )
+        return result.view(self.data.__class__)
 
 
 class StreamProps:
