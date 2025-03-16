@@ -81,16 +81,18 @@ class SimpleDataSampler:
     def interpolate(self, sorted_ts: npt.NDArray[np.int64]):
         """Interpolated stream data for `sorted_ts`"""
         sorted_ts = np.array(sorted_ts)
-        result = np.zeros(len(sorted_ts), self.data.dtype)
+
+        interpolated_dtype = np.dtype([
+            (k, np.int64 if k == TIMESTAMP_FIELD_NAME else np.float64)
+            for k in self.data.dtype.names
+            if issubclass(self.data.dtype[k].type, (np.floating, np.integer))
+        ])
+        result = np.zeros(len(sorted_ts), interpolated_dtype)
         result[TIMESTAMP_FIELD_NAME] = sorted_ts
-        for key in self.data.dtype.names:
+        for key in interpolated_dtype.names or []:
             if key == TIMESTAMP_FIELD_NAME:
                 continue
-            value = self.data[key]
-            if issubclass(value.dtype.type, np.integer):
-                value = value.astype(np.float64)
-            elif not issubclass(value.dtype.type, np.floating):
-                continue
+            value = self.data[key].astype(np.float64)
             result[key] = np.interp(
                 sorted_ts,
                 self.ts,
