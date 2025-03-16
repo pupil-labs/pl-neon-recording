@@ -22,7 +22,7 @@ classifiers = [
 dependencies = ["numpy", "protobuf", "scipy", "pupil-labs-video"]
 
 [project.optional-dependencies]
-examples = ["opencv-python", "tqdm"]
+examples = ["opencv-python", "tqdm", "pandas"]
 
 [project.urls]
 Homepage = "https://pupil-labs.github.io/pl-neon-recording"

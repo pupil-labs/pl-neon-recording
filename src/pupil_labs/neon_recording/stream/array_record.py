@@ -1,6 +1,6 @@
 from ast import literal_eval
 from collections.abc import Iterable
-from functools import partial
+from functools import cached_property, partial
 from pathlib import Path
 from re import compile as re_compile
 from typing import (
@@ -172,6 +172,13 @@ class Array(np.ndarray, Generic[RecordType]):
         else:
             raise TypeError("unknown type")
         return sorted(sources, key=natural_sort_key)
+
+    @cached_property
+    def pd(self):
+        """Return array as a pandas DataFrame"""
+        import pandas
+
+        return pandas.DataFrame(self)
 
 
 T = TypeVar("T")

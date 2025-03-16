@@ -24,7 +24,7 @@ np.record.__bool__ = _record_truthiness  # type: ignore
 
 class SimpleDataSampler:
     _ts: npt.NDArray[np.int64]
-    _data: npt.NDArray
+    _data: Array
 
     def __init__(self, data):
         self._data = data
@@ -109,6 +109,8 @@ class StreamProps:
 
 
 class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
+    _data: Array
+
     def __init__(self, name, recording: "NeonRecording", data):
         self.name = name
         self.recording = recording
@@ -125,7 +127,7 @@ class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
     @overload
     def __getitem__(self, key: slice | str) -> Array: ...
     def __getitem__(self, key: SupportsIndex | slice | str) -> Array | RecordType:
-        return self._data[key]  # type: ignore
+        return self._data[key]
 
     def __getattr__(self, key):
         return getattr(self._data, key)
@@ -134,4 +136,11 @@ class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
         return iter(self._data)
 
     def keys(self):
+        if not self._data.dtype:
+            return ["data"]
         return self._data.dtype.names
+
+    @property
+    def pd(self):
+        """Return stream data as a pandas DataFrame"""
+        return self.data.pd
