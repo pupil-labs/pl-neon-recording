@@ -39,7 +39,7 @@ class BlinkArray(Array[BlinkRecord], BlinkProps):
     record_class = BlinkRecord
 
 
-class BlinkStream(Stream[BlinkRecord], BlinkProps):
+class BlinkStream(Stream[BlinkArray, BlinkRecord], BlinkProps):
     """Blinks data"""
 
     data: BlinkArray

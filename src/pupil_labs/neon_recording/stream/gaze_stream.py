@@ -38,7 +38,7 @@ class GazeArray(Array[GazeRecord], GazeProps):
     record_class = GazeRecord
 
 
-class GazeStream(Stream[GazeRecord], GazeProps):
+class GazeStream(Stream[GazeArray, GazeRecord], GazeProps):
     """Gaze data"""
 
     data: GazeArray

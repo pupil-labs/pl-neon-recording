@@ -19,6 +19,7 @@ recording = nr.load(sys.argv[1])
 
 # Sample the IMU data at 60Hz
 fps = 60
+z = recording.gaze[:10]
 timestamps = np.arange(recording.imu.ts[0], recording.imu.ts[-1], 1e9 / fps)
 imu_data = recording.imu.sample(timestamps)
 

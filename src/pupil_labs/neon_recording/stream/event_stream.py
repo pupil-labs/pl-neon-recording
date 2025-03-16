@@ -31,7 +31,7 @@ class EventArray(Array[EventRecord], EventProps):
     record_class = EventRecord
 
 
-class EventStream(Stream[EventRecord], EventProps):
+class EventStream(Stream[EventArray, EventRecord], EventProps):
     """Event annotations"""
 
     data: EventArray

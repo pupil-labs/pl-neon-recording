@@ -83,7 +83,7 @@ class EyeStateArray(Array[EyeStateRecord], EyeStateProps):
     record_class = EyeStateRecord
 
 
-class EyeStateStream(Stream[EyeStateRecord], EyeStateProps):
+class EyeStateStream(Stream[EyeStateArray, EyeStateRecord], EyeStateProps):
     """Eye state data"""
 
     data: EyeStateArray

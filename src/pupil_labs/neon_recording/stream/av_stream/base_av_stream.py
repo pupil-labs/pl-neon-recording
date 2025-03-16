@@ -43,7 +43,7 @@ class BaseAVStreamFrame(Record):
         return getattr(self.plv_frame, name)
 
 
-class BaseAVStream(Stream):
+class BaseAVStream(Stream[Array[BaseAVStreamFrame], BaseAVStreamFrame]):
     """Frames from a media container"""
 
     kind: AVStreamKind

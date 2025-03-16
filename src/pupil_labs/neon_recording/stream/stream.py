@@ -1,15 +1,24 @@
-from typing import TYPE_CHECKING, Generic, Literal, SupportsIndex, TypeVar, overload
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    Literal,
+    SupportsIndex,
+    TypeVar,
+    cast,
+    overload,
+)
 
 import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
-from pupil_labs.neon_recording.stream.array_record import Array, fields
+from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
 
-RecordType = TypeVar("RecordType")
+ArrayType = TypeVar("ArrayType", bound=Array)
+RecordType = TypeVar("RecordType", bound=Record)
 MatchMethod = Literal["nearest", "before"]
 
 
@@ -22,15 +31,47 @@ def _record_truthiness(self: np.record):
 np.record.__bool__ = _record_truthiness  # type: ignore
 
 
-class SimpleDataSampler:
-    _data: Array
-    _ts: npt.NDArray[np.int64]
-    ts: npt.NDArray[np.int64]
+class StreamProps:
+    ts: npt.NDArray[np.int64] = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
+    "The moment these data were recorded"
 
-    def __init__(self, data):
+    def keys(self):
+        return dir(self)
+
+
+class Stream(StreamProps, Generic[ArrayType, RecordType]):
+    _data: ArrayType
+
+    def __init__(self, name, recording: "NeonRecording", data):
+        self.name = name
+        self.recording = recording
         self._data = data
 
-    def sample(self, tstamps=None, method: MatchMethod = "nearest"):
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}"
+            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
+        )
+
+    @overload
+    def __getitem__(self, key: SupportsIndex) -> RecordType: ...
+    @overload
+    def __getitem__(self, key: slice | str) -> ArrayType: ...
+    def __getitem__(self, key: SupportsIndex | slice | str) -> ArrayType | RecordType:
+        return self._data[key]  # type: ignore
+
+    def __getattr__(self, key):
+        return getattr(self._data, key)
+
+    def __iter__(self):
+        yield from self.data
+
+    def keys(self):
+        if not self._data.dtype:
+            return ["data"]
+        return self._data.dtype.names
+
+    def sample(self, tstamps=None, method: MatchMethod = "nearest") -> ArrayType:
         if tstamps is None:
             tstamps = self.ts
 
@@ -42,7 +83,7 @@ class SimpleDataSampler:
             "nearest": self._sample_nearest,
             "before": self._sample_nearest_before,
         }[method]
-        return sampler(tstamps)
+        return cast(ArrayType, sampler(tstamps))
 
     def _sample_nearest(self, ts):
         # Use searchsorted to get the insertion points
@@ -65,9 +106,6 @@ class SimpleDataSampler:
 
         return self._data[idxs]
 
-    def __iter__(self):
-        yield from self.data
-
     def __len__(self):
         return len(self.ts)
 
@@ -84,7 +122,7 @@ class SimpleDataSampler:
         """Stream data as a pandas DataFrame"""
         return self.data.pd
 
-    def interpolate(self, sorted_ts: npt.NDArray[np.int64]):
+    def interpolate(self, sorted_ts: npt.NDArray[np.int64]) -> ArrayType:
         """Interpolated stream data for `sorted_ts`"""
         assert self.data.dtype is not None
 
@@ -108,45 +146,4 @@ class SimpleDataSampler:
                 left=np.nan,
                 right=np.nan,
             )
-        return result.view(self.data.__class__)
-
-
-class StreamProps:
-    ts: npt.NDArray[np.int64] = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
-    "The moment these data were recorded"
-
-    def keys(self):
-        return dir(self)
-
-
-class Stream(SimpleDataSampler, StreamProps, Generic[RecordType]):
-    _data: Array
-
-    def __init__(self, name, recording: "NeonRecording", data):
-        self.name = name
-        self.recording = recording
-        self._data = data
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
-        )
-
-    @overload
-    def __getitem__(self, key: SupportsIndex) -> RecordType: ...
-    @overload
-    def __getitem__(self, key: slice | str) -> Array: ...
-    def __getitem__(self, key: SupportsIndex | slice | str) -> Array | RecordType:
-        return self._data[key]
-
-    def __getattr__(self, key):
-        return getattr(self._data, key)
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def keys(self):
-        if not self._data.dtype:
-            return ["data"]
-        return self._data.dtype.names
+        return cast(ArrayType, result.view(self.data.__class__))

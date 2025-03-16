@@ -59,7 +59,7 @@ class FixationArray(Array[FixationRecord], FixationProps):
     record_class = FixationRecord
 
 
-class FixationStream(Stream[FixationRecord], FixationProps):
+class FixationStream(Stream[FixationArray, FixationRecord], FixationProps):
     """Fixation data"""
 
     data: FixationArray

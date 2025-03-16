@@ -32,7 +32,7 @@ class WornArray(Array[WornRecord], WornProps):
     record_class = WornRecord
 
 
-class WornStream(Stream[WornRecord], WornProps):
+class WornStream(Stream[WornArray, WornRecord], WornProps):
     """Worn (headset on/off) data"""
 
     data: WornArray
