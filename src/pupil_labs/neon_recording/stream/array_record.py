@@ -86,9 +86,9 @@ class Array(np.ndarray, Generic[RecordType]):
         self.dtype = obj.dtype
         return super().__array_finalize__(obj)
 
-    @overload  # type: ignore
     def __iter__(self) -> Iterator[RecordType]:  # type: ignore
-        yield from super().__iter__()
+        for i in range(len(self)):
+            yield self[i]
 
     @overload  # type: ignore
     def __getitem__(self, key: SupportsIndex) -> RecordType: ...

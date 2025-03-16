@@ -1,6 +1,7 @@
 from typing import (
     TYPE_CHECKING,
     Generic,
+    Iterator,
     Literal,
     SupportsIndex,
     TypeVar,
@@ -39,7 +40,11 @@ class StreamProps:
         return dir(self)
 
 
-class Stream(StreamProps, Generic[ArrayType, RecordType]):
+class Stream(
+    dict,  # this is so pandas.DataFrame can be called on the stream directly
+    StreamProps,
+    Generic[ArrayType, RecordType],
+):
     _data: ArrayType
 
     def __init__(self, name, recording: "NeonRecording", data):
@@ -63,12 +68,13 @@ class Stream(StreamProps, Generic[ArrayType, RecordType]):
     def __getattr__(self, key):
         return getattr(self._data, key)
 
-    def __iter__(self):
-        yield from self.data
+    def __iter__(self: "Stream") -> Iterator[RecordType]:
+        for i in range(len(self)):
+            yield self.data[i]
 
     def keys(self):
         if not self._data.dtype:
-            return ["data"]
+            return ["0"]
         return self._data.dtype.names
 
     def sample(self, tstamps=None, method: MatchMethod = "nearest") -> ArrayType:
