@@ -43,6 +43,11 @@ class NeonRecording:
     def __repr__(self):
         return f"NeonRecording({self._rec_dir})"
 
+    @property
+    def id(self) -> str | None:
+        """UUID of the recording"""
+        return self.info.get("recording_id")
+
     @cached_property
     def info(self) -> dict:
         """Information loaded from info.json"""
@@ -52,14 +57,19 @@ class NeonRecording:
         return info_data or {}
 
     @property
-    def start_ts(self) -> int | None:
+    def start_ts(self) -> int:
         """Start timestamp (nanoseconds since 1970-01-01)"""
-        return self.info.get("start_time")
+        return self.info.get("start_time") or 0
 
     @property
-    def duration(self) -> int | None:
+    def stop_ts(self) -> int:
+        """Stop timestamp (nanoseconds since 1970-01-01)"""
+        return self.start_ts + self.duration
+
+    @property
+    def duration(self) -> int:
         """Recording Duration (nanoseconds)"""
-        return self.info.get("duration")
+        return self.info.get("duration") or 0
 
     @cached_property
     def wearer(self) -> dict:
