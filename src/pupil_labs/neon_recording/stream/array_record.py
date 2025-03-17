@@ -5,8 +5,10 @@ from pathlib import Path
 from re import compile as re_compile
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Generic,
+    Mapping,
     SupportsIndex,
     TypeVar,
     overload,
@@ -34,6 +36,22 @@ def natural_sort_key(word):
     return word
 
 
+def pretty_format_mapping(mapping: Mapping):
+    mapping = dict(mapping)
+    output = []
+    pad = "    "
+    keys = mapping.keys()
+    n = max(len(key) for key in keys)
+    for k, v in mapping.items():
+        v_repr_lines = repr(v).splitlines()
+        output.append(f"{pad}{k:>{n}} = {v_repr_lines[0]}")
+        if len(v_repr_lines) > 1:
+            output.extend(f"{pad + '  '}{n * ' '}{line}" for line in v_repr_lines[1:])
+    lines_string = "\n".join(output)
+    lines_string = "\n" + lines_string + "\n"
+    return lines_string
+
+
 class Record(np.record):
     dtype: np.dtype
 
@@ -49,19 +67,11 @@ class Record(np.record):
         return self.dtype.names
 
     def __repr__(self):
-        lines = []
-        pad = "    "
-        keys = self.keys()
-        n = max(len(key) for key in keys)
-        for k, v in self.items():
-            v_repr_lines = repr(v).splitlines()
-            lines.append(f"{pad}{k:>{n}} = {v_repr_lines[0]}")
-            if len(v_repr_lines) > 1:
-                lines.extend(
-                    f"{pad + '  '}{n * ' '}{line}" for line in v_repr_lines[1:]
-                )
-        lines_string = "\n".join(lines)
-        lines_string = "\n" + lines_string + "\n"
+        lines_string = pretty_format_mapping(self.items())
+        return f"{self.__class__.__qualname__}({lines_string})"
+
+    def __str__(self):
+        lines_string = pretty_format_mapping(self.items())
         return f"{self.__class__.__qualname__}({lines_string})"
 
 
@@ -86,15 +96,20 @@ class Array(np.ndarray, Generic[RecordType]):
         self.dtype = obj.dtype
         return super().__array_finalize__(obj)
 
-    @overload  # type: ignore
     def __iter__(self) -> Iterator[RecordType]:  # type: ignore
-        yield from super().__iter__()
+        for i in range(len(self)):
+            yield self[i]
+
+    def __str__(self):
+        return repr(self)
 
     @overload  # type: ignore
     def __getitem__(self, key: SupportsIndex) -> RecordType: ...
     @overload
-    def __getitem__(self, key: slice | str) -> "Array": ...
-    def __getitem__(self, key: SupportsIndex | slice | str) -> "Array | RecordType":
+    def __getitem__(self, key: slice | str | list[str]) -> "Array": ...
+    def __getitem__(
+        self, key: SupportsIndex | slice | str | list[str]
+    ) -> "Array | RecordType":
         result = super().__getitem__(key)
         if isinstance(result, np.void):
             if self.__class__.record_class:
