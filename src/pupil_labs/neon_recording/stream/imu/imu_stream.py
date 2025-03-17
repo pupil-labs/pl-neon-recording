@@ -41,7 +41,7 @@ class ImuArray(Array[ImuRecord], ImuProps):
     record_class = ImuRecord
 
 
-class IMUStream(Stream[ImuArray, ImuRecord]):
+class IMUStream(Stream[ImuArray, ImuRecord], ImuProps):
     """Motion and orientation data"""
 
     FALLBACK_DTYPE = np.dtype([
