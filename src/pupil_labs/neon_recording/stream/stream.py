@@ -100,7 +100,7 @@ class SampledStream(
                 f"{' | '.join(MATCHING_METHOD_TO_PANDAS_DIRECTION.keys())}"
             )
 
-        if isinstance(start_or_timestamps, (int, np.integer)):
+        if isinstance(start_or_timestamps, (int, np.integer, np.floating, float)):
             # TODO: implement before/after
             start = start_or_timestamps
             if stop is not None:
@@ -140,7 +140,7 @@ class SampledStream(
             left_on="target_ts",
             right_on="data_ts",
             direction=direction,
-            tolerance=tolerance,
+            tolerance=None if tolerance is None else int(tolerance),
         )
         closest_indices = matching_df["data"]
         idxs = closest_indices[closest_indices.notna()].to_numpy().astype(np.int_)
