@@ -591,6 +591,102 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blinks-and-fixations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Blinks And Fixations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Access
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eye-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eye Overlay
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eye-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Eye State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find-clap" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find Clap
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaze-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaze Overlay
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imu" class="md-nav__link">
+    <span class="md-ellipsis">
+      Imu
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worn" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worn
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -630,6 +726,797 @@
 </code></pre></div>
 <p>or</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>git+https://github.com/pupil-labs/pl-neon-recording.git
+</code></pre></div>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python basic_usage.py path/to/recording/folder&quot;</span><span class="p">)</span>
+
+<span class="c1"># load a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="c1"># get basic info</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Recording Info:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Start time (ns): </span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Wearer         : </span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">wearer</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Device serial  : </span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">device_serial</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Gaze samples   : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># read 10 gaze samples</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 gaze samples:&quot;</span><span class="p">)</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">subsample</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">gaze_datum</span> <span class="ow">in</span> <span class="n">subsample</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">ts</span><span class="si">}</span><span class="s2"> : (</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># resample by interpolation</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 gaze samples @ 30Hz:&quot;</span><span class="p">)</span>
+<span class="n">fps</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+
+<span class="n">subsample</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">gaze_datum</span> <span class="ow">in</span> <span class="n">subsample</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">ts</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2"> : (</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># get closest gaze data to scene frame timestamps</span>
+<span class="n">matched_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+
+<span class="c1"># interpolate gaze data to scene frame timestamps</span>
+<span class="n">interpolated_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+
+<span class="c1"># visualize both</span>
+<span class="n">scene_gaze_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">matched_gazes</span><span class="p">,</span> <span class="n">interpolated_gazes</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">matched_gaze</span><span class="p">,</span> <span class="n">interpolated_gaze</span> <span class="ow">in</span> <span class="n">scene_gaze_pairs</span><span class="p">:</span>
+    <span class="c1"># draw the nearest-time gaze sample in red</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+        <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span> <span class="mi">50</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">10</span>
+    <span class="p">)</span>
+
+    <span class="c1"># draw the interpolated gaze sample in blue</span>
+    <span class="k">if</span> <span class="n">interpolated_gaze</span><span class="p">:</span>  <span class="c1"># interpolation will fail at the end of the stream</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span>
+            <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span>
+            <span class="mi">50</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interpolation fail&quot;</span><span class="p">)</span>
+
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Gaze sample comparison&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="c1"># Extract data by index</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;64th Gaze Sample:&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;64th scene frame (push any key to quit)&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">64</span><span class="p">]</span><span class="o">.</span><span class="n">bgr</span><span class="p">)</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="blinks-and-fixations">Blinks And Fixations<a class="headerlink" href="#blinks-and-fixations" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">EventTracker</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">itr</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">itr</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span><span class="o">.</span><span class="n">start_timestamp_ns</span> <span class="o">&lt;</span> <span class="n">ts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span><span class="o">.</span><span class="n">end_timestamp_ns</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">step_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span><span class="o">.</span><span class="n">end_timestamp_ns</span> <span class="o">&lt;</span> <span class="n">ts</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">itr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_event</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_event</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">write_text</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+        <span class="n">image</span><span class="p">,</span>
+        <span class="n">text</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;MJPG&quot;</span><span class="p">),</span>
+        <span class="n">fps</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">eye_frames</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)</span>
+
+    <span class="n">fixations_only</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">fixations</span><span class="p">[</span><span class="n">recording</span><span class="o">.</span><span class="n">fixations</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">event_trackers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Fixation&quot;</span><span class="p">:</span> <span class="n">EventTracker</span><span class="p">(</span><span class="n">fixations_only</span><span class="p">),</span>
+        <span class="s2">&quot;Blink&quot;</span><span class="p">:</span> <span class="n">EventTracker</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">eye_frames</span><span class="p">):</span>
+        <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="n">text_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">stream</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">event_trackers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">text_y</span> <span class="o">+=</span> <span class="mi">40</span>
+            <span class="k">if</span> <span class="n">tracker</span><span class="o">.</span><span class="n">step_to</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">ts</span><span class="p">):</span>
+                <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">write_text</span><span class="p">(</span>
+                    <span class="n">frame_pixels</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stream</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">tracker</span><span class="o">.</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">text_y</span>
+                <span class="p">)</span>
+
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;blinks-and-fixations.mp4&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="data-access">Data Access<a class="headerlink" href="#data-access" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording.stream.stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stream</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python basic_usage.py path/to/recording/folder&quot;</span><span class="p">)</span>
+
+<span class="c1"># load a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pretty_format</span><span class="p">(</span><span class="n">mapping</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">v_repr_lines</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pad</span><span class="si">}{</span><span class="n">k</span><span class="si">:</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">n</span><span class="si">}}</span><span class="s2">: </span><span class="si">{</span><span class="n">v_repr_lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_repr_lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pad</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;  &#39;</span><span class="si">}{</span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39; &#39;</span><span class="si">}{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">v_repr_lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Basic Recording Info:&quot;</span><span class="p">)</span>
+<span class="n">print_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Recording ID&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="s2">&quot;Start time (ns since unix epoch)&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Start time (datetime)&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Duration (nanoseconds)&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">duration</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Duration (seconds)&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">duration</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Wearer&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">wearer</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">wearer</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Device serial&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">device_serial</span><span class="p">,</span>
+    <span class="s2">&quot;App version&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;app_version&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Data format&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;data_format_version&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Gaze Offset&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;gaze_offset&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pretty_format</span><span class="p">(</span><span class="n">print_data</span><span class="p">))</span>
+
+<span class="n">streams</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Stream</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">eye_state</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">fixations</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">worn</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Recording streams:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="n">pretty_format</span><span class="p">({</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">pretty_format</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">streams</span>
+    <span class="p">})</span>
+<span class="p">)</span>
+
+<span class="c1"># Data can be converted to numpy or dataframes, however multi column properties</span>
+<span class="c1"># like .xy will not be included</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting stream to numpy array:&quot;</span><span class="p">)</span>
+<span class="n">gaze_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">gaze_np</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">data</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gaze_np</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting stream to pandas dataframe:&quot;</span><span class="p">)</span>
+<span class="n">gaze_df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">gaze_df</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">pd</span>  <span class="c1"># alternatively</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gaze_df</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getting data from a stream:&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze data&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span>
+<span class="c1"># GazeArray([(1741948698620648018, 966.3677 , 439.58817),</span>
+<span class="c1">#            (1741948698630654018, 965.9669 , 441.60403),</span>
+<span class="c1">#            (1741948698635648018, 964.2665 , 442.4974 ), ...,</span>
+<span class="c1">#            (1741948717448190018, 757.85815, 852.34644),</span>
+<span class="c1">#            (1741948717453190018, 766.53174, 857.3709 ),</span>
+<span class="c1">#            (1741948717458190018, 730.93604, 851.53723)],</span>
+<span class="c1">#           dtype=[(&#39;ts&#39;, &#39;&lt;i8&#39;), (&#39;x&#39;, &#39;&lt;f4&#39;), (&#39;y&#39;, &#39;&lt;f4&#39;)])</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze ts via prop&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze ts via key&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">])</span>
+<span class="c1"># array([1741948698620648018, 1741948698630654018, 1741948698635648018, ...,</span>
+<span class="c1">#        1741948717448190018, 1741948717453190018, 1741948717458190018])</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze x coords via prop&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze x coords via key&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+<span class="c1"># array([966.3677 , 965.9669 , 964.2665 , ..., 757.85815, 766.53174,</span>
+<span class="c1">#        730.93604], dtype=float32)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze y coords via prop&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze y coords via key&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+<span class="c1"># array([439.58817, 441.60403, 442.4974 , ..., 852.34644, 857.3709 ,</span>
+<span class="c1">#        851.53723], dtype=float32)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze xy coords&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze xy coords&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+<span class="c1"># array([[966.3677 , 439.58817],</span>
+<span class="c1">#        ...,</span>
+<span class="c1">#        [730.93604, 851.53723]], dtype=float32)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze ts and x and y&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[[</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+<span class="c1"># array([[1.74194870e+18, 9.66367676e+02, 4.39588165e+02],</span>
+<span class="c1">#        ...,</span>
+<span class="c1">#        [1.74194872e+18, 7.30936035e+02, 8.51537231e+02]])</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampling data:&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Get closest gaze for scene frames&quot;</span><span class="p">)</span>
+<span class="n">closest_gaze_to_scene</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">closest_gaze_to_scene</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;closest_gaze_to_scene_times&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">closest_gaze_to_scene</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Get closest before gaze for scene frames&quot;</span><span class="p">)</span>
+<span class="n">closest_gaze_before_scene</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">closest_gaze_before_scene</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;closest_gaze_before_scene_times&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">closest_gaze_before_scene</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampled data can be resampled&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Closest gaze sampled at 1 fps&quot;</span><span class="p">)</span>
+<span class="n">closest_gaze_to_scene_at_one_fps</span> <span class="o">=</span> <span class="n">closest_gaze_before_scene</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">closest_gaze_to_scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_gaze_to_scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">closest_gaze_to_scene_at_one_fps</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;closest_gaze_to_scene_at_one_fps_times&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">closest_gaze_to_scene_at_one_fps</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="eye-overlay">Eye Overlay<a class="headerlink" href="#eye-overlay" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402, I001</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording.stream.av_stream.video_stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">GrayFrame</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">overlay_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img_overlay</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overlay `img_overlay` onto `img` at (x, y).&quot;&quot;&quot;</span>
+    <span class="c1"># Image ranges</span>
+    <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span> <span class="o">+</span> <span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span> <span class="o">+</span> <span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Overlay ranges</span>
+    <span class="n">y1o</span><span class="p">,</span> <span class="n">y2o</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">x1o</span><span class="p">,</span> <span class="n">x2o</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y1</span> <span class="o">&gt;=</span> <span class="n">y2</span> <span class="ow">or</span> <span class="n">x1</span> <span class="o">&gt;=</span> <span class="n">x2</span> <span class="ow">or</span> <span class="n">y1o</span> <span class="o">&gt;=</span> <span class="n">y2o</span> <span class="ow">or</span> <span class="n">x1o</span> <span class="o">&gt;=</span> <span class="n">x2o</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">img_crop</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
+    <span class="n">img_overlay_crop</span> <span class="o">=</span> <span class="n">img_overlay</span><span class="p">[</span><span class="n">y1o</span><span class="p">:</span><span class="n">y2o</span><span class="p">,</span> <span class="n">x1o</span><span class="p">:</span><span class="n">x2o</span><span class="p">]</span>
+    <span class="n">img_crop</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">img_overlay_crop</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;MJPG&quot;</span><span class="p">),</span>
+        <span class="n">fps</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">combined_data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">output_timestamps</span><span class="p">,</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">),</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">frame_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">eye_frame</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">combined_data</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)):</span>
+        <span class="n">frame_idx</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># noqa: SIM113</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">:</span>
+            <span class="c1"># if the video frame timestamp is too far ahead or behind temporally,</span>
+            <span class="c1"># replace it with a gray frame</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">GrayFrame</span><span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">scene_frame</span><span class="o">.</span><span class="n">height</span><span class="p">)</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">:</span>
+            <span class="c1"># if the video frame timestamp is too far ahead or behind temporally,</span>
+            <span class="c1"># replace it with a gray frame</span>
+            <span class="n">eye_pixels</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eye_pixels</span> <span class="o">=</span> <span class="n">GrayFrame</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">eye_frame</span><span class="o">.</span><span class="n">height</span><span class="p">)</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="n">overlay_image</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">,</span> <span class="n">eye_pixels</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;eye-overlay-output-video.avi&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="eye-state">Eye State<a class="headerlink" href="#eye-state" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402, I001</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording.stream.av_stream.video_stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">GrayFrame</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">overlay_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img_overlay</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overlay `img_overlay` onto `img` at (x, y).&quot;&quot;&quot;</span>
+    <span class="c1"># Image ranges</span>
+    <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span> <span class="o">+</span> <span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span> <span class="o">+</span> <span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Overlay ranges</span>
+    <span class="n">y1o</span><span class="p">,</span> <span class="n">y2o</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">x1o</span><span class="p">,</span> <span class="n">x2o</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">img_overlay</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y1</span> <span class="o">&gt;=</span> <span class="n">y2</span> <span class="ow">or</span> <span class="n">x1</span> <span class="o">&gt;=</span> <span class="n">x2</span> <span class="ow">or</span> <span class="n">y1o</span> <span class="o">&gt;=</span> <span class="n">y2o</span> <span class="ow">or</span> <span class="n">x1o</span> <span class="o">&gt;=</span> <span class="n">x2o</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">img_crop</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
+    <span class="n">img_overlay_crop</span> <span class="o">=</span> <span class="n">img_overlay</span><span class="p">[</span><span class="n">y1o</span><span class="p">:</span><span class="n">y2o</span><span class="p">,</span> <span class="n">x1o</span><span class="p">:</span><span class="n">x2o</span><span class="p">]</span>
+    <span class="n">img_crop</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">img_overlay_crop</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">value_range</span><span class="p">,</span> <span class="n">x_width</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+        <span class="n">x_values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">idx2</span> <span class="o">*</span> <span class="n">x_width</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx2</span> <span class="ow">in</span> <span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]]</span>
+
+        <span class="n">y_norms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">idx2</span><span class="p">]</span> <span class="o">-</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">idx2</span> <span class="ow">in</span> <span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">y_values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y_norm</span> <span class="o">*</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">y_norm</span> <span class="ow">in</span> <span class="n">y_norms</span><span class="p">]</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="o">*</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span> <span class="n">y_values</span><span class="p">)]</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="p">,</span> <span class="n">line_width</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_eye_state_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">fps</span> <span class="o">=</span> <span class="mi">200</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;MJPG&quot;</span><span class="p">),</span>
+        <span class="n">fps</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">eye_video_sampled</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)</span>
+    <span class="n">eye_state_sampled</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye_state</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)</span>
+    <span class="n">combined_data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">output_timestamps</span><span class="p">,</span>
+        <span class="n">eye_video_sampled</span><span class="p">,</span>
+        <span class="n">eye_state_sampled</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plot_metas</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;optical_axis_left_x&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">]},</span>
+        <span class="s2">&quot;optical_axis_left_y&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;optical_axis_left_z&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">plot_name</span><span class="p">,</span> <span class="n">plot_meta</span> <span class="ow">in</span> <span class="n">plot_metas</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">plot_meta</span><span class="p">[</span><span class="s2">&quot;range&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">eye_state</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">plot_name</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">eye_state</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">plot_name</span><span class="p">]),</span>
+        <span class="p">)</span>
+
+    <span class="n">plot_duration_secs</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">plot_point_count</span> <span class="o">=</span> <span class="n">plot_duration_secs</span> <span class="o">*</span> <span class="n">fps</span>
+    <span class="n">plot_x_width</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="n">plot_point_count</span>
+
+    <span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">eye_frame</span><span class="p">,</span> <span class="n">_eye_state</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">combined_data</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">:</span>
+            <span class="n">eye_pixels</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eye_pixels</span> <span class="o">=</span> <span class="n">GrayFrame</span><span class="p">(</span><span class="n">eye_frame</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">eye_frame</span><span class="o">.</span><span class="n">height</span><span class="p">)</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="k">for</span> <span class="n">plot_name</span><span class="p">,</span> <span class="n">plot_meta</span> <span class="ow">in</span> <span class="n">plot_metas</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">min_ts</span> <span class="o">=</span> <span class="n">ts</span> <span class="o">-</span> <span class="n">plot_duration_secs</span> <span class="o">*</span> <span class="mf">1e9</span>
+            <span class="n">time_frame</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_ts</span> <span class="o">&lt;</span> <span class="n">eye_state_sampled</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">eye_state_sampled</span><span class="o">.</span><span class="n">ts</span> <span class="o">&lt;=</span> <span class="n">ts</span><span class="p">)</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="n">eye_state_sampled</span><span class="p">[</span><span class="n">time_frame</span><span class="p">][</span><span class="n">plot_name</span><span class="p">]</span>
+            <span class="n">plot</span><span class="p">(</span>
+                <span class="n">eye_pixels</span><span class="p">,</span>
+                <span class="n">plot_data</span><span class="p">,</span>
+                <span class="n">plot_meta</span><span class="p">[</span><span class="s2">&quot;range&quot;</span><span class="p">],</span>
+                <span class="n">plot_x_width</span><span class="p">,</span>
+                <span class="n">plot_meta</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">eye_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">eye_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_eye_state_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;eye-state-output-video.avi&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="find-clap">Find Clap<a class="headerlink" href="#find-clap" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_clap</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">max_rms</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">max_time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">recording</span><span class="o">.</span><span class="n">audio</span><span class="p">:</span>
+        <span class="n">audio_data</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">()</span>
+        <span class="n">rms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">audio_data</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">rms</span> <span class="o">&gt;</span> <span class="n">max_rms</span><span class="p">:</span>
+            <span class="n">max_rms</span> <span class="o">=</span> <span class="n">rms</span>
+            <span class="n">max_time</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">ts</span>
+
+    <span class="n">rel_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_time</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The loudest audio occurs at </span><span class="si">{</span><span class="n">max_time</span><span class="si">}</span><span class="s2"> (rel=</span><span class="si">{</span><span class="n">rel_time</span><span class="si">}</span><span class="s2">), rms = </span><span class="si">{</span><span class="n">max_rms</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">find_clap</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="gaze-overlay">Gaze Overlay<a class="headerlink" href="#gaze-overlay" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402, I001</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording.stream.av_stream.video_stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">GrayFrame</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;MJPG&quot;</span><span class="p">),</span>
+        <span class="n">fps</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span>
+        <span class="p">)</span>
+
+    <span class="n">scene_datas</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)</span>
+    <span class="n">combined_data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">output_timestamps</span><span class="p">,</span>
+        <span class="n">scene_datas</span><span class="p">,</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">gaze_datum</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="n">combined_data</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">:</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">GrayFrame</span><span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">scene_frame</span><span class="o">.</span><span class="n">height</span><span class="p">)</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">ts</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">:</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+                <span class="n">frame_pixels</span><span class="p">,</span>
+                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span>
+                <span class="mi">50</span><span class="p">,</span>
+                <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+                <span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaze-overlay-output-video.avi&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="imu">Imu<a class="headerlink" href="#imu" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python imu.py path/to/recording/folder&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Sample the IMU data at 60Hz</span>
+<span class="n">fps</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+<span class="n">imu_data</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+
+<span class="c1"># Use scipy to convert the quaternions to euler angles</span>
+<span class="n">quaternions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">quaternion_wxyz</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">imu_data</span><span class="p">])</span>
+<span class="n">rotations</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">quaternions</span><span class="p">,</span> <span class="n">scalar_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_euler</span><span class="p">(</span><span class="n">seq</span><span class="o">=</span><span class="s2">&quot;XZY&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">%</span> <span class="mi">360</span>
+<span class="p">)</span>
+
+<span class="c1"># Combine the timestamps and eulers</span>
+<span class="n">rotations_with_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">rotations</span><span class="p">))</span>
+<span class="n">timestamped_eulers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rotations_with_time</span><span class="p">],</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;pitch&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;yaw&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;roll&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># Display the angles</span>
+<span class="n">frame_size</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pitch&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="s2">&quot;yaw&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;roll&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
+
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">timestamped_eulers</span><span class="p">:</span>
+    <span class="c1"># Create a blank image</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">frame_size</span><span class="p">,</span> <span class="n">frame_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="c1"># Define the center and radius of the circles</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">3</span>
+
+    <span class="c1"># Calculate the end points for the angles</span>
+    <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">colors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">pitch_end</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">field</span><span class="p">]))),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">field</span><span class="p">]))),</span>
+        <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">pitch_end</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Write the angle values on the image</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="o">*</span> <span class="mi">30</span><span class="p">),</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span>
+            <span class="mf">0.7</span><span class="p">,</span>
+            <span class="n">color</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Display the image</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;IMU Angles&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1000</span> <span class="o">//</span> <span class="n">fps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">27</span><span class="p">:</span>
+        <span class="k">break</span>
+
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="worn">Worn<a class="headerlink" href="#worn" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs</span><span class="w"> </span><span class="kn">import</span> <span class="n">neon_recording</span> <span class="k">as</span> <span class="n">nr</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">write_text</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+        <span class="n">image</span><span class="p">,</span>
+        <span class="n">text</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;MJPG&quot;</span><span class="p">),</span>
+        <span class="n">fps</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">eyes_and_worn</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">),</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">worn</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">frame</span><span class="p">,</span> <span class="n">worn_record</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">eyes_and_worn</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">output_timestamps</span><span class="p">)):</span>
+        <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="n">text_y</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="k">if</span> <span class="n">worn_record</span><span class="o">.</span><span class="n">worn</span><span class="p">:</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">write_text</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">,</span> <span class="s2">&quot;Worn&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">text_y</span><span class="p">)</span>
+
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;worn.mp4&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
