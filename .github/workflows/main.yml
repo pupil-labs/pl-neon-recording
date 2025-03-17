@@ -63,7 +63,6 @@ jobs:
 
       - name: Deploy latest docs
         run: |
-          ls examples
           git fetch origin gh-pages --depth=1
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
