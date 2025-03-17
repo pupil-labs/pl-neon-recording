@@ -3,7 +3,6 @@ from collections.abc import Mapping
 from datetime import datetime
 
 import numpy as np
-import pandas
 
 import pupil_labs.neon_recording as nr
 from pupil_labs.neon_recording.stream.stream import Stream
