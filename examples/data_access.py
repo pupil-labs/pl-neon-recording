@@ -50,9 +50,10 @@ streams: list[Stream] = [
     recording.eye_state,
     recording.blinks,
     recording.fixations,
+    recording.worn,
     recording.eye,
     recording.scene,
-    recording.worn,
+    recording.audio,
 ]
 print()
 print("Recording streams:")
@@ -67,19 +68,15 @@ print(
 # like .xy will not be included
 
 print()
-print("Converting stream to numpy array:")
-gaze_np = np.array(recording.gaze)
-# or
+print("Gaze data as numpy array:")
 gaze_np = recording.gaze.data
 print()
 print(gaze_np)
 
 
 print()
-print("Converting stream to pandas dataframe:")
-gaze_df = pandas.DataFrame(recording.gaze)
-# or
-gaze_df = recording.gaze.pd  # alternatively
+print("Gaze data as pandas dataframe:")
+gaze_df = recording.gaze.pd
 print()
 print(gaze_df)
 
