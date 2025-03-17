@@ -1,9 +1,9 @@
+import sys
 from collections.abc import Iterator
 from typing import (
     TYPE_CHECKING,
     Generic,
     Literal,
-    Self,
     SupportsIndex,
     TypeVar,
     cast,
@@ -15,6 +15,11 @@ import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
