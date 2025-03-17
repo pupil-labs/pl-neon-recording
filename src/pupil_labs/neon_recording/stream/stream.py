@@ -1,7 +1,7 @@
+from collections.abc import Iterator
 from typing import (
     TYPE_CHECKING,
     Generic,
-    Iterator,
     Literal,
     Self,
     SupportsIndex,
@@ -52,6 +52,8 @@ class SampledStream(
     StreamProps,
     Generic[ArrayType, RecordType],
 ):
+    _data: ArrayType
+
     def __init__(self, data):
         self._data = data
 
@@ -64,7 +66,7 @@ class SampledStream(
     ) -> ArrayType | RecordType:
         return self._data[key]  # type: ignore
 
-    def __iter__(self: "Stream") -> Iterator[RecordType]:
+    def __iter__(self) -> Iterator[RecordType]:
         for i in range(len(self)):
             yield self.data[i]
 
@@ -153,7 +155,7 @@ class SampledStream(
         return cast(ArrayType, result.view(self.data.__class__))
 
     def __repr__(self):
-        return f"{self.__class__.__name__}" f"(data={self.data!r})"
+        return f"{self.__class__.__name__}(data={self.data!r})"
 
 
 class Stream(SampledStream[ArrayType, RecordType]):

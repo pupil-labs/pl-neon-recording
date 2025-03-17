@@ -1,14 +1,12 @@
 from ast import literal_eval
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Mapping
 from functools import cached_property, partial
 from pathlib import Path
 from re import compile as re_compile
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     Generic,
-    Mapping,
     SupportsIndex,
     TypeVar,
     overload,
