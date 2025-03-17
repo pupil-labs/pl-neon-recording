@@ -3,6 +3,7 @@ from typing import (
     Generic,
     Iterator,
     Literal,
+    Self,
     SupportsIndex,
     TypeVar,
     cast,
@@ -39,34 +40,29 @@ class StreamProps:
     def keys(self):
         return dir(self)
 
+    def __len__(self):
+        return len(self.keys())
 
-class Stream(
-    dict,  # this is so pandas.DataFrame can be called on the stream directly
+
+StreamType = TypeVar("StreamType", bound="Stream")
+
+
+class SampledStream(
+    # dict,  # this is so pandas.DataFrame can be called on the stream directly
     StreamProps,
     Generic[ArrayType, RecordType],
 ):
-    _data: ArrayType
-
-    def __init__(self, name, recording: "NeonRecording", data):
-        self.name = name
-        self.recording = recording
+    def __init__(self, data):
         self._data = data
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
-        )
 
     @overload
     def __getitem__(self, key: SupportsIndex) -> RecordType: ...
     @overload
-    def __getitem__(self, key: slice | str) -> ArrayType: ...
-    def __getitem__(self, key: SupportsIndex | slice | str) -> ArrayType | RecordType:
+    def __getitem__(self, key: slice | str | list[str]) -> ArrayType: ...
+    def __getitem__(
+        self, key: SupportsIndex | slice | str | list[str]
+    ) -> ArrayType | RecordType:
         return self._data[key]  # type: ignore
-
-    def __getattr__(self, key):
-        return getattr(self._data, key)
 
     def __iter__(self: "Stream") -> Iterator[RecordType]:
         for i in range(len(self)):
@@ -77,7 +73,7 @@ class Stream(
             return ["0"]
         return self._data.dtype.names
 
-    def sample(self, tstamps=None, method: MatchMethod = "nearest") -> ArrayType:
+    def sample(self, tstamps=None, method: MatchMethod = "nearest") -> Self:
         if tstamps is None:
             tstamps = self.ts
 
@@ -89,7 +85,9 @@ class Stream(
             "nearest": self._sample_nearest,
             "before": self._sample_nearest_before,
         }[method]
-        return cast(ArrayType, sampler(tstamps))
+        idxs = sampler(tstamps)
+
+        return SampledStream(self._data[idxs])  # type: ignore
 
     def _sample_nearest(self, ts):
         # Use searchsorted to get the insertion points
@@ -103,20 +101,20 @@ class Stream(
         # Determine whether the left or right value is closer
         idxs -= (np.abs(ts - left) < np.abs(ts - right)).astype(int)
 
-        return self._data[idxs]
+        return idxs
 
     def _sample_nearest_before(self, ts):
         last_idx = len(self._data) - 1
         idxs = np.searchsorted(self.ts, ts)
         idxs[idxs > last_idx] = last_idx
 
-        return self._data[idxs]
+        return idxs
 
     def __len__(self):
         return len(self.ts)
 
-    def to_numpy(self):
-        return self._data
+    def __array__(self):
+        return np.array(self._data)  # , dtype=dtype)
 
     @property
     def data(self) -> Array:
@@ -153,3 +151,22 @@ class Stream(
                 right=np.nan,
             )
         return cast(ArrayType, result.view(self.data.__class__))
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}" f"(data={self.data!r})"
+
+
+class Stream(SampledStream[ArrayType, RecordType]):
+    _data: ArrayType
+    name: str
+
+    def __init__(self, name, recording: "NeonRecording", data):
+        self.name = name
+        self.recording = recording
+        self._data = data
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}"
+            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
+        )
