@@ -957,9 +957,10 @@
     <span class="n">recording</span><span class="o">.</span><span class="n">eye_state</span><span class="p">,</span>
     <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="p">,</span>
     <span class="n">recording</span><span class="o">.</span><span class="n">fixations</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">worn</span><span class="p">,</span>
     <span class="n">recording</span><span class="o">.</span><span class="n">eye</span><span class="p">,</span>
     <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
-    <span class="n">recording</span><span class="o">.</span><span class="n">worn</span><span class="p">,</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">audio</span><span class="p">,</span>
 <span class="p">]</span>
 <span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Recording streams:&quot;</span><span class="p">)</span>
@@ -974,19 +975,15 @@
 <span class="c1"># like .xy will not be included</span>
 
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting stream to numpy array:&quot;</span><span class="p">)</span>
-<span class="n">gaze_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span>
-<span class="c1"># or</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze data as numpy array:&quot;</span><span class="p">)</span>
 <span class="n">gaze_np</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">data</span>
 <span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">gaze_np</span><span class="p">)</span>
 
 
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting stream to pandas dataframe:&quot;</span><span class="p">)</span>
-<span class="n">gaze_df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span>
-<span class="c1"># or</span>
-<span class="n">gaze_df</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">pd</span>  <span class="c1"># alternatively</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gaze data as pandas dataframe:&quot;</span><span class="p">)</span>
+<span class="n">gaze_df</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">pd</span>
 <span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">gaze_df</span><span class="p">)</span>
 
