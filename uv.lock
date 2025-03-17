@@ -942,6 +942,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pandas-stubs"
+version = "2.2.3.250308"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "types-pytz" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2e/5a/261f5c67a73e46df2d5984fe7129d66a3ed4864fd7aa9d8721abb3fc802e/pandas_stubs-2.2.3.250308.tar.gz", hash = "sha256:3a6e9daf161f00b85c83772ed3d5cff9522028f07a94817472c07b91f46710fd", size = 103986 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/64/ab61d9ca06ff66c07eb804ec27dec1a2be1978b3c3767caaa91e363438cc/pandas_stubs-2.2.3.250308-py3-none-any.whl", hash = "sha256:a377edff3b61f8b268c82499fdbe7c00fdeed13235b8b71d6a1dc347aeddc74d", size = 158053 },
+]
+
+[[package]]
 name = "pathspec"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1030,6 +1043,7 @@ dev = [
     { name = "mkdocs-minify-plugin" },
     { name = "mkdocstrings", extra = ["python"] },
     { name = "mypy" },
+    { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1065,6 +1079,7 @@ dev = [
     { name = "mkdocs-minify-plugin", specifier = ">=0.8" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.25" },
     { name = "mypy", specifier = ">=0.991" },
+    { name = "pandas-stubs" },
     { name = "pre-commit", specifier = ">=2.20.0" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
@@ -1442,6 +1457,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c6/17/90edbe60687c38d5368b94303d7e6413402cdd8527314679851fef96f3a3/types_protobuf-5.29.1.20250315.tar.gz", hash = "sha256:0b05bc34621d046de54b94fddd5f4eb3bf849fe2e13a50f8fb8e89f35045ff49", size = 59409 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/19/5a6ec0c0957fcfef6d71861c7145d02ecd65379696bcd535949dd9d88d66/types_protobuf-5.29.1.20250315-py3-none-any.whl", hash = "sha256:57efd51fd0979d1f5e1d94053d1e7cfff9c028e8d05b17e341b91a1c7fce37c4", size = 73967 },
+]
+
+[[package]]
+name = "types-pytz"
+version = "2025.1.0.20250204"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/d2/2190c54d53c04491ad72a1df019c5dfa692e6ab6c2dba1be7b6c9d530e30/types_pytz-2025.1.0.20250204.tar.gz", hash = "sha256:00f750132769f1c65a4f7240bc84f13985b4da774bd17dfbe5d9cd442746bd49", size = 10352 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/50/65ffad73746f1d8b15992c030e0fd22965fd5ae2c0206dc28873343b3230/types_pytz-2025.1.0.20250204-py3-none-any.whl", hash = "sha256:32ca4a35430e8b94f6603b35beb7f56c32260ddddd4f4bb305fdf8f92358b87e", size = 10059 },
 ]
 
 [[package]]
