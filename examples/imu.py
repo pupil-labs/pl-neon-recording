@@ -14,8 +14,8 @@ if len(sys.argv) < 2:
     print("Usage:")
     print("python imu.py path/to/recording/folder")
 
-# Load a recording
-recording = nr.load(sys.argv[1])
+# Open a recording
+recording = nr.open(sys.argv[1])
 
 # Sample the IMU data at 60Hz
 fps = 60

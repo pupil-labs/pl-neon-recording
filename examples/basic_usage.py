@@ -9,8 +9,8 @@ if len(sys.argv) < 2:
     print("Usage:")
     print("python basic_usage.py path/to/recording/folder")
 
-# load a recording
-recording = nr.load(sys.argv[1])
+# Open a recording
+recording = nr.open(sys.argv[1])
 
 
 # get basic info

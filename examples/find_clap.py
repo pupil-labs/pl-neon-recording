@@ -6,7 +6,7 @@ import pupil_labs.neon_recording as nr
 
 
 def find_clap(recording_dir):
-    recording = nr.load(recording_dir)
+    recording = nr.open(recording_dir)
 
     max_rms = -1
     max_time = -1

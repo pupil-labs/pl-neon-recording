@@ -46,7 +46,7 @@ def plot(img, data, value_range, x_width, color, line_width=2):
 
 
 def make_eye_state_video(recording_dir, output_video_path):
-    recording = nr.load(recording_dir)
+    recording = nr.open(recording_dir)
 
     fps = 200
 
