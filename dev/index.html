@@ -762,8 +762,8 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python basic_usage.py path/to/recording/folder&quot;</span><span class="p">)</span>
 
-<span class="c1"># load a recording</span>
-<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># Open a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
 <span class="c1"># get basic info</span>
@@ -885,7 +885,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
@@ -940,8 +940,8 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python basic_usage.py path/to/recording/folder&quot;</span><span class="p">)</span>
 
-<span class="c1"># load a recording</span>
-<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># Open a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pretty_format</span><span class="p">(</span><span class="n">mapping</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
@@ -1124,7 +1124,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
@@ -1225,7 +1225,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">make_eye_state_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">fps</span> <span class="o">=</span> <span class="mi">200</span>
 
@@ -1305,7 +1305,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">find_clap</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">max_rms</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">max_time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -1341,7 +1341,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>
@@ -1408,8 +1408,8 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;python imu.py path/to/recording/folder&quot;</span><span class="p">)</span>
 
-<span class="c1"># Load a recording</span>
-<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># Open a recording</span>
+<span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="c1"># Sample the IMU data at 60Hz</span>
 <span class="n">fps</span> <span class="o">=</span> <span class="mi">60</span>
@@ -1502,7 +1502,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
 
     <span class="n">video_writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">),</span>

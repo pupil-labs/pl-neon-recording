@@ -1377,9 +1377,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pupil_labs.neon_recording.load" class="md-nav__link">
+  <a href="#pupil_labs.neon_recording.open" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;load
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;open
     </span>
   </a>
   
@@ -2388,9 +2388,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pupil_labs.neon_recording.load" class="md-nav__link">
+  <a href="#pupil_labs.neon_recording.open" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;load
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;open
     </span>
   </a>
   
@@ -2545,7 +2545,7 @@
 <p><span class="doc-section-title">Functions:</span></p>
     <ul>
           <li class="doc-section-item field-body">
-            <b><code><a class="autorefs autorefs-internal" title="            load (pupil_labs.neon_recording.load)" href="#pupil_labs.neon_recording.load">load</a></code></b>
+            <b><code><a class="autorefs autorefs-internal" title="            open (pupil_labs.neon_recording.open)" href="#pupil_labs.neon_recording.open">open</a></code></b>
             –
             <div class="doc-md-description">
               <p>Load a NeonRecording from a path</p>
@@ -7209,12 +7209,12 @@
 <div class="doc doc-object doc-function">
 
 
-<h2 id="pupil_labs.neon_recording.load" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">load</span>
+<h2 id="pupil_labs.neon_recording.open" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">open</span>
 
 
-<a href="#pupil_labs.neon_recording.load" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">load</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            NeonRecording (pupil_labs.neon_recording.neon_recording.NeonRecording)" href="#pupil_labs.neon_recording.NeonRecording">NeonRecording</a></span>
+<a href="#pupil_labs.neon_recording.open" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nb">open</span><span class="p">(</span><span class="nf">rec_dir_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Union" href="https://docs.python.org/3/library/typing.html#typing.Union">Union</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            NeonRecording (pupil_labs.neon_recording.neon_recording.NeonRecording)" href="#pupil_labs.neon_recording.NeonRecording">NeonRecording</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -7226,7 +7226,7 @@
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>  <span class="c1"># noqa: A001</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a NeonRecording from a path&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">NeonRecording</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
