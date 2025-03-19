@@ -25,7 +25,7 @@ def write_text(image, text, x, y):
 
 
 def make_overlaid_video(recording_dir, output_video_path, fps=30):
-    recording = nr.load(recording_dir)
+    recording = nr.open(recording_dir)
 
     video_writer = cv2.VideoWriter(
         str(output_video_path),
