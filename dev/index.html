@@ -614,6 +614,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Documentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       Usage
@@ -749,12 +758,11 @@
 <p>or</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>git+https://github.com/pupil-labs/pl-neon-recording.git
 </code></pre></div>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<p>Documentation is available at <a href="https://pupil-labs.github.io/pl-neon-recording/">https://pupil-labs.github.io/pl-neon-recording/</a></p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>
 
@@ -765,7 +773,6 @@
 <span class="c1"># Open a recording</span>
 <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-
 <span class="c1"># get basic info</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Recording Info:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Start time (ns): </span><span class="si">{</span><span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -774,62 +781,12 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Gaze samples   : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-
 <span class="c1"># read 10 gaze samples</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 gaze samples:&quot;</span><span class="p">)</span>
 <span class="n">timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
 <span class="n">subsample</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">gaze_datum</span> <span class="ow">in</span> <span class="n">subsample</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">ts</span><span class="si">}</span><span class="s2"> : (</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-
-<span class="c1"># resample by interpolation</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 10 gaze samples @ 30Hz:&quot;</span><span class="p">)</span>
-<span class="n">fps</span> <span class="o">=</span> <span class="mi">30</span>
-<span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
-
-<span class="n">subsample</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">timestamps</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">gaze_datum</span> <span class="ow">in</span> <span class="n">subsample</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">ts</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2"> : (</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-
-<span class="c1"># get closest gaze data to scene frame timestamps</span>
-<span class="n">matched_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
-
-<span class="c1"># interpolate gaze data to scene frame timestamps</span>
-<span class="n">interpolated_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
-
-<span class="c1"># visualize both</span>
-<span class="n">scene_gaze_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">matched_gazes</span><span class="p">,</span> <span class="n">interpolated_gazes</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">matched_gaze</span><span class="p">,</span> <span class="n">interpolated_gaze</span> <span class="ow">in</span> <span class="n">scene_gaze_pairs</span><span class="p">:</span>
-    <span class="c1"># draw the nearest-time gaze sample in red</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
-        <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span> <span class="mi">50</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">10</span>
-    <span class="p">)</span>
-
-    <span class="c1"># draw the interpolated gaze sample in blue</span>
-    <span class="k">if</span> <span class="n">interpolated_gaze</span><span class="p">:</span>  <span class="c1"># interpolation will fail at the end of the stream</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
-            <span class="n">frame</span><span class="p">,</span>
-            <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span>
-            <span class="mi">50</span><span class="p">,</span>
-            <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="mi">10</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interpolation fail&quot;</span><span class="p">)</span>
-
-    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Gaze sample comparison&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
-    <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
-
-<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
-
-<span class="c1"># Extract data by index</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;64th Gaze Sample:&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">64</span><span class="p">])</span>
-<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;64th scene frame (push any key to quit)&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">64</span><span class="p">]</span><span class="o">.</span><span class="n">bgr</span><span class="p">)</span>
-<span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="blinks-and-fixations">Blinks And Fixations<a class="headerlink" href="#blinks-and-fixations" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1135,6 +1092,7 @@
 
     <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
             <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
@@ -1174,7 +1132,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;eye-overlay-output-video.avi&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">)</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;eye-overlay-output-video.avi&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="eye-state">Eye State<a class="headerlink" href="#eye-state" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1352,6 +1310,7 @@
 
     <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">output_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
             <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e9</span> <span class="o">/</span> <span class="n">fps</span>
