@@ -2,7 +2,7 @@ import importlib.metadata
 import logging
 import os
 
-from .neon_recording import NeonRecording, load
+from .neon_recording import NeonRecording, load, open  # noqa: A004
 from .stream.av_stream.audio_stream import AudioStream
 from .stream.av_stream.video_stream import VideoStream
 from .stream.blink_stream import BlinkStream
