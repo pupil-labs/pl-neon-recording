@@ -42,6 +42,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
 
     if fps is None:
         output_timestamps = recording.scene.ts
+        fps = 30
     else:
         output_timestamps = np.arange(
             recording.scene.ts[0], recording.scene.ts[-1], int(1e9 / fps)
@@ -81,4 +82,4 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
 
 
 if __name__ == "__main__":
-    make_overlaid_video(sys.argv[1], "eye-overlay-output-video.avi", 24)
+    make_overlaid_video(sys.argv[1], "eye-overlay-output-video.avi", None)
