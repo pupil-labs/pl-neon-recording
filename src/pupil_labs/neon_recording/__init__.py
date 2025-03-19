@@ -1,8 +1,6 @@
 import importlib.metadata
 import logging
 import os
-import pathlib
-from typing import Union
 
 from .neon_recording import NeonRecording, load
 from .stream.av_stream.audio_stream import AudioStream
@@ -25,11 +23,6 @@ log = logging.getLogger(__name__)
 
 level = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = getattr(logging, level)
-
-
-def open(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:  # noqa: A001
-    """Load a NeonRecording from a path"""
-    return load(rec_dir_in)
 
 
 __all__ = [

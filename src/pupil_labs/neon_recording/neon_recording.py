@@ -52,7 +52,7 @@ class NeonRecording:
     def info(self) -> dict:
         """Information loaded from info.json"""
         log.debug("NeonRecording: Loading recording info")
-        with open(self._rec_dir / "info.json") as f:
+        with (self._rec_dir / "info.json").open() as f:
             info_data = json.load(f)
         return info_data or {}
 
@@ -76,7 +76,7 @@ class NeonRecording:
         """Wearer information containing uuid and name"""
         log.debug("NeonRecording: Loading wearer")
         wearer = {"uuid": "", "name": ""}
-        with open(self._rec_dir / "wearer.json") as f:
+        with (self._rec_dir / "wearer.json").open() as f:
             wearer_data = json.load(f)
 
         wearer["uuid"] = wearer_data["uuid"]
@@ -148,6 +148,9 @@ class NeonRecording:
         return WornStream(self)
 
 
-def load(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:
+def open(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:  # noqa: A001
     """Load a NeonRecording from a path"""
     return NeonRecording(rec_dir_in)
+
+
+load = open
