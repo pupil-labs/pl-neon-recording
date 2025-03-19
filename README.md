@@ -20,3 +20,7 @@ or
 ```bash
 pip install -e git+https://github.com/pupil-labs/pl-neon-recording.git
 ```
+
+## Documentation
+
+Documentation is available at https://pupil-labs.github.io/pl-neon-recording/
