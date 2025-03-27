@@ -3,7 +3,7 @@
 name = "pupil-labs-neon-recording"
 description = "Functionality for loading Neon recordings in native recording format"
 authors = [{ name = "Pupil Labs GmbH", email = "info@pupil-labs.com" }]
-license = { text = "" }
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10, <4.0"
 keywords = []
@@ -19,10 +19,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = ["numpy", "protobuf", "scipy", "pupil-labs-video"]
+dependencies = ["numpy", "protobuf", "pupil-labs-video", "scipy"]
 
 [project.optional-dependencies]
-examples = ["opencv-python", "tqdm", "pandas"]
+examples = ["opencv-python", "pandas", "tqdm"]
 
 [project.urls]
 Homepage = "https://pupil-labs.github.io/pl-neon-recording"
@@ -39,6 +39,9 @@ dev-dependencies = [
     "deptry>=0.20.0",
     "tox-uv>=1.11.3",
     "pytest-cov>=4.0.0",
+
+    # stubs
+    "opencv-stubs",
     "types-protobuf",
     "pandas-stubs",
 
