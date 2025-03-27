@@ -1379,7 +1379,7 @@
 <span class="c1"># Use scipy to convert the quaternions to euler angles</span>
 <span class="n">quaternions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">quaternion_wxyz</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">imu_data</span><span class="p">])</span>
 <span class="n">rotations</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">quaternions</span><span class="p">,</span> <span class="n">scalar_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_euler</span><span class="p">(</span><span class="n">seq</span><span class="o">=</span><span class="s2">&quot;XZY&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">quaternions</span><span class="p">,</span> <span class="n">scalar_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_euler</span><span class="p">(</span><span class="n">seq</span><span class="o">=</span><span class="s2">&quot;YXZ&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">%</span> <span class="mi">360</span>
 <span class="p">)</span>
 
@@ -1389,9 +1389,9 @@
     <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rotations_with_time</span><span class="p">],</span>
     <span class="n">dtype</span><span class="o">=</span><span class="p">[</span>
         <span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;roll&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;pitch&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;yaw&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;roll&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
 
