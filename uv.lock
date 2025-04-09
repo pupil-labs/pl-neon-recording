@@ -314,6 +314,15 @@ wheels = [
 ]
 
 [[package]]
+name = "fsspec"
+version = "2025.3.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/d8/8425e6ba5fcec61a1d16e41b1b71d2bf9344f1fe48012c2b48b9620feae5/fsspec-2025.3.2.tar.gz", hash = "sha256:e52c77ef398680bbd6a98c0e628fbc469491282981209907bbc8aea76a04fdc6", size = 299281 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/4b/e0cfc1a6f17e990f3e64b7d941ddc4acdc7b19d6edd51abf495f32b1a9e4/fsspec-2025.3.2-py3-none-any.whl", hash = "sha256:2daf8dc3d1dfa65b6aa37748d112773a7a08416f6c70d96b264c96476ecaf711", size = 194435 },
+]
+
+[[package]]
 name = "ghp-import"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1031,6 +1040,7 @@ dependencies = [
     { name = "protobuf" },
     { name = "pupil-labs-video" },
     { name = "scipy" },
+    { name = "universal-pathlib" },
 ]
 
 [package.optional-dependencies]
@@ -1071,9 +1081,10 @@ requires-dist = [
     { name = "opencv-python", marker = "extra == 'examples'" },
     { name = "pandas", marker = "extra == 'examples'" },
     { name = "protobuf" },
-    { name = "pupil-labs-video" },
+    { name = "pupil-labs-video", specifier = ">=1.0.5" },
     { name = "scipy" },
     { name = "tqdm", marker = "extra == 'examples'" },
+    { name = "universal-pathlib" },
 ]
 provides-extras = ["examples"]
 
@@ -1104,15 +1115,16 @@ dev = [
 
 [[package]]
 name = "pupil-labs-video"
-version = "1.0.3"
+version = "1.0.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "av" },
     { name = "numpy" },
+    { name = "universal-pathlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0f/d9/5a52e25028f6565fe4fcf01833e65beef52c27f4276c33b89ee73cabd122/pupil_labs_video-1.0.3.tar.gz", hash = "sha256:ac374b7f287bab56d976183ffbc618550889df1bf3cc8a475b528f1e4f1c603a", size = 85365 }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/7f/972b1573a275cf1f94d9168653d6a7e74c29cdff908810626755038897d9/pupil_labs_video-1.0.5.tar.gz", hash = "sha256:3a8213c2047f0c41dade63bda439da60062638071c0d568aba4ccee7ad559844", size = 91888 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/b0/57476e3704b3c0c549694a9b5b02efc033f8c71d37c20249cfaa52f0c93b/pupil_labs_video-1.0.3-py3-none-any.whl", hash = "sha256:c094cf0461c887c3c4cb0bcad6d472345c89bbf35187ef6241cbd39a7b577df4", size = 20205 },
+    { url = "https://files.pythonhosted.org/packages/52/ee/4ff9d9efa65c636e01e346cb12cf9dbab81f35b76c960ce3f674e748da7a/pupil_labs_video-1.0.5-py3-none-any.whl", hash = "sha256:ddb7055bc48387681af2ec9d29315e079a29fcfbb2a20ea1c9d1f65c9c3f3d0a", size = 20663 },
 ]
 
 [[package]]
@@ -1510,6 +1522,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/0f/fa4723f22942480be4ca9527bbde8d43f6c3f2fe8412f00e7f5f6746bc8b/tzdata-2025.1.tar.gz", hash = "sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694", size = 194950 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/dd/84f10e23edd882c6f968c21c2434fe67bd4a528967067515feca9e611e5e/tzdata-2025.1-py2.py3-none-any.whl", hash = "sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639", size = 346762 },
+]
+
+[[package]]
+name = "universal-pathlib"
+version = "0.2.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fsspec" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/21/dd871495af3933e585261adce42678dcdf1168c9d6fa0a8f7b6565e54472/universal_pathlib-0.2.6.tar.gz", hash = "sha256:50817aaeaa9f4163cb1e76f5bdf84207fa05ce728b23fd779479b3462e5430ac", size = 175427 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/4d/2e577f6db7aa0f932d19f799c18f604b2b302c65f733419b900ec07dbade/universal_pathlib-0.2.6-py3-none-any.whl", hash = "sha256:700dec2b58ef34b87998513de6d2ae153b22f083197dfafb8544744edabd1b18", size = 50087 },
 ]
 
 [[package]]

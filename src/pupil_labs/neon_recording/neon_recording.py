@@ -6,6 +6,8 @@ import pathlib
 from functools import cached_property
 from typing import Union
 
+from upath import UPath
+
 from pupil_labs.neon_recording.stream.blink_stream import BlinkStream
 from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
 from pupil_labs.neon_recording.stream.worn_stream import WornStream
@@ -34,7 +36,7 @@ class NeonRecording:
             FileNotFoundError: If the directory does not exist or is not valid.
 
         """
-        self._rec_dir = pathlib.Path(rec_dir_in).resolve()
+        self._rec_dir = UPath(rec_dir_in).resolve()
         if not self._rec_dir.exists() or not self._rec_dir.is_dir():
             raise FileNotFoundError(
                 f"Directory not found or not valid: {self._rec_dir}"

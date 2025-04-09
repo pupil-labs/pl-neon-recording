@@ -19,7 +19,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = ["numpy", "protobuf", "pupil-labs-video", "scipy"]
+dependencies = [
+    "numpy",
+    "protobuf",
+    "pupil-labs-video>=1.0.5",
+    "scipy",
+    "universal_pathlib",
+]
 
 [project.optional-dependencies]
 examples = ["opencv-python", "pandas", "tqdm"]
