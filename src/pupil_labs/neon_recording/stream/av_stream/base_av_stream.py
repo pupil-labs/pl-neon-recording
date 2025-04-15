@@ -87,11 +87,13 @@ class BaseAVStream(Stream[Array[BaseAVStreamFrame], BaseAVStreamFrame]):
             video_readers.append(reader)
 
         parts_ts = np.concatenate(parts_ts)
+        idxs = np.empty(len(parts_ts), dtype=AV_INDEX_DTYPE)
+        idxs[AV_INDEX_FIELD_NAME] = np.arange(len(parts_ts))
 
         data = join_struct_arrays(
             [
                 parts_ts,  # type: ignore
-                np.arange(len(parts_ts)).view(AV_INDEX_DTYPE),
+                idxs,
             ],
         )
         self.av_reader = plv.MultiReader(video_readers)
