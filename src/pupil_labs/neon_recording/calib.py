@@ -52,7 +52,7 @@ class Calibration(Record):
     crc = fields[int]("crc")
 
     @classmethod
-    def from_buffer(cls, buffer: bytes):
+    def from_buffer(cls, buffer: bytes) -> "Calibration":
         return cls(buffer)
 
     @classmethod
