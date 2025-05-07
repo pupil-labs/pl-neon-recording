@@ -2737,10 +2737,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="n">time_file</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TIMESTAMP_DTYPE</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">container_timestamps</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_ts</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">av_file</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">container_timestamps</span><span class="p">)</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">av_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">container_timestamps</span><span class="p">)</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="n">part_ts</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">reader</span><span class="p">)]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">av_file</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">av_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span> <span class="o">+</span> <span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">container_timestamps</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TIMESTAMP_DTYPE</span><span class="p">)</span>
@@ -5973,9 +5973,7 @@
 
                   <details class="quote">
                     <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
@@ -5987,7 +5985,9 @@
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the NeonRecording object</span>
 
 <span class="sd">    Args:</span>
@@ -5997,7 +5997,7 @@
 <span class="sd">        FileNotFoundError: If the directory does not exist or is not valid.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span> <span class="o">=</span> <span class="n">UPath</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Directory not found or not valid: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -6667,10 +6667,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;video&quot;</span><span class="p">:</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="n">Array</span><span class="p">(</span><span class="n">time_file</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TIMESTAMP_DTYPE</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">container_timestamps</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_ts</span><span class="p">[</span><span class="s2">&quot;ts&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">av_file</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">container_timestamps</span><span class="p">)</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">av_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="n">container_timestamps</span><span class="p">)</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="n">part_ts</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">reader</span><span class="p">)]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;audio&quot;</span><span class="p">:</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">av_file</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">plv</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">av_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">part_ts</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">recording</span><span class="o">.</span><span class="n">start_ts</span> <span class="o">+</span> <span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">container_timestamps</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TIMESTAMP_DTYPE</span><span class="p">)</span>
@@ -7232,9 +7232,9 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>  <span class="c1"># noqa: A001</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>  <span class="c1"># noqa: A001</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a NeonRecording from a path&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">NeonRecording</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
