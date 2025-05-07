@@ -15,6 +15,7 @@ from typing import (
 import numpy as np
 import numpy.typing as npt
 from numpy.lib.recfunctions import structured_to_unstructured
+from upath import UPath
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.stream.stream import Stream
@@ -144,6 +145,9 @@ class Array(np.ndarray, Generic[RecordType]):
             )
 
             raise ValueError(f"dtype could not be found for {source_repr}")
+
+        if isinstance(source, UPath):
+            source = source.open("rb").read()
 
         if isinstance(source, (str, Path)):
             data = np.fromfile(source, dtype=dtype)

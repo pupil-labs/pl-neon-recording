@@ -27,7 +27,7 @@ def correct_data(rec_dir: Path) -> np.ndarray:
         ],
     )
 
-    calibration = np.fromfile(calib_path, dtype)[0]
+    calibration = np.frombuffer(calib_path.open("rb").read(), dtype)[0]
     return calibration
 
 

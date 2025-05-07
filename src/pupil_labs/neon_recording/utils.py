@@ -51,7 +51,7 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
 
 
 def load_and_convert_tstamps(path: Path):
-    return np.fromfile(str(path), dtype="<i8")
+    return np.frombuffer(path.open("rb").read(), dtype="<i8")
 
 
 def load_multipart_timestamps(files):
