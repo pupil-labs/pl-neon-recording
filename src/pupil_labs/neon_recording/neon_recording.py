@@ -4,7 +4,6 @@ import json
 import logging
 import pathlib
 from functools import cached_property
-from typing import Union
 
 from upath import UPath
 
@@ -17,7 +16,7 @@ from .stream.av_stream.audio_stream import AudioStream
 from .stream.av_stream.video_stream import VideoStream
 from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
-from .stream.gaze_stream import GazeStream
+from .stream.gaze_stream import GazeArray
 from .stream.imu import IMUStream
 
 log = logging.getLogger(__name__)
@@ -26,7 +25,7 @@ log = logging.getLogger(__name__)
 class NeonRecording:
     """Class to handle the Neon Recording data"""
 
-    def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
+    def __init__(self, rec_dir_in: pathlib.Path | str):
         """Initialize the NeonRecording object
 
         Args:
@@ -100,9 +99,9 @@ class NeonRecording:
         return self.info.get("module_serial_number")
 
     @cached_property
-    def gaze(self) -> GazeStream:
+    def gaze(self) -> GazeArray:
         """2D gaze data in scene-camera space"""
-        return GazeStream(self)
+        return GazeArray(self)
 
     @cached_property
     def imu(self) -> IMUStream:
@@ -150,7 +149,7 @@ class NeonRecording:
         return WornStream(self)
 
 
-def open(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:  # noqa: A001
+def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001
     """Load a NeonRecording from a path"""
     return NeonRecording(rec_dir_in)
 

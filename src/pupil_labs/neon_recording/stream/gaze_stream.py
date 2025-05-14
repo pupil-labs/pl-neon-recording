@@ -1,15 +1,16 @@
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
+from pupil_labs.neon_recording.sample import ArrayLike, match_ts
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
 
-from .stream import Stream, StreamProps
+from .stream import StreamProps
 
 log = logging.getLogger(__name__)
 
@@ -37,13 +38,7 @@ class GazeRecord(Record, GazeProps):
 class GazeArray(Array[GazeRecord], GazeProps):
     record_class = GazeRecord
 
-
-class GazeStream(Stream[GazeArray, GazeRecord], GazeProps):
-    """Gaze data"""
-
-    data: GazeArray
-
-    def __init__(self, recording: "NeonRecording"):
+    def __new__(cls, recording: "NeonRecording"):
         log.debug("NeonRecording: Loading gaze data")
 
         gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
@@ -64,4 +59,42 @@ class GazeStream(Stream[GazeArray, GazeRecord], GazeProps):
                 ("y", "float32"),
             ]),
         )
-        super().__init__("gaze", recording, data.view(GazeArray))
+        return data.view(GazeArray)
+
+    def sample(
+        self,
+        target_ts: ArrayLike[int],
+        method: Literal["nearest", "before", "after"] = "nearest",
+        tolerance: int | None = None,
+    ) -> "GazeArray":
+        indices = match_ts(target_ts, self.ts, method, tolerance)
+        return self[indices]
+
+
+# class GazeStream(Stream[GazeArray, GazeRecord], GazeProps):
+#     """Gaze data"""
+
+#     data: GazeArray
+
+#     def __init__(self, recording: "NeonRecording"):
+#         log.debug("NeonRecording: Loading gaze data")
+
+#         gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
+#         time_200hz_file = recording._rec_dir / "gaze_200hz.time"
+
+#         file_pairs = []
+#         if gaze_200hz_file.exists() and time_200hz_file.exists():
+#             log.debug("NeonRecording: Using 200Hz gaze data")
+#             file_pairs.append((gaze_200hz_file, time_200hz_file))
+#         else:
+#             log.debug("NeonRecording: Using realtime gaze data")
+#             file_pairs = find_sorted_multipart_files(recording._rec_dir, "gaze")
+
+#         data = load_multipart_data_time_pairs(
+#             file_pairs,
+#             np.dtype([
+#                 ("x", "float32"),
+#                 ("y", "float32"),
+#             ]),
+#         )
+#         super().__init__("gaze", recording, data.view(GazeArray))

@@ -9,7 +9,8 @@ from .stream.blink_stream import BlinkStream
 from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.fixation_stream import FixationStream
-from .stream.gaze_stream import GazeStream
+
+# from .stream.gaze_stream import GazeStream
 from .stream.imu.imu_stream import IMUStream
 from .stream.worn_stream import WornStream
 
