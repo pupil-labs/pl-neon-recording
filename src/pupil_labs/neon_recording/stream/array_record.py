@@ -1,11 +1,10 @@
 from ast import literal_eval
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from functools import cached_property, partial
 from pathlib import Path
 from re import compile as re_compile
 from typing import (
     TYPE_CHECKING,
-    Callable,
     Generic,
     SupportsIndex,
     TypeVar,
@@ -63,7 +62,7 @@ class Record(np.record):
         return [(k, getattr(self, k, None)) for k in self.keys()]
 
     def keys(self):
-        return self.dtype.names
+        return list(self.dtype.names)  # type: ignore
 
     def __repr__(self):
         lines_string = pretty_format_mapping(self.items())
@@ -125,7 +124,7 @@ class Array(np.ndarray, Generic[RecordType]):
         return np.array(result)  # type: ignore
 
     def keys(self):
-        return self.dtype.names  # type: ignore
+        return list(self.dtype.names)  # type: ignore
 
     @classmethod
     def load_array(cls, source: str | Path | np.ndarray | bytes, dtype: npt.DTypeLike):

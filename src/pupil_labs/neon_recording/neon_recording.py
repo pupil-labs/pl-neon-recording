@@ -16,7 +16,7 @@ from .stream.av_stream.audio_stream import AudioStream
 from .stream.av_stream.video_stream import VideoStream
 from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
-from .stream.gaze_stream import GazeArray
+from .stream.gaze_stream import GazeTimeseries
 from .stream.imu import IMUStream
 
 log = logging.getLogger(__name__)
@@ -99,9 +99,9 @@ class NeonRecording:
         return self.info.get("module_serial_number")
 
     @cached_property
-    def gaze(self) -> GazeArray:
+    def gaze(self) -> GazeTimeseries:
         """2D gaze data in scene-camera space"""
-        return GazeArray(self)
+        return GazeTimeseries.from_recording(self)
 
     @cached_property
     def imu(self) -> IMUStream:
