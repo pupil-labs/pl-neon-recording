@@ -1,18 +1,18 @@
 import logging
 
-import pupil_labs.video as plv
-
-from .base_av_stream import BaseAVStream, BaseAVStreamFrame
+from .base_av_stream import AVStreamKind, BaseAVTimeseries
 
 log = logging.getLogger(__name__)
 
+# TODO: This is not used
+# class AudioFrame(BaseAVFrame):
+#     _frame: plv.AudioFrame
 
-class AudioFrame(BaseAVStreamFrame):
-    _frame: plv.AudioFrame
 
-
-class AudioStream(BaseAVStream, kind="audio"):
+class AudioTimeseries(BaseAVTimeseries):
     """Audio frames stream"""
+
+    kind: AVStreamKind = "video"
 
     @property
     def rate(self):

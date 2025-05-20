@@ -1,29 +1,27 @@
 from functools import cached_property
-from typing import Literal
 
 import numpy as np
 import numpy.typing as npt
 
-import pupil_labs.video as plv
-from pupil_labs.neon_recording.sample import ArrayLike, match_ts
+from .base_av_stream import AVStreamKind, BaseAVTimeseries
 
-from .base_av_stream import BaseAVStream, BaseAVStreamFrame
+# TODO: This is not used
+# class VideoFrame(BaseAVFrame):
+#     _frame: plv.VideoFrame
 
+#     @property
+#     def bgr(self):
+#         return self._frame.bgr
 
-class VideoFrame(BaseAVStreamFrame):
-    _frame: plv.VideoFrame
-
-    @property
-    def bgr(self):
-        return self._frame.bgr
-
-    @property
-    def gray(self):
-        return self._frame.gray
+#     @property
+#     def gray(self):
+#         return self._frame.gray
 
 
-class VideoStream(BaseAVStream, kind="video"):
+class VideoTimeseries(BaseAVTimeseries):
     """Video frames from a camera"""
+
+    kind: AVStreamKind = "video"
 
     @property
     def width(self) -> int | None:
@@ -34,15 +32,6 @@ class VideoStream(BaseAVStream, kind="video"):
     def height(self) -> int | None:
         """Height of image in stream"""
         return self.av_reader.height
-
-    def sample(
-        self,
-        target_ts: ArrayLike[int],
-        method: Literal["nearest", "before", "after"] = "nearest",
-        tolerance: int | None = None,
-    ) -> "VideoStream":
-        indices = match_ts(target_ts, self.ts, method, tolerance)
-        return self[indices]
 
 
 class GrayFrame:

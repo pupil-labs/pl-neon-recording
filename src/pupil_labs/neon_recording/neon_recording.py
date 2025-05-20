@@ -12,8 +12,8 @@ from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
 from pupil_labs.neon_recording.stream.worn_stream import WornStream
 
 from .calib import Calibration
-from .stream.av_stream.audio_stream import AudioStream
-from .stream.av_stream.video_stream import VideoStream
+from .stream.av_stream.audio_stream import AudioTimeseries
+from .stream.av_stream.video_stream import VideoTimeseries
 from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeTimeseries
@@ -114,14 +114,14 @@ class NeonRecording:
         return EyeStateStream(self)
 
     @cached_property
-    def scene(self) -> VideoStream:
+    def scene(self) -> VideoTimeseries:
         """Frames of video from the scene camera"""
-        return VideoStream("scene", "Neon Scene Camera v1", self)
+        return VideoTimeseries.from_recording("scene", "Neon Scene Camera v1", self)
 
     @cached_property
-    def eye(self) -> VideoStream:
+    def eye(self) -> VideoTimeseries:
         """Frames of video from the eye cameras"""
-        return VideoStream("eye", "Neon Sensor Module v1", self)
+        return VideoTimeseries.from_recording("eye", "Neon Sensor Module v1", self)
 
     @cached_property
     def events(self) -> EventStream:
@@ -139,9 +139,9 @@ class NeonRecording:
         return BlinkStream(self)
 
     @cached_property
-    def audio(self) -> AudioStream:
+    def audio(self) -> AudioTimeseries:
         """Audio from the scene video"""
-        return AudioStream("audio", "Neon Scene Camera v1", self)
+        return AudioTimeseries.from_recording("audio", "Neon Scene Camera v1", self)
 
     @cached_property
     def worn(self) -> WornStream:
