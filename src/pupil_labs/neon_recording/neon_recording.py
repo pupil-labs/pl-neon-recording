@@ -17,7 +17,7 @@ from .stream.av_stream.video_stream import VideoTimeseries
 from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeTimeseries
-from .stream.imu import IMUStream
+from .stream.imu import IMUTimeseries
 
 log = logging.getLogger(__name__)
 
@@ -104,9 +104,9 @@ class NeonRecording:
         return GazeTimeseries.from_recording(self)
 
     @cached_property
-    def imu(self) -> IMUStream:
+    def imu(self) -> IMUTimeseries:
         """Motion and orientation data"""
-        return IMUStream(self)
+        return IMUTimeseries.from_recording(self)
 
     @cached_property
     def eye_state(self) -> EyeStateStream:

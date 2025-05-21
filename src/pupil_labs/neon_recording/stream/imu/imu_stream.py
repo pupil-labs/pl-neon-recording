@@ -1,28 +1,41 @@
 import logging
+from typing import TYPE_CHECKING
 
 import numpy as np
+import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import (
     TIMESTAMP_DTYPE,
     TIMESTAMP_FIELD_NAME,
 )
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
 
 from ...utils import find_sorted_multipart_files, join_struct_arrays
-from ..stream import Stream, StreamProps
 from . import imu_pb2
+
+if TYPE_CHECKING:
+    from pupil_labs.neon_recording import NeonRecording
 
 log = logging.getLogger(__name__)
 
 
-class ImuProps(StreamProps):
-    gyro_xyz = fields[np.float64](["gyro_x", "gyro_y", "gyro_z"])
+class ImuProps(TimeseriesProps):
+    gyro_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+        "gyro_x",
+        "gyro_y",
+        "gyro_z",
+    ])  # type:ignore
     "Gyroscope data"
 
-    accel_xyz = fields[np.float64](["accel_x", "accel_y", "accel_z"])
+    accel_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+        "accel_x",
+        "accel_y",
+        "accel_z",
+    ])  # type:ignore
     "Acceleration data"
 
-    quaternion_wxyz = fields[np.float64]([
+    quaternion_wxyz: npt.NDArray[np.float64] = fields[np.float64]([  # type:ignore
         "quaternion_w",
         "quaternion_x",
         "quaternion_y",
@@ -33,15 +46,14 @@ class ImuProps(StreamProps):
 
 class ImuRecord(Record, ImuProps):
     def keys(self):
-        keys = ImuProps.__dict__.keys()
-        return [x for x in keys if not x.startswith("_")]
+        return [x for x in dir(ImuProps) if not x.startswith("_") and x != "keys"]
 
 
 class ImuArray(Array[ImuRecord], ImuProps):
     record_class = ImuRecord
 
 
-class IMUStream(Stream[ImuArray, ImuRecord], ImuProps):
+class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
     """Motion and orientation data"""
 
     FALLBACK_DTYPE = np.dtype([
@@ -57,7 +69,11 @@ class IMUStream(Stream[ImuArray, ImuRecord], ImuProps):
         ("quaternion_z", "float32"),
     ])
 
-    def __init__(self, recording):
+    def __init__(self, data: ImuArray, recording: "NeonRecording"):
+        super().__init__(data, "imu", recording)
+
+    @staticmethod
+    def from_recording(recording: "NeonRecording") -> "IMUTimeseries":
         log.debug("NeonRecording: Loading IMU data")
 
         imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "imu")
@@ -65,7 +81,7 @@ class IMUStream(Stream[ImuArray, ImuRecord], ImuProps):
         if len(imu_file_pairs) > 0:
             imu_data = Array(  # type: ignore
                 [file for file, _ in imu_file_pairs],
-                fallback_dtype=np.dtype(IMUStream.FALLBACK_DTYPE),
+                fallback_dtype=np.dtype(IMUTimeseries.FALLBACK_DTYPE),
             )
             imu_data.dtype.names = [  # type: ignore
                 TIMESTAMP_FIELD_NAME if name == "timestamp_ns" else name
@@ -98,10 +114,11 @@ class IMUStream(Stream[ImuArray, ImuRecord], ImuProps):
                         for packet in imu_packets
                     ])
 
-            imu_data = np.array(records, dtype=IMUStream.FALLBACK_DTYPE)  # type: ignore
+            imu_data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
             imu_data = join_struct_arrays([time_data, imu_data])
+            imu_data = imu_data.view(ImuArray)
 
-        super().__init__("imu", recording, imu_data.view(ImuArray))
+        return IMUTimeseries(imu_data, recording)
 
 
 def parse_neon_imu_raw_packets(buffer):

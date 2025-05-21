@@ -10,7 +10,7 @@ from .stream.event_stream import EventStream
 from .stream.eye_state_stream import EyeStateStream
 from .stream.fixation_stream import FixationStream
 from .stream.gaze_stream import GazeTimeseries
-from .stream.imu.imu_stream import IMUStream
+from .stream.imu.imu_stream import IMUTimeseries
 from .stream.worn_stream import WornStream
 
 try:
@@ -32,7 +32,7 @@ __all__ = [
     "EyeStateStream",
     "FixationStream",
     "GazeTimeseries",
-    "IMUStream",
+    "IMUTimeseries",
     "NeonRecording",
     "VideoTimeseries",
     "WornStream",

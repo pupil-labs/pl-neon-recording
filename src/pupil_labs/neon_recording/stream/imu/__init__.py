@@ -1,3 +1,3 @@
-from .imu_stream import IMUStream
+from .imu_stream import IMUTimeseries
 
-__all__ = ["IMUStream"]
+__all__ = ["IMUTimeseries"]
