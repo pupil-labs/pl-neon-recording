@@ -9,7 +9,7 @@ from upath import UPath
 
 from pupil_labs.neon_recording.stream.blink_stream import BlinkTimeseries
 from pupil_labs.neon_recording.stream.fixation_stream import FixationTimeseries
-from pupil_labs.neon_recording.stream.worn_stream import Timeseries
+from pupil_labs.neon_recording.stream.worn_stream import WornTimeseries
 
 from .calib import Calibration
 from .stream.av_stream.audio_stream import AudioTimeseries
@@ -144,9 +144,9 @@ class NeonRecording:
         return AudioTimeseries.from_recording("audio", "Neon Scene Camera v1", self)
 
     @cached_property
-    def worn(self) -> Timeseries:
+    def worn(self) -> WornTimeseries:
         """Worn (headset on/off) data"""
-        return Timeseries.from_recording(self)
+        return WornTimeseries.from_recording(self)
 
 
 def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001
