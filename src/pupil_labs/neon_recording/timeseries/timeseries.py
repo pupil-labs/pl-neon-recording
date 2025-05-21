@@ -12,7 +12,7 @@ import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.sample import match_ts
-from pupil_labs.neon_recording.stream.array_record import (
+from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
     RecordType,
     fields,
@@ -81,12 +81,12 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
 
     @property
     def data(self):
-        """Stream data as a numpy array"""
+        """Data as a numpy array"""
         return self._data
 
     @property
     def pd(self):
-        """Stream data as a pandas DataFrame"""
+        """Data as a pandas DataFrame"""
         return self._data.pd
 
     def __repr__(self):

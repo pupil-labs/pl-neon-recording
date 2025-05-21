@@ -7,7 +7,9 @@ from pathlib import Path
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.neon_recording.stream.imu.imu_stream import parse_neon_imu_raw_packets
+from pupil_labs.neon_recording.timeseries.imu.imu_timeseries import (
+    parse_neon_imu_raw_packets,
+)
 
 
 def load_info(rec_dir: Path):
@@ -78,7 +80,9 @@ class GroundTruth:
 
         data = []
         abs_timestamp = []
-        for raw_file_path, time_file_path in zip(raw_file_paths, time_file_paths):
+        for raw_file_path, time_file_path in zip(
+            raw_file_paths, time_file_paths, strict=False
+        ):
             d = np.fromfile(raw_file_path, "<f4").reshape([-1, 2])
             abs_ts = np.fromfile(time_file_path, dtype="<u8").astype(np.int64)
             data.append(d)
@@ -101,7 +105,9 @@ class GroundTruth:
 
         data = []
         abs_timestamp = []
-        for raw_file_path, time_file_path in zip(raw_file_paths, time_file_paths):
+        for raw_file_path, time_file_path in zip(
+            raw_file_paths, time_file_paths, strict=False
+        ):
             d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
             abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
             data.append(d)

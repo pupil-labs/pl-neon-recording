@@ -17,7 +17,7 @@ from numpy.lib.recfunctions import structured_to_unstructured
 from upath import UPath
 
 if TYPE_CHECKING:
-    from pupil_labs.neon_recording.stream.stream import Stream
+    from pupil_labs.neon_recording.timeseries import Timeseries
 
 RecordType = TypeVar("RecordType", bound=np.record)
 ArraySource = str | Path | np.ndarray | bytes
@@ -243,10 +243,10 @@ class fields(Generic[T]):
     def __get__(self, obj: np.record | Record, objtype=None) -> T: ...
     @overload
     def __get__(
-        self, obj: "np.ndarray | Array | Stream", objtype=None
+        self, obj: "np.ndarray | Array | Timeseries", objtype=None
     ) -> npt.NDArray[T]: ...  # type: ignore
     def __get__(
-        self, obj: "np.record | np.ndarray | Record | Array | Stream", objtype=None
+        self, obj: "np.record | np.ndarray | Record | Array | Timeseries", objtype=None
     ) -> "T | Array[T] | npt.NDArray[T]":  # type: ignore
         if len(self.columns) < 2:
             result = obj[self.columns[0]]

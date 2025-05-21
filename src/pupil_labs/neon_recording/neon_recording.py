@@ -7,17 +7,19 @@ from functools import cached_property
 
 from upath import UPath
 
-from pupil_labs.neon_recording.stream.blink_stream import BlinkTimeseries
-from pupil_labs.neon_recording.stream.fixation_stream import FixationTimeseries
-from pupil_labs.neon_recording.stream.worn_stream import WornTimeseries
+from pupil_labs.neon_recording.timeseries import (
+    AudioTimeseries,
+    BlinkTimeseries,
+    EventTimeseries,
+    EyeStateTimeseries,
+    FixationTimeseries,
+    GazeTimeseries,
+    IMUTimeseries,
+    VideoTimeseries,
+    WornTimeseries,
+)
 
 from .calib import Calibration
-from .stream.av_stream.audio_stream import AudioTimeseries
-from .stream.av_stream.video_stream import VideoTimeseries
-from .stream.event_stream import EventTimeseries
-from .stream.eye_state_stream import EyeStateTimeseries
-from .stream.gaze_stream import GazeTimeseries
-from .stream.imu import IMUTimeseries
 
 log = logging.getLogger(__name__)
 

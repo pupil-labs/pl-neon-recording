@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
-from pupil_labs.neon_recording.stream.array_record import Array
+from pupil_labs.neon_recording.timeseries.array_record import Array
 
 
 def find_sorted_multipart_files(

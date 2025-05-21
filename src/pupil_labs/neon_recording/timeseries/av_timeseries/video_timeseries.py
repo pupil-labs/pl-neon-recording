@@ -3,7 +3,7 @@ from functools import cached_property
 import numpy as np
 import numpy.typing as npt
 
-from .base_av_stream import AVStreamKind, BaseAVTimeseries
+from .base_av_timeseries import AVTimeseriesKind, BaseAVTimeseries
 
 # TODO: This is not used
 # class VideoFrame(BaseAVFrame):
@@ -21,16 +21,16 @@ from .base_av_stream import AVStreamKind, BaseAVTimeseries
 class VideoTimeseries(BaseAVTimeseries):
     """Video frames from a camera"""
 
-    kind: AVStreamKind = "video"
+    kind: AVTimeseriesKind = "video"
 
     @property
     def width(self) -> int | None:
-        """Width of image in stream"""
+        """Width of the video"""
         return self.av_reader.width
 
     @property
     def height(self) -> int | None:
-        """Height of image in stream"""
+        """Height of the video"""
         return self.av_reader.height
 
 

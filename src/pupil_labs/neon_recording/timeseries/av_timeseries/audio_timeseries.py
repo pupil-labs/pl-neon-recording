@@ -1,6 +1,6 @@
 import logging
 
-from .base_av_stream import AVStreamKind, BaseAVTimeseries
+from .base_av_timeseries import AVTimeseriesKind, BaseAVTimeseries
 
 log = logging.getLogger(__name__)
 
@@ -10,9 +10,9 @@ log = logging.getLogger(__name__)
 
 
 class AudioTimeseries(BaseAVTimeseries):
-    """Audio frames stream"""
+    """Audio frames"""
 
-    kind: AVStreamKind = "video"
+    kind: AVTimeseriesKind = "video"
 
     @property
     def rate(self):

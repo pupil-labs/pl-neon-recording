@@ -8,8 +8,10 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr  # noqa: E402, I001
-from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame  # noqa: E402
+import pupil_labs.neon_recording as nr  # noqa: E402
+from pupil_labs.neon_recording.timeseries.av_timeseries.video_timeseries import (  # noqa: E402
+    GrayFrame,
+)
 
 
 def make_overlaid_video(recording_dir, output_video_path, fps=None):

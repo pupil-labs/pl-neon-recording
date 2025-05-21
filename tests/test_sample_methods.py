@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 
 
 class MockProps(TimeseriesProps):
@@ -25,7 +25,7 @@ class MockTimeseries(Timeseries[MockArray, MockRecord], MockProps):
 
 
 @pytest.fixture
-def mock_stream():
+def mock_timeseries():
     ts_data = np.array([10, 20, 30, 40, 50])
     x_data = ts_data.copy()
     dtype = np.dtype([
@@ -38,8 +38,8 @@ def mock_stream():
     data["x"] = x_data
     data = data.view(MockArray)
 
-    stream = MockTimeseries(data)
-    return stream
+    timeseries = MockTimeseries(data)
+    return timeseries
 
 
 @pytest.mark.parametrize(
@@ -53,9 +53,9 @@ def mock_stream():
         ([20, 40], [20, 40]),
     ],
 )
-def test_sample_nearest(mock_stream, target_ts, result):
+def test_sample_nearest(mock_timeseries, target_ts, result):
     for s, r in zip(
-        mock_stream.sample(target_ts, method="nearest"), result, strict=True
+        mock_timeseries.sample(target_ts, method="nearest"), result, strict=True
     ):
         assert s["ts"] == r
         assert s["x"] == r
@@ -72,14 +72,14 @@ def test_sample_nearest(mock_stream, target_ts, result):
         ([20, 40], [20, 40]),
     ],
 )
-def test_sample_before(mock_stream, target_ts, result):
+def test_sample_before(mock_timeseries, target_ts, result):
     for s, r in zip(
-        mock_stream.sample(target_ts, method="before"), result, strict=True
+        mock_timeseries.sample(target_ts, method="before"), result, strict=True
     ):
         assert s["ts"] == r
         assert s["x"] == r
 
 
-def test_sample_before_oob(mock_stream):
+def test_sample_before_oob(mock_timeseries):
     with pytest.raises(ValueError):
-        mock_stream.sample([-100], method="before", tolerance=0)
+        mock_timeseries.sample([-100], method="before", tolerance=0)

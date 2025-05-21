@@ -3,15 +3,15 @@ import logging
 import os
 
 from .neon_recording import NeonRecording, load, open  # noqa: A004
-from .stream.av_stream.audio_stream import AudioTimeseries
-from .stream.av_stream.video_stream import VideoTimeseries
-from .stream.blink_stream import BlinkTimeseries
-from .stream.event_stream import EventTimeseries
-from .stream.eye_state_stream import EyeStateTimeseries
-from .stream.fixation_stream import FixationTimeseries
-from .stream.gaze_stream import GazeTimeseries
-from .stream.imu.imu_stream import IMUTimeseries
-from .stream.worn_stream import Timeseries
+from .timeseries.av_timeseries.audio_timeseries import AudioTimeseries
+from .timeseries.av_timeseries.video_timeseries import VideoTimeseries
+from .timeseries.blinks import BlinkTimeseries
+from .timeseries.events import EventTimeseries
+from .timeseries.eye_state import EyeStateTimeseries
+from .timeseries.fixations import FixationTimeseries
+from .timeseries.gaze import GazeTimeseries
+from .timeseries.imu.imu_timeseries import IMUTimeseries
+from .timeseries.worn import Timeseries
 
 try:
     __version__ = importlib.metadata.version(__name__)

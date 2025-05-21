@@ -8,8 +8,8 @@ from pupil_labs.neon_recording.constants import (
     TIMESTAMP_DTYPE,
     TIMESTAMP_FIELD_NAME,
 )
-from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 
 from ...utils import find_sorted_multipart_files, join_struct_arrays
 from . import imu_pb2

@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import load_multipart_data_time_pairs
 
 log = logging.getLogger(__name__)

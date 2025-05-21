@@ -3,7 +3,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.neon_recording.stream.array_record import Record, fields
+from pupil_labs.neon_recording.timeseries.array_record import Record, fields
 
 
 class Calibration(Record):

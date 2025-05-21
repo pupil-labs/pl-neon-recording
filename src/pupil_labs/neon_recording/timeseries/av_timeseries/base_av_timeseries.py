@@ -10,10 +10,15 @@ from pupil_labs.neon_recording.constants import (
     TIMESTAMP_DTYPE,
 )
 from pupil_labs.neon_recording.sample import match_ts
-from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-
-# from ..stream import Stream, StreamProps
-from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.array_record import (
+    Array,
+    Record,
+    fields,
+)
+from pupil_labs.neon_recording.timeseries.timeseries import (
+    Timeseries,
+    TimeseriesProps,
+)
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     join_struct_arrays,
@@ -23,7 +28,7 @@ from pupil_labs.video import ArrayLike
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
 
-AVStreamKind = Literal["audio", "video"]
+AVTimeseriesKind = Literal["audio", "video"]
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +55,7 @@ T = TypeVar("T", bound="BaseAVTimeseries")
 class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
     """Frames from a media container"""
 
-    kind: AVStreamKind
+    kind: AVTimeseriesKind
 
     def __init__(
         self,
