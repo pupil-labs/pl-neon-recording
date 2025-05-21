@@ -98,7 +98,7 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
     def sample(
         self: T,
         target_ts: ArrayLike[int],
-        method: Literal["nearest", "before", "after"] = "nearest",
+        method: Literal["nearest", "backward", "forward"] = "nearest",
         tolerance: int | None = None,
     ) -> T:
         indices = match_ts(target_ts, self.ts, method, tolerance)

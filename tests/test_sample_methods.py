@@ -72,14 +72,14 @@ def test_sample_nearest(mock_timeseries, target_ts, result):
         ([20, 40], [20, 40]),
     ],
 )
-def test_sample_before(mock_timeseries, target_ts, result):
+def test_sample_backward(mock_timeseries, target_ts, result):
     for s, r in zip(
-        mock_timeseries.sample(target_ts, method="before"), result, strict=True
+        mock_timeseries.sample(target_ts, method="backward"), result, strict=True
     ):
         assert s["ts"] == r
         assert s["x"] == r
 
 
-def test_sample_before_oob(mock_timeseries):
+def test_sample_backward_oob(mock_timeseries):
     with pytest.raises(ValueError):
-        mock_timeseries.sample([-100], method="before", tolerance=0)
+        mock_timeseries.sample([-100], method="backward", tolerance=0)

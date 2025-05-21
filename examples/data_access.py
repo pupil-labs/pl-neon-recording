@@ -139,7 +139,7 @@ print(
 
 print()
 print("Get closest before gaze for scene frames")
-closest_gaze_before_scene = recording.gaze.sample(recording.scene.ts, method="before")
+closest_gaze_before_scene = recording.gaze.sample(recording.scene.ts, method="backward")
 print(closest_gaze_before_scene)
 print(
     "closest_gaze_before_scene_times",
