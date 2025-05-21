@@ -42,7 +42,7 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
     """Blinks data"""
 
     def __init__(self, data: BlinkArray, recording: "NeonRecording"):
-        super().__init__(data, "blinks", recording)
+        super().__init__(data, "blink", recording)
 
     @staticmethod
     def from_recording(recording: "NeonRecording") -> "BlinkTimeseries":
