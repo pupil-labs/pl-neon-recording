@@ -2,14 +2,14 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
+import numpy.typing as npt
 
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
-
-from .stream import Stream, StreamProps
 
 log = logging.getLogger(__name__)
 
@@ -17,27 +17,28 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class WornProps(StreamProps):
-    worn = fields[np.float64]("worn")
+class WornProps(TimeseriesProps):
+    worn: npt.NDArray[np.float64] = fields[np.float64]("worn")
     "Worn"
 
 
 class WornRecord(Record, WornProps):
     def keys(self):
-        keys = WornProps.__dict__.keys()
-        return [x for x in keys if not x.startswith("_")]
+        return [x for x in dir(WornProps) if not x.startswith("_") and x != "keys"]
 
 
 class WornArray(Array[WornRecord], WornProps):
     record_class = WornRecord
 
 
-class WornStream(Stream[WornArray, WornRecord], WornProps):
+class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
     """Worn (headset on/off) data"""
 
-    data: WornArray
+    def __init__(self, data: WornArray, recording: "NeonRecording"):
+        super().__init__(data, "worn", recording)
 
-    def __init__(self, recording: "NeonRecording"):
+    @staticmethod
+    def from_recording(recording: "NeonRecording") -> "WornTimeseries":
         log.debug("NeonRecording: Loading worn data")
 
         worn_200hz_file = recording._rec_dir / "worn_200hz.raw"
@@ -52,4 +53,5 @@ class WornStream(Stream[WornArray, WornRecord], WornProps):
             file_pairs = find_sorted_multipart_files(recording._rec_dir, "worn")
 
         data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
-        super().__init__("worn", recording, data.view(WornArray))
+        data = data.view(WornArray)
+        return WornTimeseries(data, recording)

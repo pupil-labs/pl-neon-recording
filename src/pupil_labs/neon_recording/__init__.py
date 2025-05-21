@@ -7,11 +7,11 @@ from .stream.av_stream.audio_stream import AudioTimeseries
 from .stream.av_stream.video_stream import VideoTimeseries
 from .stream.blink_stream import BlinkTimeseries
 from .stream.event_stream import EventTimeseries
-from .stream.eye_state_stream import EyeStateStream
-from .stream.fixation_stream import FixationStream
+from .stream.eye_state_stream import EyeStateTimeseries
+from .stream.fixation_stream import FixationTimeseries
 from .stream.gaze_stream import GazeTimeseries
 from .stream.imu.imu_stream import IMUTimeseries
-from .stream.worn_stream import WornStream
+from .stream.worn_stream import Timeseries
 
 try:
     __version__ = importlib.metadata.version(__name__)
@@ -29,13 +29,13 @@ __all__ = [
     "AudioTimeseries",
     "BlinkTimeseries",
     "EventTimeseries",
-    "EyeStateStream",
-    "FixationStream",
+    "EyeStateTimeseries",
+    "FixationTimeseries",
     "GazeTimeseries",
     "IMUTimeseries",
     "NeonRecording",
+    "Timeseries",
     "VideoTimeseries",
-    "WornStream",
     "__version__",
     "load",
     "open",

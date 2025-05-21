@@ -8,14 +8,14 @@ from functools import cached_property
 from upath import UPath
 
 from pupil_labs.neon_recording.stream.blink_stream import BlinkTimeseries
-from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
-from pupil_labs.neon_recording.stream.worn_stream import WornStream
+from pupil_labs.neon_recording.stream.fixation_stream import FixationTimeseries
+from pupil_labs.neon_recording.stream.worn_stream import Timeseries
 
 from .calib import Calibration
 from .stream.av_stream.audio_stream import AudioTimeseries
 from .stream.av_stream.video_stream import VideoTimeseries
 from .stream.event_stream import EventTimeseries
-from .stream.eye_state_stream import EyeStateStream
+from .stream.eye_state_stream import EyeStateTimeseries
 from .stream.gaze_stream import GazeTimeseries
 from .stream.imu import IMUTimeseries
 
@@ -109,9 +109,9 @@ class NeonRecording:
         return IMUTimeseries.from_recording(self)
 
     @cached_property
-    def eye_state(self) -> EyeStateStream:
+    def eye_state(self) -> EyeStateTimeseries:
         """Eye state data"""
-        return EyeStateStream(self)
+        return EyeStateTimeseries.from_recording(self)
 
     @cached_property
     def scene(self) -> VideoTimeseries:
@@ -129,9 +129,9 @@ class NeonRecording:
         return EventTimeseries.from_recording(self)
 
     @cached_property
-    def fixations(self) -> FixationStream:
+    def fixations(self) -> FixationTimeseries:
         """Fixations data"""
-        return FixationStream(self)
+        return FixationTimeseries.from_recording(self)
 
     @cached_property
     def blinks(self) -> BlinkTimeseries:
@@ -144,9 +144,9 @@ class NeonRecording:
         return AudioTimeseries.from_recording("audio", "Neon Scene Camera v1", self)
 
     @cached_property
-    def worn(self) -> WornStream:
+    def worn(self) -> Timeseries:
         """Worn (headset on/off) data"""
-        return WornStream(self)
+        return Timeseries.from_recording(self)
 
 
 def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001
