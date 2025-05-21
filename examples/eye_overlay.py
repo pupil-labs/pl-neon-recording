@@ -9,7 +9,7 @@ cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
 import pupil_labs.neon_recording as nr  # noqa: E402
-from pupil_labs.neon_recording.timeseries.av_timeseries.video_timeseries import (  # noqa: E402
+from pupil_labs.neon_recording.timeseries.av.video import (  # noqa: E402
     GrayFrame,
 )
 

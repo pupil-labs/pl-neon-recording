@@ -3,8 +3,8 @@ import logging
 import os
 
 from .neon_recording import NeonRecording, load, open  # noqa: A004
-from .timeseries.av_timeseries.audio_timeseries import AudioTimeseries
-from .timeseries.av_timeseries.video_timeseries import VideoTimeseries
+from .timeseries.av.audio import AudioTimeseries
+from .timeseries.av.video import VideoTimeseries
 from .timeseries.blinks import BlinkTimeseries
 from .timeseries.events import EventTimeseries
 from .timeseries.eye_state import EyeStateTimeseries

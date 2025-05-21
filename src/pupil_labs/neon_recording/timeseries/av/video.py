@@ -3,7 +3,7 @@ from functools import cached_property
 import numpy as np
 import numpy.typing as npt
 
-from .base_av_timeseries import AVTimeseriesKind, BaseAVTimeseries
+from .base_av import AVTimeseriesKind, BaseAVTimeseries
 
 # TODO: This is not used
 # class VideoFrame(BaseAVFrame):

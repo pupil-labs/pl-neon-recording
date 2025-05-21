@@ -1,6 +1,6 @@
 import logging
 
-from .base_av_timeseries import AVTimeseriesKind, BaseAVTimeseries
+from .base_av import AVTimeseriesKind, BaseAVTimeseries
 
 log = logging.getLogger(__name__)
 

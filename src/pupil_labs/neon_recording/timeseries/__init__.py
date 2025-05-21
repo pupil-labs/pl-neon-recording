@@ -1,5 +1,5 @@
-from .av_timeseries.audio_timeseries import AudioTimeseries
-from .av_timeseries.video_timeseries import VideoTimeseries
+from .av.audio import AudioTimeseries
+from .av.video import VideoTimeseries
 from .blinks import BlinkTimeseries
 from .events import EventTimeseries
 from .eye_state import EyeStateTimeseries
