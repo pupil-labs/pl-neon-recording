@@ -97,6 +97,13 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
         tolerance: int | None = None,
     ) -> T:
         indices = match_ts(target_ts, self.ts, method, tolerance)
+
+        if True in np.isnan(indices):
+            raise ValueError(
+                "Failed to find matching samples for some samples.",
+                [t for t, i in zip(target_ts, indices, strict=False) if np.isnan(i)],
+            )
+
         return self.__class__(
             self._data[indices],  # type: ignore
             self.recording,

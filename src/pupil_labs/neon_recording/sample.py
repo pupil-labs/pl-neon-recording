@@ -1,6 +1,7 @@
 from typing import Literal, TypeVar
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 
 from pupil_labs.video.array_like import ArrayLike
@@ -13,7 +14,7 @@ def match_ts(
     source_ts: ArrayLike[int],
     method: Literal["nearest", "before", "after"] = "nearest",
     tolerance: int | None = None,
-) -> ArrayLike[int]:
+) -> npt.NDArray[np.int64]:
     target_ts = np.array(target_ts)
     target_df = pd.DataFrame(target_ts, columns=["target_ts"])
     target_df.index.name = "target"
