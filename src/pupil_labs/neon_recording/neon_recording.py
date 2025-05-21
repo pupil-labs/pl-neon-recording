@@ -7,14 +7,14 @@ from functools import cached_property
 
 from upath import UPath
 
-from pupil_labs.neon_recording.stream.blink_stream import BlinkStream
+from pupil_labs.neon_recording.stream.blink_stream import BlinkTimeseries
 from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
 from pupil_labs.neon_recording.stream.worn_stream import WornStream
 
 from .calib import Calibration
 from .stream.av_stream.audio_stream import AudioTimeseries
 from .stream.av_stream.video_stream import VideoTimeseries
-from .stream.event_stream import EventStream
+from .stream.event_stream import EventTimeseries
 from .stream.eye_state_stream import EyeStateStream
 from .stream.gaze_stream import GazeTimeseries
 from .stream.imu import IMUTimeseries
@@ -124,9 +124,9 @@ class NeonRecording:
         return VideoTimeseries.from_recording("eye", "Neon Sensor Module v1", self)
 
     @cached_property
-    def events(self) -> EventStream:
+    def events(self) -> EventTimeseries:
         """Event annotations"""
-        return EventStream(self)
+        return EventTimeseries.from_recording(self)
 
     @cached_property
     def fixations(self) -> FixationStream:
@@ -134,9 +134,9 @@ class NeonRecording:
         return FixationStream(self)
 
     @cached_property
-    def blinks(self) -> BlinkStream:
+    def blinks(self) -> BlinkTimeseries:
         """Blink data"""
-        return BlinkStream(self)
+        return BlinkTimeseries.from_recording(self)
 
     @cached_property
     def audio(self) -> AudioTimeseries:

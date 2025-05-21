@@ -5,8 +5,8 @@ import os
 from .neon_recording import NeonRecording, load, open  # noqa: A004
 from .stream.av_stream.audio_stream import AudioTimeseries
 from .stream.av_stream.video_stream import VideoTimeseries
-from .stream.blink_stream import BlinkStream
-from .stream.event_stream import EventStream
+from .stream.blink_stream import BlinkTimeseries
+from .stream.event_stream import EventTimeseries
 from .stream.eye_state_stream import EyeStateStream
 from .stream.fixation_stream import FixationStream
 from .stream.gaze_stream import GazeTimeseries
@@ -27,8 +27,8 @@ LOG_LEVEL = getattr(logging, level)
 
 __all__ = [
     "AudioTimeseries",
-    "BlinkStream",
-    "EventStream",
+    "BlinkTimeseries",
+    "EventTimeseries",
     "EyeStateStream",
     "FixationStream",
     "GazeTimeseries",

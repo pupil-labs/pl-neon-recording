@@ -4,11 +4,11 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 import numpy as np
+import numpy.typing as npt
 
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import load_multipart_data_time_pairs
-
-from .stream import Stream, StreamProps
 
 log = logging.getLogger(__name__)
 
@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class EventProps(StreamProps):
-    event = fields[np.float64]("event")
+class EventProps(TimeseriesProps):
+    event: npt.NDArray[np.str_] = fields[np.str_]("event")  # type:ignore
     "Event name"
 
 
@@ -31,12 +31,14 @@ class EventArray(Array[EventRecord], EventProps):
     record_class = EventRecord
 
 
-class EventStream(Stream[EventArray, EventRecord], EventProps):
+class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
     """Event annotations"""
 
-    data: EventArray
+    def __init__(self, data: EventArray, recording: "NeonRecording"):
+        super().__init__(data, "event", recording)
 
-    def __init__(self, recording: "NeonRecording"):
+    @staticmethod
+    def from_recording(recording: "NeonRecording") -> "EventTimeseries":
         log.debug("NeonRecording: Loading event data")
 
         events_file = recording._rec_dir / "event.txt"
@@ -48,12 +50,13 @@ class EventStream(Stream[EventArray, EventRecord], EventProps):
         data.dtype.names = [
             "event" if name == "text" else name for name in data.dtype.names
         ]
-        super().__init__("event", recording, data.view(EventArray))
+        data = data.view(EventArray)
+        return EventTimeseries(data, recording)
 
     @cached_property
     def by_name(self):
         """Return a dict of event_name => all ts"""
         result = defaultdict(list)
-        for name, ts in zip(self.data.event, self.data.ts):
+        for name, ts in zip(self._data.event, self._data.ts, strict=False):
             result[name].append(ts)
         return {key: np.array(ts) for key, ts in result.items()}
