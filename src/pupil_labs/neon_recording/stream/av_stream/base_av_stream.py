@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Literal, TypeVar
+from typing import TYPE_CHECKING, Literal, SupportsIndex, TypeVar, overload
 
 import numpy as np
 
@@ -52,20 +52,15 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
 
     kind: AVStreamKind
 
-    # def __init_subclass__(cls, kind: AVStreamKind):
-    #     cls.kind = kind
-
     def __init__(
         self,
         data: Array[BaseAVFrame],
         name: str,
         recording: "NeonRecording",
         av_reader: plv.MultiReader,
-        # kind: AVStreamKind = "video",
     ):
         super().__init__(data, name, recording)
         self.av_reader = av_reader
-        # self.kind = kind
 
     @classmethod
     def from_recording(
@@ -132,6 +127,23 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             # kind,
         )
 
+    @overload
+    def __getitem__(self, key: SupportsIndex) -> BaseAVFrame: ...
+    @overload
+    def __getitem__(self: T, key: slice | list[str]) -> T: ...
+    def __getitem__(
+        self, key: SupportsIndex | slice | str | list[str]
+    ) -> "BaseAVTimeseries | BaseAVFrame":
+        if isinstance(key, slice):
+            return self.__class__(
+                self._data[key],  # type: ignore
+                self.name,
+                self.recording,
+                self.av_reader,
+            )
+        else:
+            return super().__getitem__(key)  # type: ignore
+
     def sample(
         self: T,
         target_ts: ArrayLike[int],
@@ -144,5 +156,4 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             self.name,
             self.recording,
             self.av_reader,
-            # self.kind,
         )
