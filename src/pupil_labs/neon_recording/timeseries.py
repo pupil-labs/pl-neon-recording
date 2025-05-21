@@ -80,6 +80,11 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
             return self._data[key]  # type: ignore
 
     @property
+    def data(self):
+        """Stream data as a numpy array"""
+        return self._data
+
+    @property
     def pd(self):
         """Stream data as a pandas DataFrame"""
         return self._data.pd

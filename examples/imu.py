@@ -20,7 +20,9 @@ recording = nr.open(sys.argv[1])
 # Sample the IMU data at 60Hz
 fps = 60
 z = recording.gaze[:10]
-timestamps = np.arange(recording.imu.ts[0], recording.imu.ts[-1], 1e9 / fps)
+timestamps = np.arange(
+    recording.imu.ts[0], recording.imu.ts[-1], 1e9 / fps, dtype=np.int64
+)
 imu_data = recording.imu.sample(timestamps)
 
 # Use scipy to convert the quaternions to euler angles

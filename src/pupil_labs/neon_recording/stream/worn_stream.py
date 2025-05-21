@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class WornProps(TimeseriesProps):
-    worn: npt.NDArray[np.float64] = fields[np.float64]("worn")
+    worn: npt.NDArray[np.float64] = fields[np.float64]("worn")  # type:ignore
     "Worn"
 
 
