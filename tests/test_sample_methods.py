@@ -2,10 +2,10 @@ import numpy as np
 import pytest
 
 from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-from pupil_labs.neon_recording.stream.stream import Stream, StreamProps
+from pupil_labs.neon_recording.timeseries import Timeseries, TimeseriesProps
 
 
-class MockProps(StreamProps):
+class MockProps(TimeseriesProps):
     x = fields[np.float64]("x")
 
 
@@ -19,11 +19,9 @@ class MockArray(Array[MockRecord], MockProps):
     record_class = MockRecord
 
 
-class MockStream(Stream[MockArray, MockRecord], MockProps):
-    data: MockArray
-
-    def __init__(self, data):
-        super().__init__("mock", None, data.view(MockArray))
+class MockTimeseries(Timeseries[MockArray, MockRecord], MockProps):
+    def __init__(self, data, recording=None):
+        super().__init__(data.view(MockArray), "mock", None)  # type:ignore
 
 
 @pytest.fixture
@@ -40,7 +38,7 @@ def mock_stream():
     data["x"] = x_data
     data = data.view(MockArray)
 
-    stream = MockStream(data)
+    stream = MockTimeseries(data)
     return stream
 
 
@@ -69,7 +67,7 @@ def test_sample_nearest(mock_stream, target_ts, result):
         ([20, 30], [20, 30]),
         ([21, 31], [20, 30]),
         ([19, 29], [10, 20]),
-        ([-100, 100], [10, 50]),
+        ([11, 100], [10, 50]),
         ([20, 20], [20, 20]),
         ([20, 40], [20, 40]),
     ],
@@ -80,3 +78,8 @@ def test_sample_before(mock_stream, target_ts, result):
     ):
         assert s["ts"] == r
         assert s["x"] == r
+
+
+def test_sample_before_oob(mock_stream):
+    with pytest.raises(ValueError):
+        mock_stream.sample([-100], method="before", tolerance=0)
