@@ -1037,6 +1037,7 @@ name = "pupil-labs-neon-recording"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
+    { name = "pandas" },
     { name = "protobuf" },
     { name = "pupil-labs-video" },
     { name = "scipy" },
@@ -1074,11 +1075,16 @@ dev = [
     { name = "tox-uv" },
     { name = "types-protobuf" },
 ]
+examples = [
+    { name = "opencv-python" },
+    { name = "tqdm" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "numpy" },
     { name = "opencv-python", marker = "extra == 'examples'" },
+    { name = "pandas", specifier = ">=2.2.3" },
     { name = "pandas", marker = "extra == 'examples'" },
     { name = "protobuf" },
     { name = "pupil-labs-video", specifier = ">=1.0.5" },
@@ -1111,6 +1117,10 @@ dev = [
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0" },
     { name = "tox-uv", specifier = ">=1.11.3" },
     { name = "types-protobuf" },
+]
+examples = [
+    { name = "opencv-python", specifier = ">=4.11.0.86" },
+    { name = "tqdm", specifier = ">=4.67.1" },
 ]
 
 [[package]]
