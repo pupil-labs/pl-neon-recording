@@ -23,8 +23,7 @@ class EventProps(TimeseriesProps):
 
 class EventRecord(Record, EventProps):
     def keys(self):
-        keys = EventProps.__dict__.keys()
-        return [x for x in keys if not x.startswith("_")]
+        return [x for x in dir(EventProps) if not x.startswith("_") and x != "keys"]
 
 
 class EventArray(Array[EventRecord], EventProps):
