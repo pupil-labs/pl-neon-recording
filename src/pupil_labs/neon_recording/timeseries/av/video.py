@@ -23,17 +23,15 @@ class VideoTimeseries(BaseAVTimeseries):
 
     kind: AVTimeseriesKind = "video"
 
-    @property
+    @cached_property
     def width(self) -> int | None:
         """Width of the video"""
-        # return self.av_reader.width
-        raise NotImplementedError()
+        return self._data[0].multi_video_reader.width
 
-    @property
+    @cached_property
     def height(self) -> int | None:
         """Height of the video"""
-        # return self.av_reader.height
-        raise NotImplementedError()
+        return self._data[0].multi_video_reader.height
 
 
 class SceneVideoTimeseries(VideoTimeseries):

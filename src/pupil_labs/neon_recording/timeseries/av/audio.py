@@ -18,5 +18,4 @@ class AudioTimeseries(BaseAVTimeseries):
 
     @property
     def rate(self):
-        # return self.av_reader.rate
-        raise NotImplementedError()
+        return self._data[0].multi_video_reader.rate
