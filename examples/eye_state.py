@@ -8,8 +8,8 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr  # noqa: E402, I001
-from pupil_labs.neon_recording.stream.av_stream.video_stream import GrayFrame  # noqa: E402
+import pupil_labs.neon_recording as nr  # noqa: E402
+from pupil_labs.neon_recording.timeseries.av.video import GrayFrame  # noqa: E402
 
 
 def overlay_image(img, img_overlay, x, y):
@@ -40,7 +40,7 @@ def plot(img, data, value_range, x_width, color, line_width=2):
         ]
         y_values = [int(y_norm * img.shape[0]) for y_norm in y_norms]
 
-        points = [[*v] for v in zip(x_values, y_values)]
+        points = [[*v] for v in zip(x_values, y_values, strict=False)]
 
         cv2.line(img, points[0], points[1], color, line_width)
 
@@ -67,6 +67,7 @@ def make_eye_state_video(recording_dir, output_video_path):
         output_timestamps,
         eye_video_sampled,
         eye_state_sampled,
+        strict=False,
     )
 
     plot_metas = {

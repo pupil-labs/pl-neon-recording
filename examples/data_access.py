@@ -5,7 +5,7 @@ from datetime import datetime
 import numpy as np
 
 import pupil_labs.neon_recording as nr
-from pupil_labs.neon_recording.stream.stream import Stream
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 
 if len(sys.argv) < 2:
     print("Usage:")
@@ -43,7 +43,7 @@ print_data = {
 }
 print(pretty_format(print_data))
 
-streams: list[Stream] = [
+streams: list[Timeseries] = [
     recording.gaze,
     recording.imu,
     recording.eye_state,
