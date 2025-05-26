@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from .base_av import AVTimeseriesKind, BaseAVTimeseries
 
@@ -16,6 +17,6 @@ class AudioTimeseries(BaseAVTimeseries):
     base_name: str = "Neon Scene Camera v1"
     name: str = "audio"
 
-    @property
+    @cached_property
     def rate(self):
         return self._data[0].multi_video_reader.rate
