@@ -43,6 +43,8 @@ class GazeArray(Array[GazeRecord], GazeProps):
 
 
 class GazeTimeseries(Timeseries[GazeArray, GazeRecord], GazeProps):
+    name: str = "gaze"
+
     def _load_data_from_recording(self, recording) -> "GazeArray":
         log.debug("NeonRecording: Loading gaze data")
 
