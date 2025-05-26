@@ -20,8 +20,10 @@ class MockArray(Array[MockRecord], MockProps):
 
 
 class MockTimeseries(Timeseries[MockArray, MockRecord], MockProps):
-    def __init__(self, data, recording=None):
-        super().__init__(data.view(MockArray), "mock", None)  # type:ignore
+    name: str = "mock"
+
+    def __init__(self, recording, data):
+        super().__init__(recording, data.view(MockArray))  # type:ignore
 
 
 @pytest.fixture
@@ -38,7 +40,7 @@ def mock_timeseries():
     data["x"] = x_data
     data = data.view(MockArray)
 
-    timeseries = MockTimeseries(data)
+    timeseries = MockTimeseries(None, data)
     return timeseries
 
 

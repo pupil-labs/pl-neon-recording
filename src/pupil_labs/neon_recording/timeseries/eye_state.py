@@ -89,13 +89,11 @@ class EyeStateArray(Array[EyeStateRecord], EyeStateProps):
 class EyeStateTimeseries(Timeseries[EyeStateArray, EyeStateRecord], EyeStateProps):
     """Eye state data"""
 
-    def __init__(self, data: EyeStateArray, recording: "NeonRecording"):
-        super().__init__(data, "eye_state", recording)
+    name: str = "eye_state"
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "EyeStateTimeseries":
+    def _load_data_from_recording(self, recording: "NeonRecording") -> EyeStateArray:
         log.debug("NeonRecording: Loading eye state data")
-        file_pairs = find_sorted_multipart_files(recording._rec_dir, "eye_state")
+        file_pairs = find_sorted_multipart_files(self.recording._rec_dir, "eye_state")
         data = load_multipart_data_time_pairs(
             file_pairs,
             dtype=np.dtype([
@@ -116,4 +114,4 @@ class EyeStateTimeseries(Timeseries[EyeStateArray, EyeStateRecord], EyeStateProp
             ]),
         )
         data = data.view(EyeStateArray)
-        return EyeStateTimeseries(data, recording)
+        return data

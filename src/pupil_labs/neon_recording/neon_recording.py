@@ -12,10 +12,11 @@ from pupil_labs.neon_recording.timeseries import (
     BlinkTimeseries,
     EventTimeseries,
     EyeStateTimeseries,
+    EyeVideoTimeseries,
     FixationTimeseries,
     GazeTimeseries,
     IMUTimeseries,
-    VideoTimeseries,
+    SceneVideoTimeseries,
     WornTimeseries,
 )
 
@@ -103,52 +104,52 @@ class NeonRecording:
     @cached_property
     def gaze(self) -> GazeTimeseries:
         """2D gaze data in scene-camera space"""
-        return GazeTimeseries.from_recording(self)
+        return GazeTimeseries(self)
 
     @cached_property
     def imu(self) -> IMUTimeseries:
         """Motion and orientation data"""
-        return IMUTimeseries.from_recording(self)
+        return IMUTimeseries(self)
 
     @cached_property
     def eye_state(self) -> EyeStateTimeseries:
         """Eye state data"""
-        return EyeStateTimeseries.from_recording(self)
+        return EyeStateTimeseries(self)
 
     @cached_property
-    def scene(self) -> VideoTimeseries:
+    def scene(self) -> SceneVideoTimeseries:
         """Frames of video from the scene camera"""
-        return VideoTimeseries.from_recording("scene", "Neon Scene Camera v1", self)
+        return SceneVideoTimeseries(self)
 
     @cached_property
-    def eye(self) -> VideoTimeseries:
+    def eye(self) -> EyeVideoTimeseries:
         """Frames of video from the eye cameras"""
-        return VideoTimeseries.from_recording("eye", "Neon Sensor Module v1", self)
+        return EyeVideoTimeseries(self)
 
     @cached_property
     def events(self) -> EventTimeseries:
         """Event annotations"""
-        return EventTimeseries.from_recording(self)
+        return EventTimeseries(self)
 
     @cached_property
     def fixations(self) -> FixationTimeseries:
         """Fixations data"""
-        return FixationTimeseries.from_recording(self)
+        return FixationTimeseries(self)
 
     @cached_property
     def blinks(self) -> BlinkTimeseries:
         """Blink data"""
-        return BlinkTimeseries.from_recording(self)
+        return BlinkTimeseries(self)
 
     @cached_property
     def audio(self) -> AudioTimeseries:
         """Audio from the scene video"""
-        return AudioTimeseries.from_recording("audio", "Neon Scene Camera v1", self)
+        return AudioTimeseries(self)
 
     @cached_property
     def worn(self) -> WornTimeseries:
         """Worn (headset on/off) data"""
-        return WornTimeseries.from_recording(self)
+        return WornTimeseries(self)
 
 
 def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001

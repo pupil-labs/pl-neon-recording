@@ -72,11 +72,9 @@ class FixationArray(Array[FixationRecord], FixationProps):
 class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProps):
     """Fixation data"""
 
-    def __init__(self, data: FixationArray, recording: "NeonRecording"):
-        super().__init__(data, "fixation", recording)
+    name = "fixation"
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "FixationTimeseries":
+    def _load_data_from_recording(self, recording: "NeonRecording") -> FixationArray:
         log.debug("NeonRecording: Loading fixation data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "fixations")
         data = load_multipart_data_time_pairs(
@@ -98,4 +96,4 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             ]),
         )
         data = data.view(FixationArray)
-        return FixationTimeseries(data, recording)
+        return data

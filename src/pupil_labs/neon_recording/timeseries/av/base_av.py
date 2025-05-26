@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING, Literal, SupportsIndex, TypeVar, overload
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
@@ -9,7 +9,6 @@ from pupil_labs.neon_recording.constants import (
     AV_INDEX_FIELD_NAME,
     TIMESTAMP_DTYPE,
 )
-from pupil_labs.neon_recording.sample import match_ts
 from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
     Record,
@@ -23,7 +22,6 @@ from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     join_struct_arrays,
 )
-from pupil_labs.video import ArrayLike
 
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.neon_recording import NeonRecording
@@ -49,50 +47,36 @@ class BaseAVFrame(Record):
         return getattr(self.plv_frame, name)
 
 
-T = TypeVar("T", bound="BaseAVTimeseries")
-
-
 class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
     """Frames from a media container"""
 
     kind: AVTimeseriesKind
+    base_name: str
 
-    def __init__(
+    def _load_data_from_recording(
         self,
-        data: Array[BaseAVFrame],
-        name: str,
         recording: "NeonRecording",
-        av_reader: plv.MultiReader,
-    ):
-        super().__init__(data, name, recording)
-        self.av_reader = av_reader
+    ) -> Array[BaseAVFrame]:
+        log.debug(f"NeonRecording: Loading video: {self.base_name}.")
 
-    @classmethod
-    def from_recording(
-        cls: type[T],
-        name: str,
-        base_name: str,
-        recording: "NeonRecording",
-        # kind: AVStreamKind,
-    ) -> T:
-        log.debug(f"NeonRecording: Loading video: {base_name}.")
-
-        av_files = find_sorted_multipart_files(recording._rec_dir, base_name, ".mp4")
+        av_files = find_sorted_multipart_files(
+            recording._rec_dir, self.base_name, ".mp4"
+        )
         parts_ts = []
         video_readers = []
         for av_file, time_file in av_files:
-            if cls.kind == "video":
+            if self.kind == "video":
                 part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
                 container_timestamps = (part_ts["ts"] - recording.start_ts) / 1e9
-                reader = plv.Reader(av_file, cls.kind, container_timestamps)
+                reader = plv.Reader(av_file, self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
-            elif cls.kind == "audio":
-                reader = plv.Reader(av_file, cls.kind)  # type: ignore
+            elif self.kind == "audio":
+                reader = plv.Reader(av_file, self.kind)  # type: ignore
                 part_ts = (
                     recording.start_ts + (reader.container_timestamps * 1e9)  # type: ignore
                 ).astype(TIMESTAMP_DTYPE)
             else:
-                raise RuntimeError(f"unknown av stream kind: {cls.kind}")
+                raise RuntimeError(f"unknown av stream kind: {self.kind}")
 
             parts_ts.append(part_ts)
             video_readers.append(reader)
@@ -110,12 +94,12 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
         av_reader = plv.MultiReader(video_readers)
 
         BoundAVFrameClass = type(
-            f"{name.capitalize()}Frame",
+            f"{self.name.capitalize()}Frame",
             (BaseAVFrame, AVProps),
             {"dtype": data.dtype, "multi_video_reader": av_reader},
         )
         BoundAVFramesClass = type(
-            f"{name.capitalize()}Frames",
+            f"{self.name.capitalize()}Frames",
             (Array, AVProps),
             {
                 "record_class": BoundAVFrameClass,
@@ -124,41 +108,4 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             },
         )
 
-        return cls(
-            data.view(BoundAVFramesClass),
-            name,
-            recording,
-            av_reader,
-            # kind,
-        )
-
-    @overload
-    def __getitem__(self, key: SupportsIndex) -> BaseAVFrame: ...
-    @overload
-    def __getitem__(self: T, key: slice | list[str]) -> T: ...
-    def __getitem__(
-        self, key: SupportsIndex | slice | str | list[str]
-    ) -> "BaseAVTimeseries | BaseAVFrame":
-        if isinstance(key, slice):
-            return self.__class__(
-                self._data[key],  # type: ignore
-                self.name,
-                self.recording,
-                self.av_reader,
-            )
-        else:
-            return super().__getitem__(key)  # type: ignore
-
-    def sample(
-        self: T,
-        target_ts: ArrayLike[int],
-        method: Literal["nearest", "backward", "forward"] = "nearest",
-        tolerance: int | None = None,
-    ) -> T:
-        indices = match_ts(target_ts, self.ts, method, tolerance)
-        return self.__class__(
-            self._data[indices],  # type: ignore
-            self.name,
-            self.recording,
-            self.av_reader,
-        )
+        return data.view(BoundAVFramesClass)

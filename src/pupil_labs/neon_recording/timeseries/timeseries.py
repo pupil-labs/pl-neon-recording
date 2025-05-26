@@ -46,10 +46,16 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
     recording: "NeonRecording"
     _data: ArrayType
 
-    def __init__(self, data: ArrayType, name: str, recording: "NeonRecording"):
-        self.name = name
+    def __init__(self, recording: "NeonRecording", data: ArrayType | None = None):
         self.recording = recording
+        if data is None:
+            data = self._load_data_from_recording(recording)
         self._data = data
+
+    def _load_data_from_recording(self, recording: "NeonRecording") -> ArrayType:
+        raise NotImplementedError(
+            f"Loading data for {self.__class__.__name__} is not implemented."
+        )
 
     @property
     def dtype(self):
@@ -73,8 +79,8 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
     ) -> "Timeseries | RecordType":
         if isinstance(key, slice):
             return self.__class__(
-                self._data[key],  # type: ignore
                 self.recording,
+                self._data[key],  # type: ignore
             )
         else:
             return self._data[key]  # type: ignore
@@ -110,6 +116,6 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
             )
 
         return self.__class__(
-            self._data[indices],  # type: ignore
             self.recording,
+            self._data[indices],  # type: ignore
         )

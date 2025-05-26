@@ -20,7 +20,7 @@ from pupil_labs.neon_recording.utils import (
 log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from ..neon_recording import NeonRecording
+    pass
 
 
 class GazeProps(TimeseriesProps):
@@ -44,11 +44,7 @@ class GazeArray(Array[GazeRecord], GazeProps):
 
 
 class GazeTimeseries(Timeseries[GazeArray, GazeRecord], GazeProps):
-    def __init__(self, data: GazeArray, recording: "NeonRecording"):
-        super().__init__(data, "gaze", recording)
-
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "GazeTimeseries":
+    def _load_data_from_recording(self, recording) -> "GazeArray":
         log.debug("NeonRecording: Loading gaze data")
 
         gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
@@ -70,4 +66,4 @@ class GazeTimeseries(Timeseries[GazeArray, GazeRecord], GazeProps):
             ]),
         )
         data = data.view(GazeArray)
-        return GazeTimeseries(data, recording)
+        return data

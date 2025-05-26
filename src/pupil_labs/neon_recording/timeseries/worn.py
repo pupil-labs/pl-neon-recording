@@ -34,15 +34,16 @@ class WornArray(Array[WornRecord], WornProps):
 class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
     """Worn (headset on/off) data"""
 
-    def __init__(self, data: WornArray, recording: "NeonRecording"):
-        super().__init__(data, "worn", recording)
+    def __init__(self, recording: "NeonRecording", data: WornArray | None = None):
+        if data is None:
+            data = self._load_data_from_recording()
+        super().__init__("worn", recording, data)
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "WornTimeseries":
+    def _load_data_from_recording(self) -> "WornArray":
         log.debug("NeonRecording: Loading worn data")
 
-        worn_200hz_file = recording._rec_dir / "worn_200hz.raw"
-        time_200hz_file = recording._rec_dir / "gaze_200hz.time"
+        worn_200hz_file = self.recording._rec_dir / "worn_200hz.raw"
+        time_200hz_file = self.recording._rec_dir / "gaze_200hz.time"
 
         file_pairs = []
         if worn_200hz_file.exists() and time_200hz_file.exists():
@@ -50,8 +51,8 @@ class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
             file_pairs.append((worn_200hz_file, time_200hz_file))
         else:
             log.debug("NeonRecording: Using realtime worn data")
-            file_pairs = find_sorted_multipart_files(recording._rec_dir, "worn")
+            file_pairs = find_sorted_multipart_files(self.recording._rec_dir, "worn")
 
         data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
         data = data.view(WornArray)
-        return WornTimeseries(data, recording)
+        return data

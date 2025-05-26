@@ -26,12 +26,28 @@ class VideoTimeseries(BaseAVTimeseries):
     @property
     def width(self) -> int | None:
         """Width of the video"""
-        return self.av_reader.width
+        # return self.av_reader.width
+        raise NotImplementedError()
 
     @property
     def height(self) -> int | None:
         """Height of the video"""
-        return self.av_reader.height
+        # return self.av_reader.height
+        raise NotImplementedError()
+
+
+class SceneVideoTimeseries(VideoTimeseries):
+    """Frames of video from the scene camera"""
+
+    base_name: str = "Neon Scene Camera v1"
+    name: str = "scene"
+
+
+class EyeVideoTimeseries(VideoTimeseries):
+    """Frames of video from the eye cameras"""
+
+    base_name: str = "Neon Sensor Module v1"
+    name: str = "eye"
 
 
 class GrayFrame:

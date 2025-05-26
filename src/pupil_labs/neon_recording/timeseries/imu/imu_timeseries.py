@@ -15,7 +15,7 @@ from ...utils import find_sorted_multipart_files, join_struct_arrays
 from . import imu_pb2
 
 if TYPE_CHECKING:
-    from pupil_labs.neon_recording import NeonRecording
+    pass
 
 log = logging.getLogger(__name__)
 
@@ -69,11 +69,9 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
         ("quaternion_z", "float32"),
     ])
 
-    def __init__(self, data: ImuArray, recording: "NeonRecording"):
-        super().__init__(data, "imu", recording)
+    name: str = "imu"
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "IMUTimeseries":
+    def _load_data_from_recording(self, recording) -> "ImuArray":
         log.debug("NeonRecording: Loading IMU data")
 
         imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "imu")
@@ -89,7 +87,9 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
             ]
 
         else:
-            imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "extimu")
+            imu_file_pairs = find_sorted_multipart_files(
+                self.recording._rec_dir, "extimu"
+            )
             time_data = Array([file for _, file in imu_file_pairs], TIMESTAMP_DTYPE)  # type: ignore
 
             records = []
@@ -118,7 +118,7 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
             imu_data = join_struct_arrays([time_data, imu_data])
             imu_data = imu_data.view(ImuArray)
 
-        return IMUTimeseries(imu_data, recording)
+        return imu_data
 
 
 def parse_neon_imu_raw_packets(buffer):

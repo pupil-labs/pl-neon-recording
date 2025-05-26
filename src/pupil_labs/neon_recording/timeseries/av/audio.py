@@ -13,7 +13,10 @@ class AudioTimeseries(BaseAVTimeseries):
     """Audio frames"""
 
     kind: AVTimeseriesKind = "video"
+    base_name: str = "Neon Scene Camera v1"
+    name: str = "audio"
 
     @property
     def rate(self):
-        return self.av_reader.rate
+        # return self.av_reader.rate
+        raise NotImplementedError()

@@ -41,11 +41,9 @@ class BlinkArray(Array[BlinkRecord], BlinkProps):
 class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
     """Blinks data"""
 
-    def __init__(self, data: BlinkArray, recording: "NeonRecording"):
-        super().__init__(data, "blink", recording)
+    name: str = "blink"
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "BlinkTimeseries":
+    def from_recording(self, recording: "NeonRecording") -> BlinkArray:
         log.debug("NeonRecording: Loading blink data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "blinks")
         data = load_multipart_data_time_pairs(
@@ -56,4 +54,4 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
             ]),
         )
         data = data.view(BlinkArray)
-        return BlinkTimeseries(data, recording)
+        return data

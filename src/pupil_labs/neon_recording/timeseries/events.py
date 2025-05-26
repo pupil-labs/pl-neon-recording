@@ -33,11 +33,9 @@ class EventArray(Array[EventRecord], EventProps):
 class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
     """Event annotations"""
 
-    def __init__(self, data: EventArray, recording: "NeonRecording"):
-        super().__init__(data, "event", recording)
+    name: str = "event"
 
-    @staticmethod
-    def from_recording(recording: "NeonRecording") -> "EventTimeseries":
+    def _load_data_from_recording(self, recording: "NeonRecording") -> EventArray:
         log.debug("NeonRecording: Loading event data")
 
         events_file = recording._rec_dir / "event.txt"
@@ -50,7 +48,7 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
             "event" if name == "text" else name for name in data.dtype.names
         ]
         data = data.view(EventArray)
-        return EventTimeseries(data, recording)
+        return data
 
     @cached_property
     def by_name(self):

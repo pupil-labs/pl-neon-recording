@@ -1,5 +1,5 @@
 from .av.audio import AudioTimeseries
-from .av.video import VideoTimeseries
+from .av.video import EyeVideoTimeseries, SceneVideoTimeseries
 from .blinks import BlinkTimeseries
 from .events import EventTimeseries
 from .eye_state import EyeStateTimeseries
@@ -13,9 +13,10 @@ __all__ = [
     "BlinkTimeseries",
     "EventTimeseries",
     "EyeStateTimeseries",
+    "EyeVideoTimeseries",
     "FixationTimeseries",
     "GazeTimeseries",
     "IMUTimeseries",
-    "VideoTimeseries",
+    "SceneVideoTimeseries",
     "WornTimeseries",
 ]
