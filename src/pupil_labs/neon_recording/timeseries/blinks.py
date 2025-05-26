@@ -42,7 +42,7 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
 
     name: str = "blink"
 
-    def from_recording(self, recording: "NeonRecording") -> BlinkArray:
+    def _load_data_from_recording(self, recording: "NeonRecording") -> BlinkArray:
         log.debug("NeonRecording: Loading blink data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "blinks")
         data = load_multipart_data_time_pairs(
