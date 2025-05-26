@@ -115,8 +115,8 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
 
             imu_data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
             imu_data = join_struct_arrays([time_data, imu_data])
-            imu_data = imu_data.view(ImuArray)
 
+        imu_data = imu_data.view(ImuArray)
         return imu_data
 
 
