@@ -2,7 +2,6 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import (
     TIMESTAMP_DTYPE,
@@ -21,21 +20,21 @@ log = logging.getLogger(__name__)
 
 
 class ImuProps(TimeseriesProps):
-    gyro_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    gyro_xyz = fields[np.float64]([
         "gyro_x",
         "gyro_y",
         "gyro_z",
     ])  # type:ignore
     "Gyroscope data"
 
-    accel_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    accel_xyz = fields[np.float64]([
         "accel_x",
         "accel_y",
         "accel_z",
     ])  # type:ignore
     "Acceleration data"
 
-    quaternion_wxyz: npt.NDArray[np.float64] = fields[np.float64]([  # type:ignore
+    quaternion_wxyz = fields[np.float64]([  # type:ignore
         "quaternion_w",
         "quaternion_x",
         "quaternion_y",

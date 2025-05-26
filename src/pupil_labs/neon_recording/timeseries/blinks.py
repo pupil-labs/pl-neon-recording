@@ -2,7 +2,6 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
@@ -22,10 +21,10 @@ if TYPE_CHECKING:
 
 
 class BlinkProps(TimeseriesProps):
-    start_ts: npt.NDArray[np.int64] = fields[np.int64]("start_timestamp_ns")  # type:ignore
+    start_ts = fields[np.int64]("start_timestamp_ns")  # type:ignore
     "Start timestamp of blink"
 
-    end_ts: npt.NDArray[np.int64] = fields[np.int64]("end_timestamp_ns")  # type:ignore
+    end_ts = fields[np.int64]("end_timestamp_ns")  # type:ignore
     "End timestamp of blink"
 
 

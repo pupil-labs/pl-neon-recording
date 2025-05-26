@@ -8,7 +8,6 @@ from typing import (
 )
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.sample import match_ts
@@ -26,7 +25,7 @@ ArrayType = TypeVar("ArrayType", bound=Array)
 
 
 class TimeseriesProps:
-    ts: npt.NDArray[np.int64] = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
+    ts = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
     "The moment these data were recorded"
 
     def keys(self):

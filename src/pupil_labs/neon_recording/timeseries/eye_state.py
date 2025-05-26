@@ -2,7 +2,6 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
@@ -18,51 +17,47 @@ if TYPE_CHECKING:
 
 
 class EyeStateProps(TimeseriesProps):
-    pupil_diameter_left_right_mm: npt.NDArray[np.float64] = fields[np.float64]([
+    pupil_diameter_left_right_mm = fields[np.float64]([
         "pupil_diameter_left_mm",
         "pupil_diameter_right_mm",
     ])  # type:ignore
     "Pupil diameter (in mm) for both eyes: (left, right)"
 
-    pupil_diameter_left_mm: npt.NDArray[np.float64] = fields[np.float64]([
-        "pupil_diameter_left_mm"
-    ])  # type:ignore
+    pupil_diameter_left_mm = fields[np.float64](["pupil_diameter_left_mm"])  # type:ignore
     "Pupil diameter (in mm) for left eye"
 
-    pupil_diameter_right_mm: npt.NDArray[np.float64] = fields[np.float64]([
-        "pupil_diameter_right_mm"
-    ])  # type:ignore
+    pupil_diameter_right_mm = fields[np.float64](["pupil_diameter_right_mm"])  # type:ignore
     "Pupil diameter (in mm) for right eye"
 
-    eyeball_center_left_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    eyeball_center_left_xyz = fields[np.float64]([
         "eyeball_center_left_x",
         "eyeball_center_left_y",
         "eyeball_center_left_z",
     ])  # type:ignore
     "The xyz position in mm of the left eyeball relative to the scene camera"
 
-    eyeball_center_right_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    eyeball_center_right_xyz = fields[np.float64]([
         "eyeball_center_right_x",
         "eyeball_center_right_y",
         "eyeball_center_right_z",
     ])  # type:ignore
     "The xyz position in mm of the right eyeball relative to the scene camera"
 
-    optical_axis_left_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    optical_axis_left_xyz = fields[np.float64]([
         "optical_axis_left_x",
         "optical_axis_left_y",
         "optical_axis_left_z",
     ])  # type:ignore
     "A xyz vector in the forward direction of the left eye's optical axis"
 
-    optical_axis_right_xyz: npt.NDArray[np.float64] = fields[np.float64]([
+    optical_axis_right_xyz = fields[np.float64]([
         "optical_axis_right_x",
         "optical_axis_right_y",
         "optical_axis_right_z",
     ])  # type:ignore
     "A xyz vector in the forward direction of the right eye's optical axis"
 
-    eyelid_angle: npt.NDArray[np.float64] = fields[np.float64]([
+    eyelid_angle = fields[np.float64]([
         "eyelid_angle_top_left",
         "eyelid_angle_bottom_left",
         "eyelid_angle_top_right",
@@ -70,7 +65,7 @@ class EyeStateProps(TimeseriesProps):
     ])  # type:ignore
     "Eyelid angle: (top_left, bottom_left, top_right, bottom_right)"
 
-    eyelid_aperture_left_right_mm: npt.NDArray[np.float64] = fields[np.float64]([
+    eyelid_aperture_left_right_mm = fields[np.float64]([
         "eyelid_aperture_left_mm",
         "eyelid_aperture_right_mm",
     ])  # type:ignore

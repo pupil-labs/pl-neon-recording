@@ -2,7 +2,6 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class WornProps(TimeseriesProps):
-    worn: npt.NDArray[np.float64] = fields[np.float64]("worn")  # type:ignore
+    worn = fields[np.float64]("worn")  # type:ignore
     "Worn"
 
 

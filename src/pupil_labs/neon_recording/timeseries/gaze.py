@@ -4,7 +4,6 @@ from typing import (
 )
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
@@ -24,13 +23,13 @@ if TYPE_CHECKING:
 
 
 class GazeProps(TimeseriesProps):
-    x: npt.NDArray[np.float64] = fields[np.float64]("x")  # type:ignore
+    x = fields[np.float64]("x")  # type:ignore
     "Gaze x coordinate in pixels"
 
-    y: npt.NDArray[np.float64] = fields[np.float64]("y")  # type:ignore
+    y = fields[np.float64]("y")  # type:ignore
     "Gaze y coordinate in pixels"
 
-    xy: npt.NDArray[np.float64] = fields[np.float64](["x", "y"])  # type:ignore
+    xy = fields[np.float64](["x", "y"])  # type:ignore
     "Gaze xy coordinates in pixels"
 
 
