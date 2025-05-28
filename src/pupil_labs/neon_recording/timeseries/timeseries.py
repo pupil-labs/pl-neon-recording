@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import (
     TYPE_CHECKING,
     Generic,
@@ -99,6 +100,11 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
             f"{self.__class__.__name__}"
             f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
         )
+
+    def __iter__(self) -> Iterator[RecordType]:
+        """Iterate over the records in the timeseries."""
+        for i in range(len(self)):
+            yield self[i]
 
     def sample(
         self: T,
