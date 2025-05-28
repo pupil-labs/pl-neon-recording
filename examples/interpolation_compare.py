@@ -22,13 +22,15 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
     )
 
     # get closest gaze data to scene frame timestamps
-    matched_gazes = recording.gaze.sample(recording.scene.ts)
+    matched_gazes = recording.gaze.sample(recording.scene.time)
 
     # interpolate gaze data to scene frame timestamps
-    interpolated_gazes = recording.gaze.interpolate(recording.scene.ts)
+    interpolated_gazes = recording.gaze.interpolate(recording.scene.time)
 
     # visualize both
-    scene_gaze_pairs = zip(recording.scene, matched_gazes, interpolated_gazes)
+    scene_gaze_pairs = zip(
+        recording.scene, matched_gazes, interpolated_gazes, strict=False
+    )
     for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
         # draw the nearest-time gaze sample in red
         frame = cv2.circle(

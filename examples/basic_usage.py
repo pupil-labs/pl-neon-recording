@@ -19,7 +19,7 @@ print("")
 
 # read 10 gaze samples
 print("First 10 gaze samples:")
-timestamps = recording.gaze.ts[:10]
+timestamps = recording.gaze.time[:10]
 subsample = recording.gaze.sample(timestamps)
 for gaze_datum in subsample:
-    print(f"\t{gaze_datum.ts} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")
+    print(f"\t{gaze_datum.time} : ({gaze_datum.x:0.2f}, {gaze_datum.y:0.2f})")

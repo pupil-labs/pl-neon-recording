@@ -54,6 +54,6 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
     def by_name(self):
         """Return a dict of event_name => all ts"""
         result = defaultdict(list)
-        for name, ts in zip(self._data.event, self._data.ts, strict=False):
+        for name, ts in zip(self._data.event, self._data.time, strict=False):
             result[name].append(ts)
         return {key: np.array(ts) for key, ts in result.items()}

@@ -58,7 +58,7 @@ def make_eye_state_video(recording_dir, output_video_path):
     )
 
     output_timestamps = np.arange(
-        recording.eye.ts[0], recording.eye.ts[-1], int(1e9 / fps)
+        recording.eye.time[0], recording.eye.time[-1], int(1e9 / fps)
     )
 
     eye_video_sampled = recording.eye.sample(output_timestamps)
@@ -98,7 +98,9 @@ def make_eye_state_video(recording_dir, output_video_path):
 
         for plot_name, plot_meta in plot_metas.items():
             min_ts = ts - plot_duration_secs * 1e9
-            time_frame = (min_ts < eye_state_sampled.ts) & (eye_state_sampled.ts <= ts)
+            time_frame = (min_ts < eye_state_sampled.time) & (
+                eye_state_sampled.time <= ts
+            )
             plot_data = eye_state_sampled[time_frame][plot_name]
             plot(
                 eye_pixels,

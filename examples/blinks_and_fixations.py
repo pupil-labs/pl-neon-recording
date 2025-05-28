@@ -61,7 +61,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     )
 
     output_timestamps = np.arange(
-        recording.eye.ts[0], recording.eye.ts[-1], int(1e9 / fps)
+        recording.eye.time[0], recording.eye.time[-1], int(1e9 / fps)
     )
     eye_frames = recording.eye.sample(output_timestamps)
 

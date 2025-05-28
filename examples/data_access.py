@@ -94,7 +94,7 @@ print("Gaze data", recording.gaze)
 #           dtype=[('ts', '<i8'), ('x', '<f4'), ('y', '<f4')])
 
 print()
-print("Gaze ts via prop", recording.gaze.ts)
+print("Gaze ts via prop", recording.gaze.time)
 print("Gaze ts via key", recording.gaze["ts"])
 # array([1741948698620648018, 1741948698630654018, 1741948698635648018, ...,
 #        1741948717448190018, 1741948717453190018, 1741948717458190018])
@@ -129,21 +129,23 @@ print("Sampling data:")
 
 print()
 print("Get closest gaze for scene frames")
-closest_gaze_to_scene = recording.gaze.sample(recording.scene.ts)
+closest_gaze_to_scene = recording.gaze.sample(recording.scene.time)
 print(closest_gaze_to_scene)
 print(
     "closest_gaze_to_scene_times",
-    (closest_gaze_to_scene.ts - recording.start_ts) / 1e9,
+    (closest_gaze_to_scene.time - recording.start_ts) / 1e9,
 )
 
 
 print()
 print("Get closest before gaze for scene frames")
-closest_gaze_before_scene = recording.gaze.sample(recording.scene.ts, method="backward")
+closest_gaze_before_scene = recording.gaze.sample(
+    recording.scene.time, method="backward"
+)
 print(closest_gaze_before_scene)
 print(
     "closest_gaze_before_scene_times",
-    (closest_gaze_before_scene.ts - recording.start_ts) / 1e9,
+    (closest_gaze_before_scene.time - recording.start_ts) / 1e9,
 )
 
 
@@ -153,10 +155,10 @@ print("Sampled data can be resampled")
 print()
 print("Closest gaze sampled at 1 fps")
 closest_gaze_to_scene_at_one_fps = closest_gaze_before_scene.sample(
-    np.arange(closest_gaze_to_scene.ts[0], closest_gaze_to_scene.ts[-1], 1e9 / 1)
+    np.arange(closest_gaze_to_scene.time[0], closest_gaze_to_scene.time[-1], 1e9 / 1)
 )
 print(closest_gaze_to_scene_at_one_fps)
 print(
     "closest_gaze_to_scene_at_one_fps_times",
-    (closest_gaze_to_scene_at_one_fps.ts - recording.start_ts) / 1e9,
+    (closest_gaze_to_scene_at_one_fps.time - recording.start_ts) / 1e9,
 )

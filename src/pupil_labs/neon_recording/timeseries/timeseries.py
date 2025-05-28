@@ -25,7 +25,7 @@ ArrayType = TypeVar("ArrayType", bound=Array)
 
 
 class TimeseriesProps:
-    ts = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
+    time = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
     "The moment these data were recorded"
 
     def keys(self):
@@ -106,7 +106,7 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
         method: Literal["nearest", "backward", "forward"] = "nearest",
         tolerance: int | None = None,
     ) -> T:
-        indices = match_ts(target_ts, self.ts, method, tolerance)
+        indices = match_ts(target_ts, self.time, method, tolerance)
 
         if True in np.isnan(indices):
             raise ValueError(

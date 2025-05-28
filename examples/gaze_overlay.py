@@ -25,11 +25,11 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
     )
 
     if fps is None:
-        output_timestamps = recording.scene.ts
+        output_timestamps = recording.scene.time
         fps = 30
     else:
         output_timestamps = np.arange(
-            recording.scene.ts[0], recording.scene.ts[-1], 1e9 / fps, dtype=np.int64
+            recording.scene.time[0], recording.scene.time[-1], 1e9 / fps, dtype=np.int64
         )
 
     scene_datas = recording.scene.sample(output_timestamps)

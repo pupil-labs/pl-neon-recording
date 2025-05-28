@@ -35,11 +35,12 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
     )
 
     output_timestamps = np.arange(
-        recording.eye.ts[0], recording.eye.ts[-1], int(1e9 / fps)
+        recording.eye.time[0], recording.eye.time[-1], int(1e9 / fps)
     )
     eyes_and_worn = zip(
         recording.eye.sample(output_timestamps),
         recording.worn.sample(output_timestamps),
+        strict=False,
     )
 
     for frame, worn_record in tqdm(eyes_and_worn, total=len(output_timestamps)):

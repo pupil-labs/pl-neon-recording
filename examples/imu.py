@@ -21,7 +21,7 @@ recording = nr.open(sys.argv[1])
 fps = 60
 z = recording.gaze[:10]
 timestamps = np.arange(
-    recording.imu.ts[0], recording.imu.ts[-1], 1e9 / fps, dtype=np.int64
+    recording.imu.time[0], recording.imu.time[-1], 1e9 / fps, dtype=np.int64
 )
 imu_data = recording.imu.sample(timestamps)
 
