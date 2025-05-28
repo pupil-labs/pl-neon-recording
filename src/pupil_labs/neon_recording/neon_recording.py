@@ -11,11 +11,13 @@ from pupil_labs.neon_recording.timeseries import (
     AudioTimeseries,
     BlinkTimeseries,
     EventTimeseries,
-    EyeStateTimeseries,
+    EyeballPoseTimeseries,
+    EyelidTimeseries,
     EyeVideoTimeseries,
     FixationTimeseries,
     GazeTimeseries,
     IMUTimeseries,
+    PupilDiameterTimeseries,
     SceneVideoTimeseries,
     WornTimeseries,
 )
@@ -112,9 +114,19 @@ class NeonRecording:
         return IMUTimeseries(self)
 
     @cached_property
-    def eye_state(self) -> EyeStateTimeseries:
+    def pupil_diameter(self) -> PupilDiameterTimeseries:
+        """Pupil diameter data"""
+        return PupilDiameterTimeseries(self)
+
+    @cached_property
+    def eyelid(self) -> EyelidTimeseries:
+        """Eyelid data"""
+        return EyelidTimeseries(self)
+
+    @cached_property
+    def eyeball_pose(self) -> EyeballPoseTimeseries:
         """Eye state data"""
-        return EyeStateTimeseries(self)
+        return EyeballPoseTimeseries(self)
 
     @cached_property
     def scene(self) -> SceneVideoTimeseries:
