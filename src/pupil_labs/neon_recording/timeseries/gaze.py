@@ -23,14 +23,8 @@ if TYPE_CHECKING:
 
 
 class GazeProps(TimeseriesProps):
-    x = fields[np.float64]("x")  # type:ignore
-    "Gaze x coordinate in pixels"
-
-    y = fields[np.float64]("y")  # type:ignore
-    "Gaze y coordinate in pixels"
-
-    xy = fields[np.float64](["x", "y"])  # type:ignore
-    "Gaze xy coordinates in pixels"
+    point = fields[np.float64](["x", "y"])  # type:ignore
+    "2D gaze coordinates in the scene video in pixels"
 
 
 class GazeRecord(Record, GazeProps):
