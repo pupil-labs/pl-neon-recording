@@ -2,67 +2,46 @@ import sys
 
 import cv2
 import numpy as np
-from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
 import pupil_labs.neon_recording as nr  # noqa: E402
-from pupil_labs.neon_recording.timeseries.av.video import (  # noqa: E402
-    GrayFrame,
-)
+from pupil_labs.video import Writer  # noqa: E402
 
 
-def make_overlaid_video(recording_dir, output_video_path, fps=None):
-    recording = nr.open(recording_dir)
+def make_overlaid_video(recording_dir, output_video_path):
+    rec = nr.open(recording_dir)
 
-    video_writer = cv2.VideoWriter(
-        str(output_video_path),
-        cv2.VideoWriter_fourcc(*"MJPG"),
-        fps,
-        (recording.scene.width, recording.scene.height),
+    combined_data = zip(
+        rec.scene,
+        rec.gaze.sample(rec.scene.time),
+        strict=True,
     )
 
-    if fps is None:
-        output_timestamps = recording.scene.time
-        fps = 30
-    else:
-        output_timestamps = np.arange(
-            recording.scene.time[0], recording.scene.time[-1], 1e9 / fps, dtype=np.int64
+    video_writer = Writer(output_video_path)
+    video_start_time = rec.scene.time[0]
+
+    for scene_frame, gaze_datum in combined_data:
+        frame_pixels = scene_frame.bgr
+
+        frame_pixels = cv2.circle(
+            frame_pixels,
+            (int(gaze_datum.x), int(gaze_datum.y)),
+            50,
+            (0, 0, 255),
+            10,
         )
 
-    scene_datas = recording.scene.sample(output_timestamps)
-    combined_data = zip(
-        output_timestamps,
-        scene_datas,
-        recording.gaze.sample(output_timestamps),
-        strict=False,
-    )
+        video_time = (scene_frame.ts - video_start_time) / 1e9
+        video_writer.write_image(frame_pixels, time=video_time)
 
-    for ts, scene_frame, gaze_datum in tqdm(
-        combined_data, total=len(output_timestamps)
-    ):
-        if abs(scene_frame.ts - ts) < 2e9 / fps:
-            frame_pixels = scene_frame.bgr
-        else:
-            frame_pixels = GrayFrame(scene_frame.width, scene_frame.height).bgr
-
-        if abs(gaze_datum.ts - ts) < 2e9 / fps:
-            frame_pixels = cv2.circle(
-                frame_pixels,
-                (int(gaze_datum.x), int(gaze_datum.y)),
-                50,
-                (0, 0, 255),
-                10,
-            )
-
-        video_writer.write(frame_pixels)
         cv2.imshow("Frame", frame_pixels)
-        cv2.pollKey()
+        cv2.waitKey(30)
 
-    video_writer.release()
+    video_writer.close()
 
 
 if __name__ == "__main__":
-    make_overlaid_video(sys.argv[1], "gaze-overlay-output-video.avi", 24)
+    make_overlaid_video(sys.argv[1], "gaze-overlay-output-video.mp4")
