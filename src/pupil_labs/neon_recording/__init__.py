@@ -7,7 +7,6 @@ from .timeseries.av.audio import AudioTimeseries
 from .timeseries.av.video import VideoTimeseries
 from .timeseries.blinks import BlinkTimeseries
 from .timeseries.events import EventTimeseries
-from .timeseries.eye_state import EyeStateTimeseries
 from .timeseries.fixations import FixationTimeseries
 from .timeseries.gaze import GazeTimeseries
 from .timeseries.imu.imu_timeseries import IMUTimeseries
@@ -29,7 +28,6 @@ __all__ = [
     "AudioTimeseries",
     "BlinkTimeseries",
     "EventTimeseries",
-    "EyeStateTimeseries",
     "FixationTimeseries",
     "GazeTimeseries",
     "IMUTimeseries",

@@ -74,6 +74,7 @@ class EyelidTimeseries(Timeseries[EyelidArray, EyelidRecord], EyelidProps):
         )
         data = data[
             [
+                "time",
                 "eyelid_angle_top_left",
                 "eyelid_angle_bottom_left",
                 "eyelid_aperture_left_mm",
@@ -83,6 +84,7 @@ class EyelidTimeseries(Timeseries[EyelidArray, EyelidRecord], EyelidProps):
             ]
         ]
         data.dtype.names = (
+            "time",
             "angle_upper_left",
             "angle_lower_left",
             "aperture_left",

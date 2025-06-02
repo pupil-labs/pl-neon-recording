@@ -68,11 +68,13 @@ class PupilDiameterTimeseries(
         )
         data = data[
             [
+                "time",
                 "pupil_diameter_left_mm",
                 "pupil_diameter_right_mm",
             ]
         ]
         data.dtype.names = (
+            "time",
             "left",
             "right",
         )

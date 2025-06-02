@@ -88,6 +88,7 @@ class EyeballPoseTimeseries(
         )
         data = data[
             [
+                "time",
                 "eyeball_center_left_x",
                 "eyeball_center_left_y",
                 "eyeball_center_left_z",
