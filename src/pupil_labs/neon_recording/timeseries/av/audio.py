@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 class AudioTimeseries(BaseAVTimeseries):
     """Audio frames"""
 
-    kind: AVTimeseriesKind = "video"
+    kind: AVTimeseriesKind = "audio"
     base_name: str = "Neon Scene Camera v1"
     name: str = "audio"
 
