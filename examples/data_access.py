@@ -153,7 +153,12 @@ print("Sampled data can be resampled")
 print()
 print("Closest gaze sampled at 1 fps")
 closest_gaze_to_scene_at_one_fps = closest_gaze_before_scene.sample(
-    np.arange(closest_gaze_to_scene.ts[0], closest_gaze_to_scene.ts[-1], 1e9 / 1)
+    np.arange(
+        closest_gaze_to_scene.ts[0],
+        closest_gaze_to_scene.ts[-1],
+        1e9 / 1,
+        dtype=np.int64
+    )
 )
 print(closest_gaze_to_scene_at_one_fps)
 print(
