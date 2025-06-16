@@ -72,7 +72,7 @@ class BaseAVStream(Stream[Array[BaseAVStreamFrame], BaseAVStreamFrame]):
         for av_file, time_file in av_files:
             if self.kind == "video":
                 part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
-                container_timestamps = (part_ts["ts"] - recording.start_ts) / 1e9
+                container_timestamps = (part_ts["ts"] - part_ts["ts"][0]) / 1e9
                 reader = plv.Reader(av_file, self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
             elif self.kind == "audio":
