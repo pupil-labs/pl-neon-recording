@@ -16,35 +16,29 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class PupilDiameterProps(TimeseriesProps):
-    left = fields[np.float64](["left"])
+class PupilProps(TimeseriesProps):
+    diameter_left = fields[np.float64](["diameter_left"])
     "Pupil diameter of the left eye in mm."
 
-    right = fields[np.float64](["right"])
+    diameter_right = fields[np.float64](["diameter_right"])
     "Pupil diameter of the right eye in mm."
 
 
-class PupilDiameterRecord(Record, PupilDiameterProps):
+class PupilRecord(Record, PupilProps):
     def keys(self):
-        return [
-            x for x in dir(PupilDiameterProps) if not x.startswith("_") and x != "keys"
-        ]
+        return [x for x in dir(PupilProps) if not x.startswith("_") and x != "keys"]
 
 
-class PupilDiameterArray(Array[PupilDiameterRecord], PupilDiameterProps):
-    record_class = PupilDiameterRecord
+class PupilArray(Array[PupilRecord], PupilProps):
+    record_class = PupilRecord
 
 
-class PupilDiameterTimeseries(
-    Timeseries[PupilDiameterArray, PupilDiameterRecord], PupilDiameterProps
-):
-    """Pupil diameter data"""
+class PupilTimeseries(Timeseries[PupilArray, PupilRecord], PupilProps):
+    """Pupil data"""
 
-    name: str = "pupil_diameter"
+    name: str = "pupil"
 
-    def _load_data_from_recording(
-        self, recording: "NeonRecording"
-    ) -> PupilDiameterArray:
+    def _load_data_from_recording(self, recording: "NeonRecording") -> PupilArray:
         log.debug("NeonRecording: Loading eye state data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "eye_state")
         data = load_multipart_data_time_pairs(
@@ -75,9 +69,9 @@ class PupilDiameterTimeseries(
         ]
         data.dtype.names = (
             "time",
-            "left",
-            "right",
+            "diameter_left",
+            "diameter_right",
         )
-        data = data.view(PupilDiameterArray)
+        data = data.view(PupilArray)
 
         return data

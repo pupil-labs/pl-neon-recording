@@ -59,8 +59,8 @@ def make_eye_state_video(recording_dir, output_video_path):
 
     for dim, config in enumerate(plot_config):
         config["range"] = (
-            np.min(recording.eyeball_pose.optical_axis_left[:, dim]),
-            np.max(recording.eyeball_pose.optical_axis_left[:, dim]),
+            np.min(recording.eyeball.optical_axis_left[:, dim]),
+            np.max(recording.eyeball.optical_axis_left[:, dim]),
         )
 
     plot_duration_secs = 0.5
@@ -72,10 +72,10 @@ def make_eye_state_video(recording_dir, output_video_path):
 
         for dim, config in enumerate(plot_config):
             min_ts = eye_sample.time - plot_duration_secs * 1e9
-            mask = (min_ts < recording.eyeball_pose.time) & (
-                recording.eyeball_pose.time <= eye_sample.time
+            mask = (min_ts < recording.eyeball.time) & (
+                recording.eyeball.time <= eye_sample.time
             )
-            plot_data = recording.eyeball_pose.optical_axis_left[mask, dim]
+            plot_data = recording.eyeball.optical_axis_left[mask, dim]
             plot(
                 eye_pixels,
                 plot_data,

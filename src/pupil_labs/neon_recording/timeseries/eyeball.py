@@ -16,15 +16,15 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class EyeballPoseProps(TimeseriesProps):
-    eyeball_center_left = fields[np.float64]([
+class EyeballProps(TimeseriesProps):
+    center_left = fields[np.float64]([
         "eyeball_center_left_x",
         "eyeball_center_left_y",
         "eyeball_center_left_z",
     ])  # type:ignore
     "The 3D position of the left eyeball relative to the scene camera in mm."
 
-    eyeball_center_right = fields[np.float64]([
+    center_right = fields[np.float64]([
         "eyeball_center_right_x",
         "eyeball_center_right_y",
         "eyeball_center_right_z",
@@ -46,25 +46,21 @@ class EyeballPoseProps(TimeseriesProps):
     "A 3D vector in the forward direction of the right eye's optical axis"
 
 
-class EyeballPoseRecord(Record, EyeballPoseProps):
+class EyeballRecord(Record, EyeballProps):
     def keys(self):
-        return [
-            x for x in dir(EyeballPoseProps) if not x.startswith("_") and x != "keys"
-        ]
+        return [x for x in dir(EyeballProps) if not x.startswith("_") and x != "keys"]
 
 
-class EyeballPoseArray(Array[EyeballPoseRecord], EyeballPoseProps):
-    record_class = EyeballPoseRecord
+class EyeballArray(Array[EyeballRecord], EyeballProps):
+    record_class = EyeballRecord
 
 
-class EyeballPoseTimeseries(
-    Timeseries[EyeballPoseArray, EyeballPoseRecord], EyeballPoseProps
-):
-    """Eyeball pose data"""
+class EyeballTimeseries(Timeseries[EyeballArray, EyeballRecord], EyeballProps):
+    """Eyeball data"""
 
-    name: str = "eyeball_pose"
+    name: str = "eyeball"
 
-    def _load_data_from_recording(self, recording: "NeonRecording") -> EyeballPoseArray:
+    def _load_data_from_recording(self, recording: "NeonRecording") -> EyeballArray:
         log.debug("NeonRecording: Loading eye state data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "eye_state")
         data = load_multipart_data_time_pairs(
@@ -103,5 +99,5 @@ class EyeballPoseTimeseries(
                 "optical_axis_right_z",
             ]
         ]
-        data = data.view(EyeballPoseArray)
+        data = data.view(EyeballArray)
         return data

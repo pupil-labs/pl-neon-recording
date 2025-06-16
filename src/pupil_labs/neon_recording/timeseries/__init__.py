@@ -2,12 +2,12 @@ from .av.audio import AudioTimeseries
 from .av.video import EyeVideoTimeseries, SceneVideoTimeseries
 from .blinks import BlinkTimeseries
 from .events import EventTimeseries
-from .eyeball_pose import EyeballPoseTimeseries
+from .eyeball import EyeballTimeseries
 from .eyelid import EyelidTimeseries
 from .fixations import FixationTimeseries
 from .gaze import GazeTimeseries
 from .imu.imu_timeseries import IMUTimeseries
-from .pupil_diameter import PupilDiameterTimeseries
+from .pupil import PupilTimeseries
 from .worn import WornTimeseries
 
 __all__ = [
@@ -15,12 +15,12 @@ __all__ = [
     "BlinkTimeseries",
     "EventTimeseries",
     "EyeVideoTimeseries",
-    "EyeballPoseTimeseries",
+    "EyeballTimeseries",
     "EyelidTimeseries",
     "FixationTimeseries",
     "GazeTimeseries",
     "IMUTimeseries",
-    "PupilDiameterTimeseries",
+    "PupilTimeseries",
     "SceneVideoTimeseries",
     "WornTimeseries",
 ]
