@@ -32,7 +32,7 @@ def find_clap(recording_dir, window_size_seconds=0.1, first_n_seconds=10):
 
     samples_per_window = int(window_size_seconds * recording.audio.rate)
     for i in tqdm(range(len(audio_data) - samples_per_window)):
-        segment = audio_data[i:i + samples_per_window]
+        segment = audio_data[i : i + samples_per_window]
         rms = np.sqrt(np.mean(np.square(segment)))
 
         if rms > max_rms:
@@ -44,13 +44,22 @@ def find_clap(recording_dir, window_size_seconds=0.1, first_n_seconds=10):
     reference_ts = ts_lookup[lookup_idx, 1]
 
     # Calculate the sample timestamp using the reference timestamp
-    samples_after_reference = (loudest_sample_idx - ts_lookup[lookup_idx, 0])
+    samples_after_reference = loudest_sample_idx - ts_lookup[lookup_idx, 0]
     loudest_time = reference_ts + (samples_after_reference / recording.audio.rate) * 1e9
 
     print(f"The loudest audio occurs at {loudest_time:.0f} rms = {max_rms:.3f}.")
-    print(f"    Relative to recording start: {(loudest_time - recording.start_ts) / 1e9:0.3f}s")
-    print(f"    Relative to video start    : {(loudest_time - recording.scene.ts[0]) / 1e9:0.3f}s")
-    print(f"    Relative to audio start    : {(loudest_time - recording.audio.ts[0]) / 1e9:0.3f}s")
+    print(
+        f"    Relative to recording start: "
+        f"{(loudest_time - recording.start_ts) / 1e9:0.3f}s"
+    )
+    print(
+        f"    Relative to video start    : "
+        f"{(loudest_time - recording.scene.ts[0]) / 1e9:0.3f}s"
+    )
+    print(
+        f"    Relative to audio start    : "
+        f"{(loudest_time - recording.audio.ts[0]) / 1e9:0.3f}s"
+    )
 
 
 if __name__ == "__main__":
