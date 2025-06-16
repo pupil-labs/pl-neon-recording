@@ -78,7 +78,7 @@ class BaseAVStream(Stream[Array[BaseAVStreamFrame], BaseAVStreamFrame]):
             elif self.kind == "audio":
                 reader = plv.Reader(av_file, self.kind)  # type: ignore
                 part_ts = (
-                    recording.scene.ts[0] + (reader.container_timestamps * 1e9)  # type: ignore
+                    recording.scene.ts[0] + (reader.container_timestamps * 1e9)
                 ).astype(TIMESTAMP_DTYPE)
             else:
                 raise RuntimeError(f"unknown av stream kind: {self.kind}")
