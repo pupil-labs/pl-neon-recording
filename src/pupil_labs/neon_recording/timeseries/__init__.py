@@ -9,6 +9,7 @@ from .gaze import GazeTimeseries
 from .imu.imu_timeseries import IMUTimeseries
 from .pupil import PupilTimeseries
 from .worn import WornTimeseries
+from .saccades import SaccadeTimeseries
 
 __all__ = [
     "AudioTimeseries",
@@ -23,4 +24,5 @@ __all__ = [
     "PupilTimeseries",
     "SceneVideoTimeseries",
     "WornTimeseries",
+    "SaccadeTimeseries",
 ]

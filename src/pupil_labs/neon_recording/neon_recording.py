@@ -20,6 +20,7 @@ from pupil_labs.neon_recording.timeseries import (
     PupilTimeseries,
     SceneVideoTimeseries,
     WornTimeseries,
+    SaccadeTimeseries,
 )
 
 from .calib import Calibration
@@ -147,6 +148,11 @@ class NeonRecording:
     def fixations(self) -> FixationTimeseries:
         """Fixations data"""
         return FixationTimeseries(self)
+    
+    @cached_property
+    def saccades(self) -> SaccadeTimeseries:
+        """Saccades data"""
+        return SaccadeTimeseries(self)
 
     @cached_property
     def blinks(self) -> BlinkTimeseries:
