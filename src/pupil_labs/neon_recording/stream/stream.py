@@ -65,11 +65,13 @@ class SampledStream(
     @overload
     def __getitem__(self, key: SupportsIndex) -> RecordType: ...
     @overload
-    def __getitem__(self, key: slice | str | list[str]) -> ArrayType: ...
+    def __getitem__(self, key: slice) -> ArrayType: ...
+    @overload
+    def __getitem__(self, key: str | list[str]) -> Array: ...
     def __getitem__(
         self, key: SupportsIndex | slice | str | list[str]
-    ) -> ArrayType | RecordType:
-        return self._data[key]  # type: ignore
+    ) -> ArrayType | RecordType | Array:
+        return self._data[key]
 
     def __iter__(self) -> Iterator[RecordType]:
         for i in range(len(self)):
