@@ -34,7 +34,7 @@ def make_overlaid_video(recording_dir, output_video_path):
             10,
         )
 
-        video_time = (scene_frame.ts - video_start_time) / 1e9
+        video_time = (scene_frame.time - video_start_time) / 1e9
         video_writer.write_image(frame_pixels, time=video_time)
 
         cv2.imshow("Frame", frame_pixels)
