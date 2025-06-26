@@ -9,6 +9,7 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 from pupil_labs.neon_recording.sample import match_ts
@@ -108,19 +109,46 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
 
     def sample(
         self: T,
-        target_ts: ArrayLike[int],
+        target_time: ArrayLike[int],
         method: Literal["nearest", "backward", "forward"] = "nearest",
         tolerance: int | None = None,
     ) -> T:
-        indices = match_ts(target_ts, self.time, method, tolerance)
+        indices = match_ts(target_time, self.time, method, tolerance)
 
         if True in np.isnan(indices):
             raise ValueError(
                 "Failed to find matching samples for some samples.",
-                [t for t, i in zip(target_ts, indices, strict=False) if np.isnan(i)],
+                [t for t, i in zip(target_time, indices, strict=False) if np.isnan(i)],
             )
 
         return self.__class__(
             self.recording,
             self._data[indices],  # type: ignore
+        )
+
+class InterpolatableTimeseries(Timeseries[ArrayType, RecordType]):
+    def interpolate(self: T, target_time: npt.NDArray[np.int64]) -> T:
+        target_time = np.array(target_time)
+        interpolated_dtype = np.dtype([
+            (k, self.data.dtype[k].type)
+            for k in self.data.dtype.names
+            if issubclass(self.data.dtype[k].type, (np.floating, np.integer))
+        ])
+
+        result = np.zeros(len(target_time), interpolated_dtype)
+        result[TIMESTAMP_FIELD_NAME] = target_time
+        for key in interpolated_dtype.names or []:
+            if key == TIMESTAMP_FIELD_NAME:
+                continue
+            value = self.data[key].astype(np.float64)
+            result[key] = np.interp(
+                target_time,
+                self.time,
+                value,
+                left=np.nan,
+                right=np.nan,
+            )
+        return self.__class__(
+            self.recording,
+            data=result.view(self._data.__class__)  # type: ignore,
         )

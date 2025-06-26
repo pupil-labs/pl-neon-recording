@@ -4,17 +4,19 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
     Record,
     fields,
 )
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import InterpolatableTimeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
+from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class GazeArray(Array[GazeRecord], GazeProps):
     record_class = GazeRecord
 
 
-class GazeTimeseries(Timeseries[GazeArray, GazeRecord], GazeProps):
+class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps):
     name: str = "gaze"
 
     def _load_data_from_recording(self, recording) -> "GazeArray":
@@ -62,3 +64,5 @@ class GazeTimeseries(Timeseries[GazeArray, GazeRecord], GazeProps):
         )
         data = data.view(GazeArray)
         return data
+
+    

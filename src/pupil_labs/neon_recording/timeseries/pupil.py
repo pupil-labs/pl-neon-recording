@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import InterpolatableTimeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -33,7 +33,7 @@ class PupilArray(Array[PupilRecord], PupilProps):
     record_class = PupilRecord
 
 
-class PupilTimeseries(Timeseries[PupilArray, PupilRecord], PupilProps):
+class PupilTimeseries(InterpolatableTimeseries[PupilArray, PupilRecord], PupilProps):
     """Pupil data"""
 
     name: str = "pupil"

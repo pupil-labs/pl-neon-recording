@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import InterpolatableTimeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -45,7 +45,7 @@ class EyelidArray(Array[EyelidRecord], EyelidProps):
     record_class = EyelidRecord
 
 
-class EyelidTimeseries(Timeseries[EyelidArray, EyelidRecord], EyelidProps):
+class EyelidTimeseries(InterpolatableTimeseries[EyelidArray, EyelidRecord], EyelidProps):
     """Eyelid data"""
 
     name: str = "eyelid"
