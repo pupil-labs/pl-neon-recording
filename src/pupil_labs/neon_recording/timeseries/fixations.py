@@ -16,7 +16,8 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class FixationProps(TimeseriesProps):
+class FixationProps():
+    # Note, FixationProps do not inherit from TimeseriesProps because they should not have a `time` attribute.
     start_time = fields[np.int64]("start_time")  # type:ignore
     "Start timestamp of fixation"
 

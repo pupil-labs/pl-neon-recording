@@ -64,14 +64,14 @@ class NeonRecording:
         return info_data or {}
 
     @property
-    def start_ts(self) -> int:
+    def start_time(self) -> int:
         """Start timestamp (nanoseconds since 1970-01-01)"""
         return self.info.get("start_time") or 0
 
     @property
-    def stop_ts(self) -> int:
+    def stop_time(self) -> int:
         """Stop timestamp (nanoseconds since 1970-01-01)"""
-        return self.start_ts + self.duration
+        return self.start_time + self.duration
 
     @property
     def duration(self) -> int:
