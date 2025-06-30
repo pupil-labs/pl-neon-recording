@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class FixationProps():
+class FixationProps:
     # Note, FixationProps do not inherit from TimeseriesProps because they should not have a `time` attribute.
     start_time = fields[np.int64]("start_time")  # type:ignore
     "Start timestamp of fixation"
@@ -79,16 +79,18 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             ]),
         )
         data = data[data["event_type"] == 1]
-        data = data[[
-            "start_timestamp_ns",
-            "end_timestamp_ns",
-            "start_gaze_x",
-            "start_gaze_y",
-            "end_gaze_x",
-            "end_gaze_y",
-            "mean_gaze_x",
-            "mean_gaze_y",
-        ]]
+        data = data[
+            [
+                "start_timestamp_ns",
+                "end_timestamp_ns",
+                "start_gaze_x",
+                "start_gaze_y",
+                "end_gaze_x",
+                "end_gaze_y",
+                "mean_gaze_x",
+                "mean_gaze_y",
+            ]
+        ]
         data.dtype.names = [
             "start_time",
             "end_time",

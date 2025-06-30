@@ -3,6 +3,7 @@ import logging
 import os
 
 from .neon_recording import NeonRecording, load, open  # noqa: A004
+from .sample import match_ts
 from .timeseries.av.audio import AudioTimeseries
 from .timeseries.av.video import VideoTimeseries
 from .timeseries.blinks import BlinkTimeseries
@@ -36,5 +37,6 @@ __all__ = [
     "VideoTimeseries",
     "__version__",
     "load",
+    "match_ts",
     "open",
 ]

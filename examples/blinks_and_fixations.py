@@ -2,39 +2,14 @@ import sys
 
 import cv2
 import numpy as np
-from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
 import pupil_labs.neon_recording as nr  # noqa: E402
-
-
-class EventTracker:
-    def __init__(self, stream):
-        self.idx = 0
-        self.itr = iter(stream)
-        self.next_event = next(self.itr)
-
-    def in_event(self, ts):
-        if self.next_event is None:
-            return False
-
-        return (
-            self.next_event.start_timestamp_ns < ts < self.next_event.end_timestamp_ns
-        )
-
-    def step_to(self, ts):
-        try:
-            while self.next_event is not None and self.next_event.end_timestamp_ns < ts:
-                self.next_event = next(self.itr)
-                self.idx += 1
-
-        except StopIteration:
-            self.next_event = None
-
-        return self.in_event(ts)
+from pupil_labs.neon_recording import match_ts  # noqa: E402
+from pupil_labs.video import Writer  # noqa: E402
 
 
 def write_text(image, text, x, y):
@@ -50,43 +25,52 @@ def write_text(image, text, x, y):
     )
 
 
-def make_overlaid_video(recording_dir, output_video_path, fps=30):
+def match_events(target_time, events):
+    # Blink start needs to be <= target_time
+    matches = match_ts(target_time, events.start_time, method="backward")
+
+    # Blink end needs to be >= target_time
+    matches_end = match_ts(target_time, events.end_time, method="forward")
+
+    matches[np.isnan(matches_end)] = np.nan
+    matches[matches != matches_end] = np.nan
+
+    return matches
+
+
+def make_overlaid_video(recording_dir, output_video_path):
     recording = nr.open(recording_dir)
 
-    video_writer = cv2.VideoWriter(
-        str(output_video_path),
-        cv2.VideoWriter_fourcc(*"MJPG"),
-        fps,
-        (recording.eye.width, recording.eye.height),
+    video_writer = Writer(
+        output_video_path,
     )
+    video_start_time = recording.eye.time[0]
 
-    output_timestamps = np.arange(
-        recording.eye.time[0], recording.eye.time[-1], int(1e9 / fps)
-    )
-    eye_frames = recording.eye.sample(output_timestamps)
+    blink_matches = match_events(recording.eye.time, recording.blinks)
+    fixation_matches = match_events(recording.eye.time, recording.fixations)
 
-    fixations_only = recording.fixations[recording.fixations["event_type"] == 1]
-    event_trackers = {
-        "Fixation": EventTracker(fixations_only),
-        "Blink": EventTracker(recording.blinks),
-    }
-
-    for frame in tqdm(eye_frames):
+    blink_count = 0
+    fixation_count = 0
+    for frame, blink_index, fixation_index in zip(
+        recording.eye, blink_matches, fixation_matches, strict=False
+    ):
         frame_pixels = frame.bgr
 
-        text_y = 0
-        for stream, tracker in event_trackers.items():
-            text_y += 40
-            if tracker.step_to(frame.ts):
-                frame_pixels = write_text(
-                    frame_pixels, f"{stream} {tracker.idx + 1}", 0, text_y
-                )
+        if not np.isnan(blink_index):
+            blink_count = int(blink_index + 1)
+        frame_pixels = write_text(frame_pixels, f"Blinks: {blink_count}", 0, 40)
 
-        video_writer.write(frame_pixels)
+        if not np.isnan(fixation_index):
+            fixation_count = int(fixation_index + 1)
+        frame_pixels = write_text(frame_pixels, f"Fixations: {fixation_count}", 0, 80)
+
+        video_time = (frame.time - video_start_time) / 1e9
+        video_writer.write_image(frame_pixels, time=video_time)
+
         cv2.imshow("Frame", frame_pixels)
         cv2.pollKey()
 
-    video_writer.release()
+    video_writer.close()
 
 
 if __name__ == "__main__":

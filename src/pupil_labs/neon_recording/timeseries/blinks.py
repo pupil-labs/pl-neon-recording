@@ -21,10 +21,10 @@ if TYPE_CHECKING:
 
 
 class BlinkProps(TimeseriesProps):
-    start_ts = fields[np.int64]("start_timestamp_ns")  # type:ignore
+    start_time = fields[np.int64]("start_timestamp_ns")  # type:ignore
     "Start timestamp of blink"
 
-    end_ts = fields[np.int64]("end_timestamp_ns")  # type:ignore
+    end_time = fields[np.int64]("end_timestamp_ns")  # type:ignore
     "End timestamp of blink"
 
 
