@@ -20,21 +20,21 @@ log = logging.getLogger(__name__)
 
 
 class ImuProps(TimeseriesProps):
-    gyro_xyz = fields[np.float64]([
+    angular_velocity = fields[np.float64]([
         "gyro_x",
         "gyro_y",
         "gyro_z",
     ])  # type:ignore
     "Gyroscope data"
 
-    accel_xyz = fields[np.float64]([
+    acceleration = fields[np.float64]([
         "accel_x",
         "accel_y",
         "accel_z",
     ])  # type:ignore
     "Acceleration data"
 
-    quaternion_wxyz = fields[np.float64]([  # type:ignore
+    rotation = fields[np.float64]([  # type:ignore
         "quaternion_w",
         "quaternion_x",
         "quaternion_y",
