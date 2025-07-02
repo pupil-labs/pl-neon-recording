@@ -4,19 +4,20 @@ from typing import (
 )
 
 import numpy as np
-import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import (
     Array,
     Record,
     fields,
 )
-from pupil_labs.neon_recording.timeseries.timeseries import InterpolatableTimeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import (
+    InterpolatableTimeseries,
+    TimeseriesProps,
+)
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
 )
-from pupil_labs.neon_recording.constants import TIMESTAMP_FIELD_NAME
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class GazeProps(TimeseriesProps):
-    point = fields[np.float64](["x", "y"])  # type:ignore
+    point = fields[np.float64](["point_x", "point_x"])  # type:ignore
     "2D gaze coordinates in the scene video in pixels"
 
 
@@ -62,7 +63,6 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
                 ("y", "float32"),
             ]),
         )
+        data.dtype.names = ("time", "point_x", "point_y")
         data = data.view(GazeArray)
         return data
-
-    

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -16,13 +16,14 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class SaccadeProps():
-    # Note, FixationProps do not inherit from TimeseriesProps because they should not have a `time` attribute.
+class SaccadeProps:
+    # Note, FixationProps do not inherit from TimeseriesProps because they should not
+    # have a `time` attribute.
     start_time = fields[np.int64]("start_time")  # type:ignore
     "Start timestamp of Saccade"
 
-    end_time = fields[np.int64]("end_time")  # type:ignore
-    "End timestamp of Saccade"
+    stop_time = fields[np.int64]("stop_time")  # type:ignore
+    "Stop timestamp of Saccade"
 
     start_gaze = fields[np.float32]([
         "start_gaze_x",
@@ -88,10 +89,22 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
             ]),
         )
         data = data[data["event_type"] == 0]
-        data = data[["start_timestamp_ns", "end_timestamp_ns", "start_gaze_x", "start_gaze_y", "end_gaze_x", "end_gaze_y", "amplitude_angle_deg", "mean_velocity", "max_velocity"]]
+        data = data[
+            [
+                "start_timestamp_ns",
+                "end_timestamp_ns",
+                "start_gaze_x",
+                "start_gaze_y",
+                "end_gaze_x",
+                "end_gaze_y",
+                "amplitude_angle_deg",
+                "mean_velocity",
+                "max_velocity",
+            ]
+        ]
         data.dtype.names = (
             "start_time",
-            "end_time",
+            "stop_time",
             "start_gaze_x",
             "start_gaze_y",
             "stop_gaze_x",

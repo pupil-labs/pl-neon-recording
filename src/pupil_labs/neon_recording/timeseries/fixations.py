@@ -17,12 +17,13 @@ if TYPE_CHECKING:
 
 
 class FixationProps:
-    # Note, FixationProps do not inherit from TimeseriesProps because they should not have a `time` attribute.
+    # Note, BlinkProps do not inherit from TimeseriesProps because they should not
+    # have a `time` attribute.
     start_time = fields[np.int64]("start_time")  # type:ignore
     "Start timestamp of fixation"
 
-    end_time = fields[np.int64]("end_time")  # type:ignore
-    "Start timestamp of fixation"
+    stop_time = fields[np.int64]("stop_time")  # type:ignore
+    "Stop timestamp of fixation"
 
     start_gaze = fields[np.float32]([
         "start_gaze_x",
@@ -93,7 +94,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
         ]
         data.dtype.names = [
             "start_time",
-            "end_time",
+            "stop_time",
             "start_gaze_x",
             "start_gaze_y",
             "stop_gaze_x",

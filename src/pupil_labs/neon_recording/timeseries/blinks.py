@@ -8,7 +8,7 @@ from pupil_labs.neon_recording.timeseries.array_record import (
     Record,
     fields,
 )
-from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -20,12 +20,14 @@ if TYPE_CHECKING:
     from ..neon_recording import NeonRecording
 
 
-class BlinkProps(TimeseriesProps):
-    start_time = fields[np.int64]("start_timestamp_ns")  # type:ignore
+class BlinkProps:
+    # Note, BlinkProps do not inherit from TimeseriesProps because they should not
+    # have a `time` attribute.
+    start_time = fields[np.int64]("start_time")  # type:ignore
     "Start timestamp of blink"
 
-    end_time = fields[np.int64]("end_timestamp_ns")  # type:ignore
-    "End timestamp of blink"
+    stop_time = fields[np.int64]("stop_time")  # type:ignore
+    "Stop timestamp of blink"
 
 
 class BlinkRecord(Record, BlinkProps):
@@ -52,5 +54,7 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
                 ("end_timestamp_ns", "int64"),
             ]),
         )
+        data = data[["time", "start_timestamp_ns", "end_timestamp_ns"]]
+        data.dtype.names = ("time", "start_time", "stop_time")
         data = data.view(BlinkArray)
         return data

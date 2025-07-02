@@ -4,7 +4,10 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
-from pupil_labs.neon_recording.timeseries.timeseries import InterpolatableTimeseries, TimeseriesProps
+from pupil_labs.neon_recording.timeseries.timeseries import (
+    InterpolatableTimeseries,
+    TimeseriesProps,
+)
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
@@ -55,7 +58,9 @@ class EyeballArray(Array[EyeballRecord], EyeballProps):
     record_class = EyeballRecord
 
 
-class EyeballTimeseries(InterpolatableTimeseries[EyeballArray, EyeballRecord], EyeballProps):
+class EyeballTimeseries(
+    InterpolatableTimeseries[EyeballArray, EyeballRecord], EyeballProps
+):
     """Eyeball data"""
 
     name: str = "eyeball"
@@ -99,5 +104,20 @@ class EyeballTimeseries(InterpolatableTimeseries[EyeballArray, EyeballRecord], E
                 "optical_axis_right_z",
             ]
         ]
+        data.dtype.names = (
+            "time",
+            "center_left_x",
+            "center_left_y",
+            "center_left_z",
+            "optical_axis_left_x",
+            "optical_axis_left_y",
+            "optical_axis_left_z",
+            "center_right_x",
+            "center_right_y",
+            "center_right_z",
+            "optical_axis_right_x",
+            "optical_axis_right_y",
+            "optical_axis_right_z",
+        )
         data = data.view(EyeballArray)
         return data
