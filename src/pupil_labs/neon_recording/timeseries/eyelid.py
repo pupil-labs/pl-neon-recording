@@ -51,7 +51,7 @@ class EyelidArray(Array[EyelidRecord], EyelidProps):
 class EyelidTimeseries(
     InterpolatableTimeseries[EyelidArray, EyelidRecord], EyelidProps
 ):
-    """Eyelid data"""
+    """Eyelid data describing the opening angles and apertures of each eyelid."""
 
     name: str = "eyelid"
 

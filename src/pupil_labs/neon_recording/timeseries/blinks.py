@@ -24,10 +24,10 @@ class BlinkProps:
     # Note, BlinkProps do not inherit from TimeseriesProps because they should not
     # have a `time` attribute.
     start_time = fields[np.int64]("start_time")  # type:ignore
-    "Start timestamp of blink"
+    "Start timestamp of the blink."
 
     stop_time = fields[np.int64]("stop_time")  # type:ignore
-    "Stop timestamp of blink"
+    "Stop timestamp of the blink."
 
 
 class BlinkRecord(Record, BlinkProps):
@@ -40,7 +40,7 @@ class BlinkArray(Array[BlinkRecord], BlinkProps):
 
 
 class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
-    """Blinks data"""
+    """Blink event data."""
 
     name: str = "blink"
 

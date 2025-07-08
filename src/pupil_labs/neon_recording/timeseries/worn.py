@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class WornProps(TimeseriesProps):
     worn = fields[np.float64]("worn")  # type:ignore
-    "Worn"
+    "Boolean value indicating whether the headset is worn (1) or not (0)."
 
 
 class WornRecord(Record, WornProps):

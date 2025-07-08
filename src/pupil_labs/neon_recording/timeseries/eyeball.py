@@ -39,14 +39,14 @@ class EyeballProps(TimeseriesProps):
         "optical_axis_left_y",
         "optical_axis_left_z",
     ])  # type:ignore
-    "A 3D vector in the forward direction of the left eye's optical axis"
+    "A 3D vector in the forward direction of the left eye's optical axis."
 
     optical_axis_right = fields[np.float64]([
         "optical_axis_right_x",
         "optical_axis_right_y",
         "optical_axis_right_z",
     ])  # type:ignore
-    "A 3D vector in the forward direction of the right eye's optical axis"
+    "A 3D vector in the forward direction of the right eye's optical axis."
 
 
 class EyeballRecord(Record, EyeballProps):
@@ -61,7 +61,7 @@ class EyeballArray(Array[EyeballRecord], EyeballProps):
 class EyeballTimeseries(
     InterpolatableTimeseries[EyeballArray, EyeballRecord], EyeballProps
 ):
-    """Eyeball data"""
+    """Eyeball data describing the 3D pose of the eyeballs."""
 
     name: str = "eyeball"
 

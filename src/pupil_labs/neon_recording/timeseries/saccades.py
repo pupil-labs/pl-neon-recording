@@ -63,7 +63,7 @@ class SaccadeArray(Array[SaccadeRecord], SaccadeProps):
 
 
 class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
-    """Saccade data"""
+    """Saccade event data"""
 
     name = "saccade"
 
