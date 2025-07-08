@@ -56,7 +56,9 @@ def pytest_generate_tests(metafunc: Any) -> None:
     if "sensor_selection" in metafunc.fixturenames:
         pairings = [
             ("gaze", utils.GazeGroundTruth),
-            ("eye_state", utils.EyeStateGroundTruth),
+            ("eyeball", utils.EyeballGroundTruth),
+            ("pupil", utils.PupilGroundTruth),
+            ("eyelid", utils.EyelidGroundTruth),
             ("imu", utils.IMUGroundTruth),
             ("events", utils.EventGroundTruth),
             ("eye", utils.AVGroundTruth),

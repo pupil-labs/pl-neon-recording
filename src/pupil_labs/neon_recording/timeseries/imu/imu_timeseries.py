@@ -21,26 +21,26 @@ log = logging.getLogger(__name__)
 
 class ImuProps(TimeseriesProps):
     angular_velocity = fields[np.float64]([
-        "gyro_x",
-        "gyro_y",
-        "gyro_z",
+        "angular_velocity_x",
+        "angular_velocity_y",
+        "angular_velocity_z",
     ])  # type:ignore
-    "Gyroscope data"
+    "Angular velocity data."
 
     acceleration = fields[np.float64]([
-        "accel_x",
-        "accel_y",
-        "accel_z",
+        "acceleration_x",
+        "acceleration_y",
+        "acceleration_z",
     ])  # type:ignore
-    "Acceleration data"
+    "Translational acceleration data."
 
     rotation = fields[np.float64]([  # type:ignore
-        "quaternion_w",
         "quaternion_x",
         "quaternion_y",
         "quaternion_z",
+        "quaternion_w",
     ])
-    "Orientation as a quaternion"
+    "Rotation as a quaternion given as `xyzw`."
 
 
 class ImuRecord(Record, ImuProps):
@@ -76,13 +76,13 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
         imu_file_pairs = find_sorted_multipart_files(recording._rec_dir, "imu")
 
         if len(imu_file_pairs) > 0:
-            imu_data = Array(  # type: ignore
+            data = Array(  # type: ignore
                 [file for file, _ in imu_file_pairs],
                 fallback_dtype=np.dtype(IMUTimeseries.FALLBACK_DTYPE),
             )
-            imu_data.dtype.names = [  # type: ignore
+            data.dtype.names = [  # type: ignore
                 TIMESTAMP_FIELD_NAME if name == "timestamp_ns" else name
-                for name in imu_data.dtype.names  # type: ignore
+                for name in data.dtype.names  # type: ignore
             ]
 
         else:
@@ -113,11 +113,25 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
                         for packet in imu_packets
                     ])
 
-            imu_data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
-            imu_data = join_struct_arrays([time_data, imu_data])
+            data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
+            data = join_struct_arrays([time_data, data])
 
-        imu_data = imu_data.view(ImuArray)
-        return imu_data
+        data.dtype.names = (
+            "time",
+            "angular_velocity_x",
+            "angular_velocity_y",
+            "angular_velocity_z",
+            "acceleration_x",
+            "acceleration_y",
+            "acceleration_z",
+            "quaternion_w",
+            "quaternion_x",
+            "quaternion_y",
+            "quaternion_z",
+        )
+
+        data = data.view(ImuArray)
+        return data
 
 
 def parse_neon_imu_raw_packets(buffer):

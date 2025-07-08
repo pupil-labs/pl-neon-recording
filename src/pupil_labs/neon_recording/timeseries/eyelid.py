@@ -82,10 +82,10 @@ class EyelidTimeseries(
                 "time",
                 "eyelid_angle_top_left",
                 "eyelid_angle_bottom_left",
-                "eyelid_aperture_mm_left",
+                "eyelid_aperture_left_mm",
                 "eyelid_angle_top_right",
                 "eyelid_angle_bottom_right",
-                "eyelid_aperture_mm_right",
+                "eyelid_aperture_right_mm",
             ]
         ]
         data.dtype.names = (

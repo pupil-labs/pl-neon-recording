@@ -21,16 +21,16 @@ if TYPE_CHECKING:
 
 class EyeballProps(TimeseriesProps):
     center_left = fields[np.float64]([
-        "eyeball_center_left_x",
-        "eyeball_center_left_y",
-        "eyeball_center_left_z",
+        "center_left_x",
+        "center_left_y",
+        "center_left_z",
     ])  # type:ignore
     "The 3D position of the left eyeball relative to the scene camera in mm."
 
     center_right = fields[np.float64]([
-        "eyeball_center_right_x",
-        "eyeball_center_right_y",
-        "eyeball_center_right_z",
+        "center_right_x",
+        "center_right_y",
+        "center_right_z",
     ])  # type:ignore
     "The 3D position of the right eyeball relative to the scene camera in mm."
 

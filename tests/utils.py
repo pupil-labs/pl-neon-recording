@@ -20,32 +20,44 @@ def load_info(rec_dir: Path):
 
 @dataclass
 class SensorGroundTruth:
-    ts: npt.NDArray[np.int64]
+    time: npt.NDArray[np.int64]
 
 
 @dataclass
 class GazeGroundTruth(SensorGroundTruth):
-    x: npt.NDArray[np.float32]
-    y: npt.NDArray[np.float32]
-    xy: npt.NDArray[np.float32]
+    point: npt.NDArray[np.float32]
 
 
 @dataclass
-class EyeStateGroundTruth(SensorGroundTruth):
-    pupil_diameter_left_mm: npt.NDArray[np.float32]
-    eyeball_center_left_xyz: npt.NDArray[np.float32]
-    optical_axis_left_xyz: npt.NDArray[np.float32]
-    pupil_diameter_right_mm: npt.NDArray[np.float32]
-    eyeball_center_right_xyz: npt.NDArray[np.float32]
-    optical_axis_right_xyz: npt.NDArray[np.float32]
+class EyeballGroundTruth(SensorGroundTruth):
+    center_left: npt.NDArray[np.float32]
+    optical_axis_left: npt.NDArray[np.float32]
+    center_right: npt.NDArray[np.float32]
+    optical_axis_right: npt.NDArray[np.float32]
+
+
+@dataclass
+class PupilGroundTruth(SensorGroundTruth):
+    diameter_left: npt.NDArray[np.float32]
+    diameter_right: npt.NDArray[np.float32]
+
+
+@dataclass
+class EyelidGroundTruth(SensorGroundTruth):
+    angle_upper_left: npt.NDArray[np.float32]
+    angle_lower_left: npt.NDArray[np.float32]
+    aperture_left: npt.NDArray[np.float32]
+    angle_upper_right: npt.NDArray[np.float32]
+    angle_lower_right: npt.NDArray[np.float32]
+    aperture_right: npt.NDArray[np.float32]
 
 
 @dataclass
 class IMUGroundTruth(SensorGroundTruth):
-    ts: npt.NDArray[np.int64]
-    gyro_xyz: npt.NDArray[np.float64]
-    accel_xyz: npt.NDArray[np.float64]
-    quaternion_wxyz: npt.NDArray[np.float64]
+    time: npt.NDArray[np.int64]
+    angular_velocity: npt.NDArray[np.float64]
+    acceleration: npt.NDArray[np.float64]
+    rotation: npt.NDArray[np.float64]
 
 
 @dataclass
@@ -91,14 +103,12 @@ class GroundTruth:
         abs_timestamp = np.concatenate(abs_timestamp)
 
         return GazeGroundTruth(
-            ts=abs_timestamp,
-            x=data[:, 0],
-            y=data[:, 1],
-            xy=data,
+            time=abs_timestamp,
+            point=data,
         )
 
     @cached_property
-    def eye_state(self) -> EyeStateGroundTruth:
+    def eyeball(self) -> EyeballGroundTruth:
         raw_file_paths = sorted(self.rec_dir.glob("eye_state ps*.raw"))
         time_file_paths = sorted(self.rec_dir.glob("eye_state ps*.time"))
         assert len(raw_file_paths) == len(time_file_paths)
@@ -115,14 +125,64 @@ class GroundTruth:
         data = np.concatenate(data)
         abs_timestamp = np.concatenate(abs_timestamp)
 
-        return EyeStateGroundTruth(
-            ts=abs_timestamp,
-            pupil_diameter_left_mm=data[:, 0],
-            eyeball_center_left_xyz=data[:, 1:4],
-            optical_axis_left_xyz=data[:, 4:7],
-            pupil_diameter_right_mm=data[:, 7],
-            eyeball_center_right_xyz=data[:, 8:11],
-            optical_axis_right_xyz=data[:, 11:14],
+        return EyeballGroundTruth(
+            time=abs_timestamp,
+            center_left=data[:, 1:4],
+            optical_axis_left=data[:, 4:7],
+            center_right=data[:, 8:11],
+            optical_axis_right=data[:, 11:14],
+        )
+
+    @cached_property
+    def pupil(self) -> PupilGroundTruth:
+        raw_file_paths = sorted(self.rec_dir.glob("eye_state ps*.raw"))
+        time_file_paths = sorted(self.rec_dir.glob("eye_state ps*.time"))
+        assert len(raw_file_paths) == len(time_file_paths)
+
+        data = []
+        abs_timestamp = []
+        for raw_file_path, time_file_path in zip(
+            raw_file_paths, time_file_paths, strict=False
+        ):
+            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
+            abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
+            data.append(d)
+            abs_timestamp.append(abs_ts)
+        data = np.concatenate(data)
+        abs_timestamp = np.concatenate(abs_timestamp)
+
+        return PupilGroundTruth(
+            time=abs_timestamp,
+            diameter_left=data[:, 0],
+            diameter_right=data[:, 7],
+        )
+
+    @cached_property
+    def eyelid(self) -> EyelidGroundTruth:
+        raw_file_paths = sorted(self.rec_dir.glob("eye_state ps*.raw"))
+        time_file_paths = sorted(self.rec_dir.glob("eye_state ps*.time"))
+        assert len(raw_file_paths) == len(time_file_paths)
+
+        data = []
+        abs_timestamp = []
+        for raw_file_path, time_file_path in zip(
+            raw_file_paths, time_file_paths, strict=False
+        ):
+            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
+            abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
+            data.append(d)
+            abs_timestamp.append(abs_ts)
+        data = np.concatenate(data)
+        abs_timestamp = np.concatenate(abs_timestamp)
+
+        return EyelidGroundTruth(
+            time=abs_timestamp,
+            angle_upper_left=data[:, 1],
+            angle_lower_left=data[:, 2],
+            aperture_left=data[:, 3],
+            angle_upper_right=data[:, 4],
+            angle_lower_right=data[:, 5],
+            aperture_right=data[:, 6],
         )
 
     @cached_property
@@ -166,11 +226,14 @@ class GroundTruth:
         data = np.concatenate(data)
         abs_timestamp = np.concatenate(abs_timestamp)
 
+        rotation_w = data[:, 6]
+        rotation_xyz = data[:, 7:]
+        rotation_xyzw = np.column_stack((rotation_xyz, rotation_w))
         return IMUGroundTruth(
-            ts=abs_timestamp,
-            gyro_xyz=data[:, 0:3],
-            accel_xyz=data[:, 3:6],
-            quaternion_wxyz=data[:, 6:],
+            time=abs_timestamp,
+            angular_velocity=data[:, 0:3],
+            acceleration=data[:, 3:6],
+            rotation=rotation_xyzw,
         )
 
     @cached_property
@@ -186,7 +249,7 @@ class GroundTruth:
         data = np.array(events)
 
         return EventGroundTruth(
-            ts=abs_timestamp,
+            time=abs_timestamp,
             event=data,
         )
 
@@ -201,7 +264,7 @@ class GroundTruth:
             abs_timestamp.append(abs_ts)
         abs_timestamp = np.concatenate(abs_timestamp)
 
-        return AVGroundTruth(ts=abs_timestamp)
+        return AVGroundTruth(time=abs_timestamp)
 
     def _load_audio(self, base_name: str):
         video_paths = sorted(self.rec_dir.glob(f"{base_name} ps*.mp4"))
@@ -214,7 +277,7 @@ class GroundTruth:
             abs_timestamp.append(abs_ts)
         abs_timestamp = np.concatenate(abs_timestamp)
 
-        return AVGroundTruth(ts=abs_timestamp)
+        return AVGroundTruth(time=abs_timestamp)
 
     @property
     def eye(self) -> AVGroundTruth:
