@@ -31,12 +31,12 @@ def mock_timeseries():
     ts_data = np.array([10, 20, 30, 40, 50])
     x_data = ts_data.copy()
     dtype = np.dtype([
-        ("ts", np.int64),
+        ("time", np.int64),
         ("x", np.float64),
     ])
     MockArray.dtype = dtype
     data = np.empty(ts_data.shape, dtype=dtype)
-    data["ts"] = ts_data
+    data["time"] = ts_data
     data["x"] = x_data
     data = data.view(MockArray)
 
@@ -59,7 +59,7 @@ def test_sample_nearest(mock_timeseries, target_ts, result):
     for s, r in zip(
         mock_timeseries.sample(target_ts, method="nearest"), result, strict=True
     ):
-        assert s["ts"] == r
+        assert s["time"] == r
         assert s["x"] == r
 
 
@@ -78,7 +78,7 @@ def test_sample_backward(mock_timeseries, target_ts, result):
     for s, r in zip(
         mock_timeseries.sample(target_ts, method="backward"), result, strict=True
     ):
-        assert s["ts"] == r
+        assert s["time"] == r
         assert s["x"] == r
 
 
