@@ -125,53 +125,49 @@ def export_blinks(recording, export_path):
 
 
 def export_fixations(recording, export_path):
-    fixes = recording.fixations
+    fixations = recording.fixations
 
     spherical_coords = cart_to_spherical(
         unproject_points(
-            fixes.mean_gaze,
+            fixations.mean_gaze,
             recording.calibration.scene_camera_matrix,
             recording.calibration.scene_distortion_coefficients,
         )
     )
 
-    fixations = pd.DataFrame({
+    fixations_df = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "fixation id": 1 + np.arange(len(fixes)),
-        "start timestamp [ns]": fixes.start_time,
-        "end timestamp [ns]": fixes.stop_time,
-        "duration [ms]": (fixes.stop_time - fixes.start_time) / 1e6,
-        "fixation x [px]": fixes.mean_gaze[:, 0],
-        "fixation y [px]": fixes.mean_gaze[:, 1],
+        "fixation id": 1 + np.arange(len(fixations)),
+        "start timestamp [ns]": fixations.start_time,
+        "end timestamp [ns]": fixations.stop_time,
+        "duration [ms]": (fixations.stop_time - fixations.start_time) / 1e6,
+        "fixation x [px]": fixations.mean_gaze[:, 0],
+        "fixation y [px]": fixations.mean_gaze[:, 1],
         "azimuth [deg]": spherical_coords[2],
         "elevation [deg]": spherical_coords[1],
     })
 
     export_file = export_path / "fixations.csv"
-    fixations.to_csv(export_file, index=False)
+    fixations_df.to_csv(export_file, index=False)
     print(f"Wrote {export_file}")
 
 
 def export_saccades(recording, export_path):
-    print("Error: Saccade export not implemented", file=sys.stderr)
-    return
-    # @TODO: implement this with new API
-    saccades_only = recording.fixations[recording.fixations["event_type"] == 0]
+    saccades = recording.saccades
 
-    saccades = pd.DataFrame({
+    saccades_df = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "saccade id": 1 + np.arange(len(saccades_only)),
-        "start timestamp [ns]": saccades_only.start_time,
-        "end timestamp [ns]": saccades_only.stop_time,
-        "duration [ms]": (saccades_only.stop_time - saccades_only.start_time) / 1e6,
-        "amplitude [px]": saccades_only.amplitude_pixels,
-        "amplitude [deg]": saccades_only.amplitude_angle_deg,
-        "mean velocity [px/s]": saccades_only.mean_velocity,
-        "peak velocity [px/s]": saccades_only.max_velocity,
+        "saccade id": 1 + np.arange(len(saccades)),
+        "start timestamp [ns]": saccades.start_time,
+        "end timestamp [ns]": saccades.stop_time,
+        "duration [ms]": (saccades.stop_time - saccades.start_time) / 1e6,
+        "amplitude [deg]": saccades.amplitude,
+        "mean velocity [px/s]": saccades.mean_velocity,
+        "peak velocity [px/s]": saccades.max_velocity,
     })
 
     export_file = export_path / "saccades.csv"
-    saccades.to_csv(export_file, index=False)
+    saccades_df.to_csv(export_file, index=False)
     print(f"Wrote {export_file}")
 
 
