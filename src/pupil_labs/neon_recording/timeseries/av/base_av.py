@@ -65,16 +65,18 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
         parts_ts = []
         video_readers = []
         for av_file, time_file in av_files:
+            part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
             if self.kind == "video":
-                part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
                 container_timestamps = (part_ts["time"] - recording.start_time) / 1e9
                 reader = plv.Reader(av_file, self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
+
             elif self.kind == "audio":
                 reader = plv.Reader(av_file, self.kind)  # type: ignore
                 part_ts = (
-                    recording.start_time + (reader.container_timestamps * 1e9)  # type: ignore
+                    part_ts["time"][0] + (reader.container_timestamps * 1e9)  # type: ignore
                 ).astype(TIMESTAMP_DTYPE)
+
             else:
                 raise RuntimeError(f"unknown av stream kind: {self.kind}")
 
