@@ -2,13 +2,15 @@ import sys
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr  # noqa: E402
 from pupil_labs.video import Writer  # noqa: E402
+
+import pupil_labs.neon_recording as nr  # noqa: E402
 
 
 def overlay_image(img, img_overlay, x, y):
@@ -67,7 +69,7 @@ def make_eye_state_video(recording_dir, output_video_path):
     plot_point_count = plot_duration_secs * fps
     plot_x_width = recording.eye.width / plot_point_count
 
-    for eye_sample in recording.eye:
+    for eye_sample in tqdm(recording.eye):
         eye_pixels = eye_sample.bgr
 
         for dim, config in enumerate(plot_config):

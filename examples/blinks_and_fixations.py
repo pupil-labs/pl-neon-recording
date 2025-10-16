@@ -2,14 +2,16 @@ import sys
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
+from pupil_labs.video import Writer  # noqa: E402
+
 import pupil_labs.neon_recording as nr  # noqa: E402
 from pupil_labs.neon_recording import match_ts  # noqa: E402
-from pupil_labs.video import Writer  # noqa: E402
 
 
 def write_text(image, text, x, y):
@@ -30,7 +32,7 @@ def match_events(target_time, events):
     matches = match_ts(target_time, events.start_time, method="backward")
 
     # Blink end needs to be >= target_time
-    matches_end = match_ts(target_time, events.end_time, method="forward")
+    matches_end = match_ts(target_time, events.stop_time, method="forward")
 
     matches[np.isnan(matches_end)] = np.nan
     matches[matches != matches_end] = np.nan
@@ -51,8 +53,9 @@ def make_overlaid_video(recording_dir, output_video_path):
 
     blink_count = 0
     fixation_count = 0
-    for frame, blink_index, fixation_index in zip(
-        recording.eye, blink_matches, fixation_matches, strict=False
+    for frame, blink_index, fixation_index in tqdm(
+        zip(recording.eye, blink_matches, fixation_matches, strict=False),
+        total=len(recording.eye)
     ):
         frame_pixels = frame.bgr
 

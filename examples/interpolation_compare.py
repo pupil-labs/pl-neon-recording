@@ -2,13 +2,15 @@ import sys
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 # Workaround for https://github.com/opencv/opencv/issues/21952
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-import pupil_labs.neon_recording as nr  # noqa: E402
 from pupil_labs.video import Writer  # noqa: E402
+
+import pupil_labs.neon_recording as nr  # noqa: E402
 
 
 def make_overlaid_video(recording_dir, output_video_path, fps=None):
@@ -30,23 +32,25 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
     scene_gaze_pairs = zip(
         recording.scene, matched_gazes, interpolated_gazes, strict=False
     )
-    for scene_frame, matched_gaze, interpolated_gaze in scene_gaze_pairs:
+    for scene_frame, matched_gaze, interpolated_gaze in tqdm(
+        scene_gaze_pairs, total=len(recording.scene)
+    ):
         # draw the nearest-time gaze sample in red
         frame = cv2.circle(
             scene_frame.bgr,
-            (int(matched_gaze.x), int(matched_gaze.y)),
+            (int(matched_gaze.point[0]), int(matched_gaze.point[1])),
             50,
             (0, 0, 255),
             10,
         )
 
         # draw the interpolated gaze sample in blue
-        if not np.isnan(interpolated_gaze.x) and not np.isnan(
-            interpolated_gaze.y
+        if not np.isnan(interpolated_gaze.point[0]) and not np.isnan(
+            interpolated_gaze.point[1]
         ):
             frame = cv2.circle(
                 frame,
-                (int(interpolated_gaze.x), int(interpolated_gaze.y)),
+                (int(interpolated_gaze.point[0]), int(interpolated_gaze.point[1])),
                 50,
                 (255, 0, 0),
                 10,
