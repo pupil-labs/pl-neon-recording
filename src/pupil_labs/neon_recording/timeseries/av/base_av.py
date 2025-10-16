@@ -2,8 +2,8 @@ import logging
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
-
 import pupil_labs.video as plv
+
 from pupil_labs.neon_recording.constants import (
     AV_INDEX_DTYPE,
     AV_INDEX_FIELD_NAME,
@@ -67,7 +67,7 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
         for av_file, time_file in av_files:
             part_ts = Array(time_file, dtype=TIMESTAMP_DTYPE)  # type: ignore
             if self.kind == "video":
-                container_timestamps = (part_ts["time"] - recording.start_time) / 1e9
+                container_timestamps = (part_ts["time"] - part_ts["time"][0]) / 1e9
                 reader = plv.Reader(av_file, self.kind, container_timestamps)
                 part_ts = part_ts[: len(reader)]
 
