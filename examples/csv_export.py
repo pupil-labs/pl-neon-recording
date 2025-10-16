@@ -129,7 +129,7 @@ def export_fixations(recording, export_path):
 
     spherical_coords = cart_to_spherical(
         unproject_points(
-            fixations.mean_gaze,
+            fixations.mean_gaze_point,
             recording.calibration.scene_camera_matrix,
             recording.calibration.scene_distortion_coefficients,
         )
@@ -141,8 +141,8 @@ def export_fixations(recording, export_path):
         "start timestamp [ns]": fixations.start_time,
         "end timestamp [ns]": fixations.stop_time,
         "duration [ms]": (fixations.stop_time - fixations.start_time) / 1e6,
-        "fixation x [px]": fixations.mean_gaze[:, 0],
-        "fixation y [px]": fixations.mean_gaze[:, 1],
+        "fixation x [px]": fixations.mean_gaze_point[:, 0],
+        "fixation y [px]": fixations.mean_gaze_point[:, 1],
         "azimuth [deg]": spherical_coords[2],
         "elevation [deg]": spherical_coords[1],
     })

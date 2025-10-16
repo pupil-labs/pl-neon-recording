@@ -25,19 +25,19 @@ class FixationProps:
     stop_time = fields[np.int64]("stop_time")  # type:ignore
     "Stop timestamp of fixation."
 
-    start_gaze = fields[np.float32]([
+    start_gaze_point = fields[np.float32]([
         "start_gaze_x",
         "start_gaze_y",
     ])  # type:ignore
     "Start gaze position in pixels."
 
-    stop_gaze = fields[np.float32]([
+    stop_gaze_point = fields[np.float32]([
         "stop_gaze_x",
         "stop_gaze_y",
     ])  # type:ignore
     "Stop gaze position in pixels."
 
-    mean_gaze = fields[np.float32]([
+    mean_gaze_point = fields[np.float32]([
         "mean_gaze_x",
         "mean_gaze_y",
     ])  # type:ignore
