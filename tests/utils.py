@@ -44,11 +44,9 @@ class PupilGroundTruth(SensorGroundTruth):
 
 @dataclass
 class EyelidGroundTruth(SensorGroundTruth):
-    angle_upper_left: npt.NDArray[np.float32]
-    angle_lower_left: npt.NDArray[np.float32]
+    angle_left: npt.NDArray[np.float32]
     aperture_left: npt.NDArray[np.float32]
-    angle_upper_right: npt.NDArray[np.float32]
-    angle_lower_right: npt.NDArray[np.float32]
+    angle_right: npt.NDArray[np.float32]
     aperture_right: npt.NDArray[np.float32]
 
 
@@ -177,11 +175,9 @@ class GroundTruth:
 
         return EyelidGroundTruth(
             time=abs_timestamp,
-            angle_upper_left=data[:, 1],
-            angle_lower_left=data[:, 2],
+            angle_left=data[:, 1:3],
             aperture_left=data[:, 3],
-            angle_upper_right=data[:, 4],
-            angle_lower_right=data[:, 5],
+            angle_right=data[:, 4:6],
             aperture_right=data[:, 6],
         )
 

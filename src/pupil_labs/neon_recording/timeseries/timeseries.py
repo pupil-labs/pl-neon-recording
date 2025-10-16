@@ -97,9 +97,11 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
         return self._data.pd
 
     def __repr__(self):
+        data = self._data if hasattr(self, "_data") else "-"
+
         return (
             f"{self.__class__.__name__}"
-            f"(name={self.name!r}, recording={self.recording!r}, data={self._data!r})"
+            f"(name={self.name!r}, recording={self.recording!r}, data={data!r})"
         )
 
     def __iter__(self) -> Iterator[RecordType]:
