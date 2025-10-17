@@ -116,7 +116,7 @@ class GroundTruth:
         for raw_file_path, time_file_path in zip(
             raw_file_paths, time_file_paths, strict=False
         ):
-            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
+            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 20])
             abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
             data.append(d)
             abs_timestamp.append(abs_ts)
@@ -142,7 +142,7 @@ class GroundTruth:
         for raw_file_path, time_file_path in zip(
             raw_file_paths, time_file_paths, strict=False
         ):
-            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
+            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 20])
             abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
             data.append(d)
             abs_timestamp.append(abs_ts)
@@ -166,7 +166,7 @@ class GroundTruth:
         for raw_file_path, time_file_path in zip(
             raw_file_paths, time_file_paths, strict=False
         ):
-            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 14])
+            d = np.fromfile(raw_file_path, "<f4").reshape([-1, 20])
             abs_ts = np.fromfile(time_file_path, dtype="<i8").astype(np.int64)
             data.append(d)
             abs_timestamp.append(abs_ts)
@@ -175,10 +175,10 @@ class GroundTruth:
 
         return EyelidGroundTruth(
             time=abs_timestamp,
-            angle_left=data[:, 1:3],
-            aperture_left=data[:, 3],
-            angle_right=data[:, 4:6],
-            aperture_right=data[:, 6],
+            angle_left=data[:, 14:16],
+            aperture_left=data[:, 16],
+            angle_right=data[:, 17:19],
+            aperture_right=data[:, 19],
         )
 
     @cached_property
