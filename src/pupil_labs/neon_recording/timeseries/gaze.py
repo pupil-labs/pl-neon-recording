@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class GazeProps(TimeseriesProps):
-    point = fields[np.float64](["point_x", "point_y"])  # type:ignore
+    point = fields[np.float64](["point_x", "point_y"])
     "2D gaze coordinates in the scene video in pixels."
 
 
@@ -65,4 +65,4 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
         )
         data.dtype.names = ("time", "point_x", "point_y")
         data = data.view(GazeArray)
-        return data
+        return data  # type: ignore

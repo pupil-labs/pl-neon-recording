@@ -19,37 +19,37 @@ if TYPE_CHECKING:
 class SaccadeProps:
     # Note, FixationProps do not inherit from TimeseriesProps because they should not
     # have a `time` attribute.
-    start_time = fields[np.int64]("start_time")  # type:ignore
+    start_time = fields[np.int64]("start_time")
     "Start timestamp of Saccade"
 
-    stop_time = fields[np.int64]("stop_time")  # type:ignore
+    stop_time = fields[np.int64]("stop_time")
     "Stop timestamp of Saccade"
 
     start_gaze = fields[np.float32]([
         "start_gaze_x",
         "start_gaze_y",
-    ])  # type:ignore
+    ])
     "Start gaze position in pixels"
 
     stop_gaze = fields[np.float32]([
         "stop_gaze_x",
         "stop_gaze_y",
-    ])  # type:ignore
+    ])
     "Stop gaze position in pixels"
 
     mean_gaze = fields[np.float32]([
         "mean_gaze_x",
         "mean_gaze_y",
-    ])  # type:ignore
+    ])
     "Mean gaze position in pixels"
 
-    amplitude = fields[np.float32]("amplitude_angle")  # type:ignore
+    amplitude = fields[np.float32]("amplitude_angle")
     "Amplitude angle (degrees)"
 
-    mean_velocity = fields[np.float32]("mean_velocity")  # type:ignore
+    mean_velocity = fields[np.float32]("mean_velocity")
     "Mean velocity of Saccade (pixels/sec)"
 
-    max_velocity = fields[np.float32]("max_velocity")  # type:ignore
+    max_velocity = fields[np.float32]("max_velocity")
     "Max velocity of Saccade (pixels/sec)"
 
 
@@ -114,4 +114,4 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
             "max_velocity",
         )
         data = data.view(SaccadeArray)
-        return data
+        return data  # type: ignore

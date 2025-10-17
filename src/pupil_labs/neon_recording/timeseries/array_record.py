@@ -249,7 +249,7 @@ class fields(Generic[T]):
         self, obj: "np.record | np.ndarray | Record | Array | Timeseries", objtype=None
     ) -> "T | Array[T]":  # type: ignore
         if len(self.columns) < 2:
-            result = obj[self.columns[0]]
+            result = obj[self.columns[0]]  # type: ignore
         elif isinstance(obj, (np.record, Record)):
             try:
                 result = np.array(tuple(obj[self.columns]))
@@ -260,7 +260,7 @@ class fields(Generic[T]):
 
         if self.converter:
             result = self.converter(result)
-        return result
+        return result  # type: ignore
 
     def __set__(self, obj, value):
         obj[self.columns] = value

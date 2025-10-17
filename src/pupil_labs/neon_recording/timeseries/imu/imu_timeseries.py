@@ -24,17 +24,17 @@ class ImuProps(TimeseriesProps):
         "angular_velocity_x",
         "angular_velocity_y",
         "angular_velocity_z",
-    ])  # type:ignore
+    ])
     "Angular velocity data."
 
     acceleration = fields[np.float64]([
         "acceleration_x",
         "acceleration_y",
         "acceleration_z",
-    ])  # type:ignore
+    ])
     "Translational acceleration data."
 
-    rotation = fields[np.float64]([  # type:ignore
+    rotation = fields[np.float64]([
         "quaternion_x",
         "quaternion_y",
         "quaternion_z",
@@ -116,22 +116,24 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
             data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
             data = join_struct_arrays([time_data, data])
 
-        data.dtype.names = (
-            "time",
-            "angular_velocity_x",
-            "angular_velocity_y",
-            "angular_velocity_z",
-            "acceleration_x",
-            "acceleration_y",
-            "acceleration_z",
-            "quaternion_w",
-            "quaternion_x",
-            "quaternion_y",
-            "quaternion_z",
-        )
+        if data.dtype is not None:
+            data.dtype.names = (
+                "time",
+                "angular_velocity_x",
+                "angular_velocity_y",
+                "angular_velocity_z",
+                "acceleration_x",
+                "acceleration_y",
+                "acceleration_z",
+                "quaternion_w",
+                "quaternion_x",
+                "quaternion_y",
+                "quaternion_z",
+            )
 
         data = data.view(ImuArray)
-        return data
+
+        return data  # type: ignore
 
 
 def parse_neon_imu_raw_packets(buffer):

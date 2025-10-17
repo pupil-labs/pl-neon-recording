@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class WornProps(TimeseriesProps):
-    worn = fields[np.float64]("worn")  # type:ignore
+    worn = fields[np.float64]("worn")
     "Boolean value indicating whether the headset is worn (1) or not (0)."
 
 
@@ -51,4 +51,4 @@ class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
 
         data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
         data = data.view(WornArray)
-        return data
+        return data  # type: ignore

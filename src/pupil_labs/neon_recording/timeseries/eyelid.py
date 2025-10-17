@@ -98,4 +98,4 @@ class EyelidTimeseries(
             "aperture_right",
         )
         data = data.view(EyelidArray)
-        return data
+        return data  # type: ignore

@@ -23,10 +23,10 @@ if TYPE_CHECKING:
 class BlinkProps:
     # Note, BlinkProps do not inherit from TimeseriesProps because they should not
     # have a `time` attribute.
-    start_time = fields[np.int64]("start_time")  # type:ignore
+    start_time = fields[np.int64]("start_time")
     "Start timestamp of the blink."
 
-    stop_time = fields[np.int64]("stop_time")  # type:ignore
+    stop_time = fields[np.int64]("stop_time")
     "Stop timestamp of the blink."
 
 
@@ -57,4 +57,4 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
         data = data[["time", "start_timestamp_ns", "end_timestamp_ns"]]
         data.dtype.names = ("time", "start_time", "stop_time")
         data = data.view(BlinkArray)
-        return data
+        return data  # type: ignore

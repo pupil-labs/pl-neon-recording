@@ -74,7 +74,7 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             elif self.kind == "audio":
                 reader = plv.Reader(av_file, self.kind)  # type: ignore
                 part_ts = (
-                    part_ts["time"][0] + (reader.container_timestamps * 1e9)  # type: ignore
+                    part_ts["time"][0] + (reader.container_timestamps * 1e9)
                 ).astype(TIMESTAMP_DTYPE)
 
             else:
@@ -110,4 +110,4 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             },
         )
 
-        return data.view(BoundAVFramesClass)
+        return data.view(BoundAVFramesClass)  # type: ignore

@@ -48,7 +48,7 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
             "event" if name == "text" else name for name in data.dtype.names
         ]
         data = data.view(EventArray)
-        return data
+        return data  # type: ignore
 
     @cached_property
     def by_name(self):

@@ -77,4 +77,4 @@ class PupilTimeseries(InterpolatableTimeseries[PupilArray, PupilRecord], PupilPr
         )
         data = data.view(PupilArray)
 
-        return data
+        return data  # type: ignore

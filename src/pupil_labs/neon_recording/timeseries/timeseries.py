@@ -27,7 +27,7 @@ ArrayType = TypeVar("ArrayType", bound=Array)
 
 
 class TimeseriesProps:
-    time = fields[np.int64](TIMESTAMP_FIELD_NAME)  # type:ignore
+    time = fields[np.int64](TIMESTAMP_FIELD_NAME)
     "The moment these data were recorded"
 
     def keys(self):
@@ -115,7 +115,7 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
         method: Literal["nearest", "backward", "forward"] = "nearest",
         tolerance: int | None = None,
     ) -> T:
-        indices = match_ts(target_time, self.time, method, tolerance)
+        indices = match_ts(target_time, self.time, method, tolerance)  # type: ignore
 
         if True in np.isnan(indices):
             raise ValueError(
@@ -125,7 +125,7 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
 
         return self.__class__(
             self.recording,
-            self._data[indices],  # type: ignore
+            self._data[indices],
         )
 
 
@@ -153,5 +153,5 @@ class InterpolatableTimeseries(Timeseries[ArrayType, RecordType]):
             )
         return self.__class__(
             self.recording,
-            data=result.view(self._data.__class__),  # type: ignore,
+            data=result.view(self._data.__class__),
         )

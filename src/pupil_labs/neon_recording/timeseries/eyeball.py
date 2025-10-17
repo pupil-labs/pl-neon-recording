@@ -24,28 +24,28 @@ class EyeballProps(TimeseriesProps):
         "center_left_x",
         "center_left_y",
         "center_left_z",
-    ])  # type:ignore
+    ])
     "The 3D position of the left eyeball relative to the scene camera in mm."
 
     center_right = fields[np.float64]([
         "center_right_x",
         "center_right_y",
         "center_right_z",
-    ])  # type:ignore
+    ])
     "The 3D position of the right eyeball relative to the scene camera in mm."
 
     optical_axis_left = fields[np.float64]([
         "optical_axis_left_x",
         "optical_axis_left_y",
         "optical_axis_left_z",
-    ])  # type:ignore
+    ])
     "A 3D vector in the forward direction of the left eye's optical axis."
 
     optical_axis_right = fields[np.float64]([
         "optical_axis_right_x",
         "optical_axis_right_y",
         "optical_axis_right_z",
-    ])  # type:ignore
+    ])
     "A 3D vector in the forward direction of the right eye's optical axis."
 
 
@@ -120,4 +120,4 @@ class EyeballTimeseries(
             "optical_axis_right_z",
         )
         data = data.view(EyeballArray)
-        return data
+        return data  # type: ignore
