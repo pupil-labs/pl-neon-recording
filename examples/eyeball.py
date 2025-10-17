@@ -8,9 +8,8 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-from pupil_labs.video import Writer  # noqa: E402
-
 import pupil_labs.neon_recording as nr  # noqa: E402
+from pupil_labs.video import Writer  # noqa: E402
 
 
 def overlay_image(img, img_overlay, x, y):

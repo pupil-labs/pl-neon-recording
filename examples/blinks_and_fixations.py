@@ -8,10 +8,9 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-from pupil_labs.video import Writer  # noqa: E402
-
 import pupil_labs.neon_recording as nr  # noqa: E402
 from pupil_labs.neon_recording import match_ts  # noqa: E402
+from pupil_labs.video import Writer  # noqa: E402
 
 
 def write_text(image, text, x, y):
@@ -55,7 +54,7 @@ def make_overlaid_video(recording_dir, output_video_path):
     fixation_count = 0
     for frame, blink_index, fixation_index in tqdm(
         zip(recording.eye, blink_matches, fixation_matches, strict=False),
-        total=len(recording.eye)
+        total=len(recording.eye),
     ):
         frame_pixels = frame.bgr
 

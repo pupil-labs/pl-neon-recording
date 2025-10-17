@@ -2,8 +2,8 @@ import logging
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
-import pupil_labs.video as plv
 
+import pupil_labs.video as plv
 from pupil_labs.neon_recording.constants import (
     AV_INDEX_DTYPE,
     AV_INDEX_FIELD_NAME,

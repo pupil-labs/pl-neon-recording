@@ -128,6 +128,7 @@ class Timeseries(TimeseriesProps, Generic[ArrayType, RecordType]):
             self._data[indices],  # type: ignore
         )
 
+
 class InterpolatableTimeseries(Timeseries[ArrayType, RecordType]):
     def interpolate(self: T, target_time: npt.NDArray[np.int64]) -> T:
         target_time = np.array(target_time)
@@ -152,5 +153,5 @@ class InterpolatableTimeseries(Timeseries[ArrayType, RecordType]):
             )
         return self.__class__(
             self.recording,
-            data=result.view(self._data.__class__)  # type: ignore,
+            data=result.view(self._data.__class__),  # type: ignore,
         )

@@ -28,10 +28,7 @@ imu_data = recording.imu.sample(timestamps)
 
 # Use scipy to convert the quaternions to euler angles
 quaternions = np.array([s.rotation for s in imu_data])
-rotations = (
-    Rotation.from_quat(quaternions).as_euler(seq="yxz", degrees=True)
-    % 360
-)
+rotations = Rotation.from_quat(quaternions).as_euler(seq="yxz", degrees=True) % 360
 
 # Combine the timestamps and eulers
 rotations_with_time = np.column_stack((timestamps, rotations))

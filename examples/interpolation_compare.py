@@ -8,18 +8,15 @@ from tqdm import tqdm
 cv2.imshow("cv/av bug", np.zeros(1))
 cv2.destroyAllWindows()
 
-from pupil_labs.video import Writer  # noqa: E402
-
 import pupil_labs.neon_recording as nr  # noqa: E402
+from pupil_labs.video import Writer  # noqa: E402
 
 
 def make_overlaid_video(recording_dir, output_video_path, fps=None):
     # Open a recording
     recording = nr.open(recording_dir)
 
-    video_writer = Writer(
-        output_video_path
-    )
+    video_writer = Writer(output_video_path)
     video_start_time = recording.scene.time[0]
 
     # get closest gaze data to scene frame timestamps

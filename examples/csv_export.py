@@ -73,7 +73,10 @@ def export_gaze(recording, export_path):
     fixations = recording.fixations
 
     fixation_ids = (
-        find_ranged_index(recording.gaze.time, fixations.start_time, fixations.stop_time) + 1
+        find_ranged_index(
+            recording.gaze.time, fixations.start_time, fixations.stop_time
+        )
+        + 1
     )
 
     blink_ids = (
@@ -117,7 +120,8 @@ def export_blinks(recording, export_path):
         "blink id": 1 + np.arange(len(recording.blinks)),
         "start timestamp [ns]": recording.blinks.start_time,
         "end timestamp [ns]": recording.blinks.stop_time,
-        "duration [ms]": (recording.blinks.stop_time - recording.blinks.start_time) / 1e6,
+        "duration [ms]": (recording.blinks.stop_time - recording.blinks.start_time)
+        / 1e6,
     })
     export_file = export_path / "blinks.csv"
     blinks.to_csv(export_file, index=False)
