@@ -1,0 +1,6 @@
+[
+("event_type",         "int32"),
+("start_timestamp_ns", "int64"),
+("end_timestamp_ns",   "int64"),
+]
+
