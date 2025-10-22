@@ -49,6 +49,9 @@ class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
             log.debug("NeonRecording: Using realtime worn data")
             file_pairs = find_sorted_multipart_files(recording._rec_dir, "worn")
 
+        if len(file_pairs) == 0:
+            raise AttributeError("No worn data found")
+
         data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
         data = data.view(WornArray)
         return data  # type: ignore

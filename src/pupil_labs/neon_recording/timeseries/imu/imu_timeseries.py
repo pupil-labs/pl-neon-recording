@@ -89,6 +89,10 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
             imu_file_pairs = find_sorted_multipart_files(
                 self.recording._rec_dir, "extimu"
             )
+
+            if len(imu_file_pairs) == 0:
+                raise AttributeError("No IMU data found")
+
             time_data = Array([file for _, file in imu_file_pairs], TIMESTAMP_DTYPE)  # type: ignore
 
             records = []

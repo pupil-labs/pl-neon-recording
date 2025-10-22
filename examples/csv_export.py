@@ -70,21 +70,29 @@ def find_ranged_index(values, left_boundaries, right_boundaries):
 
 
 def export_gaze(recording, export_path):
-    fixations = recording.fixations
+    try:
+        fixations = recording.fixations
 
-    fixation_ids = (
-        find_ranged_index(
-            recording.gaze.time, fixations.start_time, fixations.stop_time
+        fixation_ids = (
+            find_ranged_index(
+                recording.gaze.time, fixations.start_time, fixations.stop_time
+            )
+            + 1
         )
-        + 1
-    )
+    except AttributeError:
+        fixation_ids = -1
 
-    blink_ids = (
-        find_ranged_index(
-            recording.gaze.time, recording.blinks.start_time, recording.blinks.stop_time
+    try:
+        blink_ids = (
+            find_ranged_index(
+                recording.gaze.time,
+                recording.blinks.start_time,
+                recording.blinks.stop_time,
+            )
+            + 1
         )
-        + 1
-    )
+    except AttributeError:
+        blink_ids = -1
 
     spherical_coords = cart_to_spherical(
         unproject_points(
@@ -310,4 +318,7 @@ if __name__ == "__main__":
 
     for stream_name, export_func in func_map.items():
         if f"--{stream_name}" in sys.argv:
-            export_func(recording, export_path)
+            try:
+                export_func(recording, export_path)
+            except AttributeError as err:
+                print(f"Could not export {stream_name}: {err}", file=sys.stderr)

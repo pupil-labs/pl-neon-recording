@@ -58,6 +58,10 @@ class EyelidTimeseries(
     def _load_data_from_recording(self, recording: "NeonRecording") -> EyelidArray:
         log.debug("NeonRecording: Loading eye state data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "eye_state")
+
+        if len(file_pairs) == 0:
+            raise AttributeError("No eyelid data found")
+
         data = load_multipart_data_time_pairs(
             file_pairs,
             dtype=np.dtype([

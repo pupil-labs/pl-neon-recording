@@ -62,6 +62,10 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
     def _load_data_from_recording(self, recording: "NeonRecording") -> FixationArray:
         log.debug("NeonRecording: Loading fixation data")
         file_pairs = find_sorted_multipart_files(recording._rec_dir, "fixations")
+
+        if len(file_pairs) == 0:
+            raise AttributeError("No fixation data found")
+
         data = load_multipart_data_time_pairs(
             file_pairs,
             np.dtype([

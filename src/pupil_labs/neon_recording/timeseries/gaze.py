@@ -56,6 +56,9 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
             log.debug("NeonRecording: Using realtime gaze data")
             file_pairs = find_sorted_multipart_files(recording._rec_dir, "gaze")
 
+        if len(file_pairs) == 0:
+            raise AttributeError("No gaze data found")
+
         data = load_multipart_data_time_pairs(
             file_pairs,
             np.dtype([
