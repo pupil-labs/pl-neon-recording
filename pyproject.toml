@@ -21,6 +21,7 @@ classifiers = [
 
 dependencies = [
     "numpy",
+    "pandas>=2.2.3",
     "protobuf",
     "pupil-labs-video>=1.0.5",
     "scipy",
@@ -45,12 +46,10 @@ dev-dependencies = [
     "deptry>=0.20.0",
     "tox-uv>=1.11.3",
     "pytest-cov>=4.0.0",
-
     # stubs
     "opencv-stubs",
     "types-protobuf",
     "pandas-stubs",
-
     # docs
     "markdown-callouts>=0.4",
     "markdown-exec>=1.8",
@@ -70,6 +69,12 @@ dev-dependencies = [
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+examples = [
+    "opencv-python>=4.11.0.86",
+    "tqdm>=4.67.1",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

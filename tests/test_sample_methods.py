@@ -1,11 +1,11 @@
 import numpy as np
 import pytest
 
-from pupil_labs.neon_recording.stream.array_record import Array, Record, fields
-from pupil_labs.neon_recording.stream.stream import Stream, StreamProps
+from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 
 
-class MockProps(StreamProps):
+class MockProps(TimeseriesProps):
     x = fields[np.float64]("x")
 
 
@@ -19,29 +19,29 @@ class MockArray(Array[MockRecord], MockProps):
     record_class = MockRecord
 
 
-class MockStream(Stream[MockArray, MockRecord], MockProps):
-    data: MockArray
+class MockTimeseries(Timeseries[MockArray, MockRecord], MockProps):
+    name: str = "mock"
 
-    def __init__(self, data):
-        super().__init__("mock", None, data.view(MockArray))
+    def __init__(self, recording, data):
+        super().__init__(recording, data.view(MockArray))  # type:ignore
 
 
 @pytest.fixture
-def mock_stream():
+def mock_timeseries():
     ts_data = np.array([10, 20, 30, 40, 50])
     x_data = ts_data.copy()
     dtype = np.dtype([
-        ("ts", np.int64),
+        ("time", np.int64),
         ("x", np.float64),
     ])
     MockArray.dtype = dtype
     data = np.empty(ts_data.shape, dtype=dtype)
-    data["ts"] = ts_data
+    data["time"] = ts_data
     data["x"] = x_data
     data = data.view(MockArray)
 
-    stream = MockStream(data)
-    return stream
+    timeseries = MockTimeseries(None, data)
+    return timeseries
 
 
 @pytest.mark.parametrize(
@@ -55,11 +55,11 @@ def mock_stream():
         ([20, 40], [20, 40]),
     ],
 )
-def test_sample_nearest(mock_stream, target_ts, result):
+def test_sample_nearest(mock_timeseries, target_ts, result):
     for s, r in zip(
-        mock_stream.sample(target_ts, method="nearest"), result, strict=True
+        mock_timeseries.sample(target_ts, method="nearest"), result, strict=True
     ):
-        assert s["ts"] == r
+        assert s["time"] == r
         assert s["x"] == r
 
 
@@ -67,16 +67,21 @@ def test_sample_nearest(mock_stream, target_ts, result):
     "target_ts, result",
     [
         ([20, 30], [20, 30]),
-        ([21, 31], [30, 40]),
-        ([19, 29], [20, 30]),
-        ([-100, 100], [10, 50]),
+        ([21, 31], [20, 30]),
+        ([19, 29], [10, 20]),
+        ([11, 100], [10, 50]),
         ([20, 20], [20, 20]),
         ([20, 40], [20, 40]),
     ],
 )
-def test_sample_before(mock_stream, target_ts, result):
+def test_sample_backward(mock_timeseries, target_ts, result):
     for s, r in zip(
-        mock_stream.sample(target_ts, method="before"), result, strict=True
+        mock_timeseries.sample(target_ts, method="backward"), result, strict=True
     ):
-        assert s["ts"] == r
+        assert s["time"] == r
         assert s["x"] == r
+
+
+def test_sample_backward_oob(mock_timeseries):
+    with pytest.raises(ValueError):
+        mock_timeseries.sample([-100], method="backward", tolerance=0)

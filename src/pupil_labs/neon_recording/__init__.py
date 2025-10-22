@@ -3,15 +3,15 @@ import logging
 import os
 
 from .neon_recording import NeonRecording, load, open  # noqa: A004
-from .stream.av_stream.audio_stream import AudioStream
-from .stream.av_stream.video_stream import VideoStream
-from .stream.blink_stream import BlinkStream
-from .stream.event_stream import EventStream
-from .stream.eye_state_stream import EyeStateStream
-from .stream.fixation_stream import FixationStream
-from .stream.gaze_stream import GazeStream
-from .stream.imu.imu_stream import IMUStream
-from .stream.worn_stream import WornStream
+from .sample import match_ts
+from .timeseries.av.audio import AudioTimeseries
+from .timeseries.av.video import VideoTimeseries
+from .timeseries.blinks import BlinkTimeseries
+from .timeseries.events import EventTimeseries
+from .timeseries.fixations import FixationTimeseries
+from .timeseries.gaze import GazeTimeseries
+from .timeseries.imu.imu_timeseries import IMUTimeseries
+from .timeseries.worn import Timeseries
 
 try:
     __version__ = importlib.metadata.version(__name__)
@@ -26,17 +26,17 @@ LOG_LEVEL = getattr(logging, level)
 
 
 __all__ = [
-    "AudioStream",
-    "BlinkStream",
-    "EventStream",
-    "EyeStateStream",
-    "FixationStream",
-    "GazeStream",
-    "IMUStream",
+    "AudioTimeseries",
+    "BlinkTimeseries",
+    "EventTimeseries",
+    "FixationTimeseries",
+    "GazeTimeseries",
+    "IMUTimeseries",
     "NeonRecording",
-    "VideoStream",
-    "WornStream",
+    "Timeseries",
+    "VideoTimeseries",
     "__version__",
     "load",
+    "match_ts",
     "open",
 ]

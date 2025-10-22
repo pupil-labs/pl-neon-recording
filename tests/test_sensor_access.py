@@ -25,7 +25,7 @@ def test_tabular_data(  # noqa: C901
 
     expected = getattr(rec_ground_truth, sensor_name)
     sensor = getattr(rec, sensor_name)
-    assert len(sensor) == len(expected.ts)
+    assert len(sensor) == len(expected.time)
 
     assert np.all(getattr(sensor, field) == getattr(expected, field))
 
@@ -61,7 +61,7 @@ def test_tabular_data(  # noqa: C901
         for i, j in slices:
             v = sensor[i:j]
             if isinstance(v, list):
-                for a, b in zip(v, getattr(expected, field)[i:j]):
+                for a, b in zip(v, getattr(expected, field)[i:j], strict=False):
                     assert_equal(getattr(a, field), b)
             else:
                 a = getattr(v, field)
@@ -74,7 +74,7 @@ def test_tabular_data(  # noqa: C901
         # Open end
         v = sensor[i:]
         if isinstance(v, list):
-            for a, b in zip(v, getattr(expected, field)[i:]):
+            for a, b in zip(v, getattr(expected, field)[i:], strict=False):
                 assert_equal(getattr(a, field), b)
         else:
             a = getattr(v, field)
@@ -84,7 +84,7 @@ def test_tabular_data(  # noqa: C901
         # Open start
         v = sensor[:i]
         if isinstance(v, list):
-            for a, b in zip(v, getattr(expected, field)[:i]):
+            for a, b in zip(v, getattr(expected, field)[:i], strict=False):
                 assert_equal(getattr(a, field), b)
         else:
             a = getattr(v, field)
@@ -94,7 +94,7 @@ def test_tabular_data(  # noqa: C901
     # Both open
     v = sensor[:]
     if isinstance(v, list):
-        for a, b in zip(v, getattr(expected, field)[:]):
+        for a, b in zip(v, getattr(expected, field)[:], strict=False):
             assert_equal(getattr(a, field), b)
     else:
         a = getattr(v, field)

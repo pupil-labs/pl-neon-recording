@@ -4,21 +4,26 @@ import json
 import logging
 import pathlib
 from functools import cached_property
-from typing import Union
 
 from upath import UPath
 
-from pupil_labs.neon_recording.stream.blink_stream import BlinkStream
-from pupil_labs.neon_recording.stream.fixation_stream import FixationStream
-from pupil_labs.neon_recording.stream.worn_stream import WornStream
+from pupil_labs.neon_recording.timeseries import (
+    AudioTimeseries,
+    BlinkTimeseries,
+    EventTimeseries,
+    EyeballTimeseries,
+    EyelidTimeseries,
+    EyeVideoTimeseries,
+    FixationTimeseries,
+    GazeTimeseries,
+    IMUTimeseries,
+    PupilTimeseries,
+    SaccadeTimeseries,
+    SceneVideoTimeseries,
+    WornTimeseries,
+)
 
 from .calib import Calibration
-from .stream.av_stream.audio_stream import AudioStream
-from .stream.av_stream.video_stream import VideoStream
-from .stream.event_stream import EventStream
-from .stream.eye_state_stream import EyeStateStream
-from .stream.gaze_stream import GazeStream
-from .stream.imu import IMUStream
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +31,7 @@ log = logging.getLogger(__name__)
 class NeonRecording:
     """Class to handle the Neon Recording data"""
 
-    def __init__(self, rec_dir_in: Union[pathlib.Path, str]):
+    def __init__(self, rec_dir_in: pathlib.Path | str):
         """Initialize the NeonRecording object
 
         Args:
@@ -59,14 +64,14 @@ class NeonRecording:
         return info_data or {}
 
     @property
-    def start_ts(self) -> int:
+    def start_time(self) -> int:
         """Start timestamp (nanoseconds since 1970-01-01)"""
         return self.info.get("start_time") or 0
 
     @property
-    def stop_ts(self) -> int:
+    def stop_time(self) -> int:
         """Stop timestamp (nanoseconds since 1970-01-01)"""
-        return self.start_ts + self.duration
+        return self.start_time + self.duration
 
     @property
     def duration(self) -> int:
@@ -100,57 +105,72 @@ class NeonRecording:
         return self.info.get("module_serial_number")
 
     @cached_property
-    def gaze(self) -> GazeStream:
+    def gaze(self) -> GazeTimeseries:
         """2D gaze data in scene-camera space"""
-        return GazeStream(self)
+        return GazeTimeseries(self)
 
     @cached_property
-    def imu(self) -> IMUStream:
+    def imu(self) -> IMUTimeseries:
         """Motion and orientation data"""
-        return IMUStream(self)
+        return IMUTimeseries(self)
 
     @cached_property
-    def eye_state(self) -> EyeStateStream:
+    def pupil(self) -> PupilTimeseries:
+        """Pupil diameter data"""
+        return PupilTimeseries(self)
+
+    @cached_property
+    def eyelid(self) -> EyelidTimeseries:
+        """Eyelid data"""
+        return EyelidTimeseries(self)
+
+    @cached_property
+    def eyeball(self) -> EyeballTimeseries:
         """Eye state data"""
-        return EyeStateStream(self)
+        return EyeballTimeseries(self)
 
     @cached_property
-    def scene(self) -> VideoStream:
+    def scene(self) -> SceneVideoTimeseries:
         """Frames of video from the scene camera"""
-        return VideoStream("scene", "Neon Scene Camera v1", self)
+        return SceneVideoTimeseries(self)
 
     @cached_property
-    def eye(self) -> VideoStream:
+    def eye(self) -> EyeVideoTimeseries:
         """Frames of video from the eye cameras"""
-        return VideoStream("eye", "Neon Sensor Module v1", self)
+        return EyeVideoTimeseries(self)
 
     @cached_property
-    def events(self) -> EventStream:
+    def events(self) -> EventTimeseries:
         """Event annotations"""
-        return EventStream(self)
+        return EventTimeseries(self)
 
     @cached_property
-    def fixations(self) -> FixationStream:
+    def fixations(self) -> FixationTimeseries:
         """Fixations data"""
-        return FixationStream(self)
+        return FixationTimeseries(self)
 
     @cached_property
-    def blinks(self) -> BlinkStream:
+    def saccades(self) -> SaccadeTimeseries:
+        """Saccades data"""
+        return SaccadeTimeseries(self)
+
+    @cached_property
+    def blinks(self) -> BlinkTimeseries:
         """Blink data"""
-        return BlinkStream(self)
+        return BlinkTimeseries(self)
 
     @cached_property
-    def audio(self) -> AudioStream:
+    def audio(self) -> AudioTimeseries:
         """Audio from the scene video"""
-        return AudioStream("audio", "Neon Scene Camera v1", self)
+        return AudioTimeseries(self)
 
     @cached_property
-    def worn(self) -> WornStream:
+    def worn(self) -> WornTimeseries:
         """Worn (headset on/off) data"""
-        return WornStream(self)
+        return WornTimeseries(self)
 
 
-def open(rec_dir_in: Union[pathlib.Path, str]) -> NeonRecording:  # noqa: A001
+def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001
     """Load a NeonRecording from a path"""
     return NeonRecording(rec_dir_in)
 

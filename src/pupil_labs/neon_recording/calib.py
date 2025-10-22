@@ -3,7 +3,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from pupil_labs.neon_recording.stream.array_record import Record, fields
+from pupil_labs.neon_recording.timeseries.array_record import Record, fields
 
 
 class Calibration(Record):
@@ -12,7 +12,7 @@ class Calibration(Record):
     dtype: np.dtype = np.dtype(
         [
             ("version", "u1"),
-            ("serial", "6a"),
+            ("serial", "6S"),
             ("scene_camera_matrix", "(3,3)d"),
             ("scene_distortion_coefficients", "8d"),
             ("scene_extrinsics_affine_matrix", "(4,4)d"),

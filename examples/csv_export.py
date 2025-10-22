@@ -70,22 +70,33 @@ def find_ranged_index(values, left_boundaries, right_boundaries):
 
 
 def export_gaze(recording, export_path):
-    fixations = recording.fixations[recording.fixations["event_type"] == 1]
+    try:
+        fixations = recording.fixations
 
-    fixation_ids = (
-        find_ranged_index(recording.gaze.ts, fixations.start_ts, fixations.end_ts) + 1
-    )
-
-    blink_ids = (
-        find_ranged_index(
-            recording.gaze.ts, recording.blinks.start_ts, recording.blinks.end_ts
+        fixation_ids = (
+            find_ranged_index(
+                recording.gaze.time, fixations.start_time, fixations.stop_time
+            )
+            + 1
         )
-        + 1
-    )
+    except AttributeError:
+        fixation_ids = -1
+
+    try:
+        blink_ids = (
+            find_ranged_index(
+                recording.gaze.time,
+                recording.blinks.start_time,
+                recording.blinks.stop_time,
+            )
+            + 1
+        )
+    except AttributeError:
+        blink_ids = -1
 
     spherical_coords = cart_to_spherical(
         unproject_points(
-            recording.gaze.xy,
+            recording.gaze.point,
             recording.calibration.scene_camera_matrix,
             recording.calibration.scene_distortion_coefficients,
         )
@@ -93,9 +104,9 @@ def export_gaze(recording, export_path):
 
     gaze = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "timestamp [ns]": recording.gaze.ts,
-        "gaze x [px]": recording.gaze.x,
-        "gaze y [px]": recording.gaze.y,
+        "timestamp [ns]": recording.gaze.time,
+        "gaze x [px]": recording.gaze.point[:, 0],
+        "gaze y [px]": recording.gaze.point[:, 1],
         "worn": recording.worn.worn,
         "fixation id": fixation_ids,
         "blink id": blink_ids,
@@ -115,9 +126,10 @@ def export_blinks(recording, export_path):
     blinks = pd.DataFrame({
         "recording id": recording.info["recording_id"],
         "blink id": 1 + np.arange(len(recording.blinks)),
-        "start timestamp [ns]": recording.blinks.start_ts,
-        "end timestamp [ns]": recording.blinks.end_ts,
-        "duration [ms]": (recording.blinks.end_ts - recording.blinks.start_ts) / 1e6,
+        "start timestamp [ns]": recording.blinks.start_time,
+        "end timestamp [ns]": recording.blinks.stop_time,
+        "duration [ms]": (recording.blinks.stop_time - recording.blinks.start_time)
+        / 1e6,
     })
     export_file = export_path / "blinks.csv"
     blinks.to_csv(export_file, index=False)
@@ -125,78 +137,79 @@ def export_blinks(recording, export_path):
 
 
 def export_fixations(recording, export_path):
-    fixations_only = recording.fixations[recording.fixations["event_type"] == 1]
+    fixations = recording.fixations
 
     spherical_coords = cart_to_spherical(
         unproject_points(
-            fixations_only.mean_gaze_xy,
+            fixations.mean_gaze_point,
             recording.calibration.scene_camera_matrix,
             recording.calibration.scene_distortion_coefficients,
         )
     )
 
-    fixations = pd.DataFrame({
+    fixations_df = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "fixation id": 1 + np.arange(len(fixations_only)),
-        "start timestamp [ns]": fixations_only.start_ts,
-        "end timestamp [ns]": fixations_only.end_ts,
-        "duration [ms]": (fixations_only.end_ts - fixations_only.start_ts) / 1e6,
-        "fixation x [px]": fixations_only.mean_gaze_xy[:, 0],
-        "fixation y [px]": fixations_only.mean_gaze_xy[:, 1],
+        "fixation id": 1 + np.arange(len(fixations)),
+        "start timestamp [ns]": fixations.start_time,
+        "end timestamp [ns]": fixations.stop_time,
+        "duration [ms]": (fixations.stop_time - fixations.start_time) / 1e6,
+        "fixation x [px]": fixations.mean_gaze_point[:, 0],
+        "fixation y [px]": fixations.mean_gaze_point[:, 1],
         "azimuth [deg]": spherical_coords[2],
         "elevation [deg]": spherical_coords[1],
     })
 
     export_file = export_path / "fixations.csv"
-    fixations.to_csv(export_file, index=False)
+    fixations_df.to_csv(export_file, index=False)
     print(f"Wrote {export_file}")
 
 
 def export_saccades(recording, export_path):
-    saccades_only = recording.fixations[recording.fixations["event_type"] == 0]
+    saccades = recording.saccades
 
-    saccades = pd.DataFrame({
+    saccades_df = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "saccade id": 1 + np.arange(len(saccades_only)),
-        "start timestamp [ns]": saccades_only.start_ts,
-        "end timestamp [ns]": saccades_only.end_ts,
-        "duration [ms]": (saccades_only.end_ts - saccades_only.start_ts) / 1e6,
-        "amplitude [px]": saccades_only.amplitude_pixels,
-        "amplitude [deg]": saccades_only.amplitude_angle_deg,
-        "mean velocity [px/s]": saccades_only.mean_velocity,
-        "peak velocity [px/s]": saccades_only.max_velocity,
+        "saccade id": 1 + np.arange(len(saccades)),
+        "start timestamp [ns]": saccades.start_time,
+        "end timestamp [ns]": saccades.stop_time,
+        "duration [ms]": (saccades.stop_time - saccades.start_time) / 1e6,
+        "amplitude [deg]": saccades.amplitude,
+        "mean velocity [px/s]": saccades.mean_velocity,
+        "peak velocity [px/s]": saccades.max_velocity,
     })
 
     export_file = export_path / "saccades.csv"
-    saccades.to_csv(export_file, index=False)
+    saccades_df.to_csv(export_file, index=False)
     print(f"Wrote {export_file}")
 
 
 def export_eyestates(recording, export_path):
-    es = recording.eye_state
+    eyeball = recording.eyeball
+    pupil = recording.pupil
+    eyelid = recording.eyelid
     eyestates = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "timestamp [ns]": es.ts,
-        "pupil diameter left [mm]": es.pupil_diameter_left_mm,
-        "pupil diameter right [mm]": es.pupil_diameter_right_mm,
-        "eyeball center left x [mm]": es.eyeball_center_left_xyz[:, 0],
-        "eyeball center left y [mm]": es.eyeball_center_left_xyz[:, 1],
-        "eyeball center left z [mm]": es.eyeball_center_left_xyz[:, 2],
-        "eyeball center right x [mm]": es.eyeball_center_right_xyz[:, 0],
-        "eyeball center right y [mm]": es.eyeball_center_right_xyz[:, 1],
-        "eyeball center right z [mm]": es.eyeball_center_right_xyz[:, 2],
-        "optical axis left x": es.optical_axis_left_xyz[:, 0],
-        "optical axis left y": es.optical_axis_left_xyz[:, 1],
-        "optical axis left z": es.optical_axis_left_xyz[:, 2],
-        "optical axis right x": es.optical_axis_right_xyz[:, 0],
-        "optical axis right y": es.optical_axis_right_xyz[:, 1],
-        "optical axis right z": es.optical_axis_right_xyz[:, 2],
-        "eyelid angle top left [rad]": es.eyelid_angle[:, 0],
-        "eyelid angle bottom left [rad]": es.eyelid_angle[:, 1],
-        "eyelid aperture left [mm]": es.eyelid_aperture_left_right_mm[:, 0],
-        "eyelid angle top right [rad]": es.eyelid_angle[:, 2],
-        "eyelid angle bottom right [rad]": es.eyelid_angle[:, 3],
-        "eyelid aperture right [mm]": es.eyelid_aperture_left_right_mm[:, 1],
+        "timestamp [ns]": eyeball.time,
+        "pupil diameter left [mm]": pupil.diameter_left,
+        "pupil diameter right [mm]": pupil.diameter_right,
+        "eyeball center left x [mm]": eyeball.center_left[:, 0],
+        "eyeball center left y [mm]": eyeball.center_left[:, 1],
+        "eyeball center left z [mm]": eyeball.center_left[:, 2],
+        "eyeball center right x [mm]": eyeball.center_right[:, 0],
+        "eyeball center right y [mm]": eyeball.center_right[:, 1],
+        "eyeball center right z [mm]": eyeball.center_right[:, 2],
+        "optical axis left x": eyeball.optical_axis_left[:, 0],
+        "optical axis left y": eyeball.optical_axis_left[:, 1],
+        "optical axis left z": eyeball.optical_axis_left[:, 2],
+        "optical axis right x": eyeball.optical_axis_right[:, 0],
+        "optical axis right y": eyeball.optical_axis_right[:, 1],
+        "optical axis right z": eyeball.optical_axis_right[:, 2],
+        "eyelid angle top left [rad]": eyelid.angle_left[:, 0],
+        "eyelid angle bottom left [rad]": eyelid.angle_left[:, 1],
+        "eyelid aperture left [mm]": eyelid.aperture_left,
+        "eyelid angle top right [rad]": eyelid.angle_right[:, 0],
+        "eyelid angle bottom right [rad]": eyelid.angle_right[:, 1],
+        "eyelid aperture right [mm]": eyelid.aperture_right,
     })
 
     export_file = export_path / "3d_eye_states.csv"
@@ -205,25 +218,25 @@ def export_eyestates(recording, export_path):
 
 
 def export_imu(recording, export_path):
-    rotations = Rotation.from_quat(recording.imu.quaternion_wxyz, scalar_first=True)
+    rotations = Rotation.from_quat(recording.imu.rotation)
     eulers = rotations.as_euler(seq="yxz", degrees=True)
 
     imu = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "timestamp [ns]": recording.imu.ts,
-        "gyro x [deg/s]": recording.imu.gyro_xyz[:, 0],
-        "gyro y [deg/s]": recording.imu.gyro_xyz[:, 1],
-        "gyro z [deg/s]": recording.imu.gyro_xyz[:, 2],
-        "acceleration x [g]": recording.imu.accel_xyz[:, 0],
-        "acceleration y [g]": recording.imu.accel_xyz[:, 1],
-        "acceleration z [g]": recording.imu.accel_xyz[:, 2],
+        "timestamp [ns]": recording.imu.time,
+        "gyro x [deg/s]": recording.imu.angular_velocity[:, 0],
+        "gyro y [deg/s]": recording.imu.angular_velocity[:, 1],
+        "gyro z [deg/s]": recording.imu.angular_velocity[:, 2],
+        "acceleration x [g]": recording.imu.acceleration[:, 0],
+        "acceleration y [g]": recording.imu.acceleration[:, 1],
+        "acceleration z [g]": recording.imu.acceleration[:, 2],
         "roll [deg]": eulers[:, 0],
         "pitch [deg]": eulers[:, 1],
         "yaw [deg]": eulers[:, 2],
-        "quaternion w": recording.imu.quaternion_wxyz[:, 0],
-        "quaternion x": recording.imu.quaternion_wxyz[:, 1],
-        "quaternion y": recording.imu.quaternion_wxyz[:, 2],
-        "quaternion z": recording.imu.quaternion_wxyz[:, 3],
+        "quaternion w": recording.imu.rotation[:, 3],
+        "quaternion x": recording.imu.rotation[:, 0],
+        "quaternion y": recording.imu.rotation[:, 1],
+        "quaternion z": recording.imu.rotation[:, 2],
     })
 
     export_file = export_path / "imu.csv"
@@ -234,7 +247,7 @@ def export_imu(recording, export_path):
 def export_events(recording, export_path):
     events = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "timestamp [ns]": recording.events.ts,
+        "timestamp [ns]": recording.events.time,
         "name": recording.events.event,
         "type": "recording",
     })
@@ -263,7 +276,7 @@ def export_scene_camera_calibration(recording, export_path):
 def export_world_timestamps(recording, export_path):
     events = pd.DataFrame({
         "recording id": recording.info["recording_id"],
-        "timestamp [ns]": recording.scene.ts,
+        "timestamp [ns]": recording.scene.time,
     })
 
     export_file = export_path / "world_timestamps.csv"
@@ -305,4 +318,7 @@ if __name__ == "__main__":
 
     for stream_name, export_func in func_map.items():
         if f"--{stream_name}" in sys.argv:
-            export_func(recording, export_path)
+            try:
+                export_func(recording, export_path)
+            except AttributeError as err:
+                print(f"Could not export {stream_name}: {err}", file=sys.stderr)

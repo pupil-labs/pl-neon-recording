@@ -34,7 +34,7 @@ hide:
 ### Eye State
 
 ```python
---8<-- "examples/eye_state.py"
+--8<-- "examples/eyeball.py"
 ```
 
 ### Find Clap

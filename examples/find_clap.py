@@ -13,12 +13,12 @@ def find_clap(recording_dir, window_size_seconds=0.1, first_n_seconds=10):
     ts_lookup = []
     for frame in recording.audio:
         if first_n_seconds is not None:
-            rel_time = (frame.ts - recording.start_ts) / 1e9
+            rel_time = (frame.time - recording.start_time) / 1e9
             if rel_time > first_n_seconds:
                 break
 
         # Create a timestamp lookup table
-        ts_lookup.append([len(audio_data), frame.ts])
+        ts_lookup.append([len(audio_data), frame.time])
 
         # Gather all the audio samples
         audio_data = np.concatenate((audio_data, frame.to_ndarray().flatten()))
@@ -50,15 +50,15 @@ def find_clap(recording_dir, window_size_seconds=0.1, first_n_seconds=10):
     print(f"The loudest audio occurs at {loudest_time:.0f} rms = {max_rms:.3f}.")
     print(
         f"    Relative to recording start: "
-        f"{(loudest_time - recording.start_ts) / 1e9:0.3f}s"
+        f"{(loudest_time - recording.start_time) / 1e9:0.3f}s"
     )
     print(
         f"    Relative to video start    : "
-        f"{(loudest_time - recording.scene.ts[0]) / 1e9:0.3f}s"
+        f"{(loudest_time - recording.scene.time[0]) / 1e9:0.3f}s"
     )
     print(
         f"    Relative to audio start    : "
-        f"{(loudest_time - recording.audio.ts[0]) / 1e9:0.3f}s"
+        f"{(loudest_time - recording.audio.time[0]) / 1e9:0.3f}s"
     )
 
 
