@@ -80,10 +80,10 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
                 [file for file, _ in imu_file_pairs],
                 fallback_dtype=np.dtype(IMUTimeseries.FALLBACK_DTYPE),
             )
-            data.dtype.names = [  # type: ignore
+            data.dtype.names = tuple([
                 TIMESTAMP_FIELD_NAME if name == "timestamp_ns" else name
-                for name in data.dtype.names  # type: ignore
-            ]
+                for name in data.dtype.names or []
+            ])
 
         else:
             imu_file_pairs = find_sorted_multipart_files(
