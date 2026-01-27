@@ -8,6 +8,8 @@
 [![pypi version](https://img.shields.io/pypi/v/pupil-labs-neon-recording.svg)](https://pypi.org/project/pupil-labs-neon-recording/)
 [![python version](https://img.shields.io/pypi/pyversions/pupil-labs-neon-recording)](https://pypi.org/project/pupil-labs-neon-recording/)
 
+[![pl-neon-recording banner](https://raw.githubusercontent.com/pupil-labs/pl-neon-recording/refs/heads/main/docs/assets/banner.png)](https://pupil-labs.com/)
+
 Functionality for loading Neon recordings in native recording format
 
 ## Installation
