@@ -83,16 +83,11 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
             parts_ts.append(part_ts)
             video_readers.append(reader)
 
-        parts_ts = np.concatenate(parts_ts)
-        idxs = np.empty(len(parts_ts), dtype=AV_INDEX_DTYPE)
-        idxs[AV_INDEX_FIELD_NAME] = np.arange(len(parts_ts))
+        np_parts_ts = np.concatenate(parts_ts)
+        idxs = np.empty(len(np_parts_ts), dtype=AV_INDEX_DTYPE)
+        idxs[AV_INDEX_FIELD_NAME] = np.arange(len(np_parts_ts))
 
-        data = join_struct_arrays(
-            [
-                parts_ts,  # type: ignore
-                idxs,
-            ],
-        )
+        data = join_struct_arrays([np_parts_ts, idxs])
         av_reader = plv.MultiReader(video_readers)
 
         BoundAVFrameClass = type(

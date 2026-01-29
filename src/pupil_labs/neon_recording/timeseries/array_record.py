@@ -19,7 +19,6 @@ from upath import UPath
 if TYPE_CHECKING:
     from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 
-RecordType = TypeVar("RecordType", bound=np.record)
 ArraySource = str | Path | np.ndarray | bytes
 
 
@@ -50,13 +49,22 @@ def pretty_format_mapping(mapping: Mapping):
     return lines_string
 
 
-class Record(np.record):
+class Record:
     dtype: np.dtype
 
-    def __new__(cls, source: str | Path | np.ndarray | bytes):
-        return Array.load_arrays(source, partial(Array.load_array, dtype=cls.dtype))[
-            0
-        ].view(cls)
+    def __init__(self, source: str | Path | np.ndarray | bytes | np.void):
+        if not isinstance(source, np.void):
+            source = Array.load_arrays(
+                source, partial(Array.load_array, dtype=self.dtype)
+            )[0]
+        assert isinstance(source, np.void)
+        self.source = source.view(np.recarray)
+
+    def __getitem__(self, key):
+        return self.source[key]
+
+    def __getattr__(self, key):
+        return getattr(self.source, key)
 
     def items(self):
         return [(k, getattr(self, k, None)) for k in self.keys()]
@@ -73,25 +81,28 @@ class Record(np.record):
         return f"{self.__class__.__qualname__}({lines_string})"
 
 
+RecordType = TypeVar("RecordType", bound=Record)
+
+
 class Array(np.ndarray, Generic[RecordType]):
     record_class: type = Record
-    dtype: np.dtype | None = None
 
     def __new__(
         cls,
         source: ArraySource | Iterable[ArraySource],
-        dtype: npt.DTypeLike = None,
-        fallback_dtype: npt.DTypeLike = None,
+        dtype: npt.DTypeLike | None = None,
+        fallback_dtype: npt.DTypeLike | None = None,
     ):
-        data_dtype = dtype or cls.dtype or fallback_dtype
+        data_dtype = dtype or fallback_dtype
         sources = cls.expand_source_arguments(source)
+        assert data_dtype is not None
         data = cls.load_arrays(sources, partial(cls.load_array, dtype=data_dtype))
         return data.view(cls)
 
     def __array_finalize__(self, obj):
         if obj is None:
             return
-        self.dtype = obj.dtype
+        self._dtype = obj.dtype
         return super().__array_finalize__(obj)
 
     def __iter__(self) -> Iterator[RecordType]:  # type: ignore
@@ -112,7 +123,7 @@ class Array(np.ndarray, Generic[RecordType]):
         if isinstance(result, np.void):
             if self.__class__.record_class:
                 self.__class__.record_class.dtype = result.dtype  # type: ignore
-                return result.view(self.__class__.record_class)  # type: ignore
+                return self.__class__.record_class(result)  # type: ignore
             return result  # type: ignore
 
         if isinstance(key, slice):
@@ -124,7 +135,7 @@ class Array(np.ndarray, Generic[RecordType]):
         return np.array(result)  # type: ignore
 
     def keys(self):
-        return list(self.dtype.names)  # type: ignore
+        return list(self.dtype.names or [])
 
     @classmethod
     def load_array(cls, source: str | Path | np.ndarray | bytes, dtype: npt.DTypeLike):
