@@ -20,7 +20,7 @@ jobs:
           git fetch origin gh-pages --depth=1
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          uv run mike deploy ${{ github.ref_name }} --push
+          uv run mike deploy ${{ github.ref_name }} latest --push --update-aliases
 
   build:
     name: Build distribution 📦

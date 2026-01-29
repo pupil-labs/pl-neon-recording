@@ -38,8 +38,12 @@ Repository = "https://github.com/pupil-labs/pl-neon-recording"
 Issues = "https://github.com/pupil-labs/pl-neon-recording/issues"
 
 
-[tool.uv]
-dev-dependencies = [
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
     "pytest>=8.2",
     "pre-commit>=2.20.0",
     "mypy>=0.991",
@@ -65,12 +69,6 @@ dev-dependencies = [
     # YORE: EOL 3.10: Remove line.
     "tomli>=2.0; python_version < '3.11'",
 ]
-
-[build-system]
-requires = ["hatchling", "uv-dynamic-versioning"]
-build-backend = "hatchling.build"
-
-[dependency-groups]
 examples = [
     "opencv-python>=4.11.0.86",
     "tqdm>=4.67.1",
