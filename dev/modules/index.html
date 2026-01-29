@@ -912,6 +912,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pupil_labs.neon_recording.NeonRecording.gaze_left" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;gaze_left
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pupil_labs.neon_recording.NeonRecording.gaze_right" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;gaze_right
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pupil_labs.neon_recording.NeonRecording.id" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;id
@@ -1573,6 +1591,24 @@
   <a href="#pupil_labs.neon_recording.NeonRecording.gaze" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;gaze
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pupil_labs.neon_recording.NeonRecording.gaze_left" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;gaze_left
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pupil_labs.neon_recording.NeonRecording.gaze_right" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;gaze_right
     </span>
   </a>
   
@@ -3493,7 +3529,35 @@ of the fixation in the presence of VOR movements.</p>
               (<code><span title="pupil_labs.neon_recording.timeseries.GazeTimeseries">GazeTimeseries</span></code>)
           –
           <div class="doc-md-description">
-            <p>2D gaze data in scene-camera space</p>
+            <p>2D bincular gaze data in scene-camera space</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><a class="autorefs autorefs-internal" title="            gaze_left
+
+
+  
+      cached
+      property
+   (pupil_labs.neon_recording.NeonRecording.gaze_left)" href="#pupil_labs.neon_recording.NeonRecording.gaze_left">gaze_left</a></code></b>
+              (<code><span title="pupil_labs.neon_recording.timeseries.GazeLeftTimeseries">GazeLeftTimeseries</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>2D gaze data from the left-eye in scene-camera space</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><a class="autorefs autorefs-internal" title="            gaze_right
+
+
+  
+      cached
+      property
+   (pupil_labs.neon_recording.NeonRecording.gaze_right)" href="#pupil_labs.neon_recording.NeonRecording.gaze_right">gaze_right</a></code></b>
+              (<code><span title="pupil_labs.neon_recording.timeseries.GazeRightTimeseries">GazeRightTimeseries</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>2D gaze data from the right-eye in scene-camera space</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -3637,9 +3701,7 @@ of the fixation in the presence of VOR movements.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
@@ -3651,7 +3713,9 @@ of the fixation in the presence of VOR movements.</p>
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the NeonRecording object</span>
 
 <span class="sd">    Args:</span>
@@ -3946,7 +4010,57 @@ of the fixation in the presence of VOR movements.</p>
 
     <div class="doc doc-contents ">
 
-        <p>2D gaze data in scene-camera space</p>
+        <p>2D bincular gaze data in scene-camera space</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pupil_labs.neon_recording.NeonRecording.gaze_left" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">gaze_left</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pupil_labs.neon_recording.NeonRecording.gaze_left" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">gaze_left</span><span class="p">:</span> <span class="n"><span title="pupil_labs.neon_recording.timeseries.GazeLeftTimeseries">GazeLeftTimeseries</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>2D gaze data from the left-eye in scene-camera space</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pupil_labs.neon_recording.NeonRecording.gaze_right" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">gaze_right</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pupil_labs.neon_recording.NeonRecording.gaze_right" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">gaze_right</span><span class="p">:</span> <span class="n"><span title="pupil_labs.neon_recording.timeseries.GazeRightTimeseries">GazeRightTimeseries</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>2D gaze data from the right-eye in scene-camera space</p>
 
     </div>
 
@@ -4662,9 +4776,9 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>  <span class="c1"># noqa: A001</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeonRecording</span><span class="p">:</span>  <span class="c1"># noqa: A001</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a NeonRecording from a path&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">NeonRecording</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
