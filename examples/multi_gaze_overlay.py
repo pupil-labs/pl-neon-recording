@@ -18,8 +18,8 @@ def make_overlaid_video(recording_dir, output_video_path):
     combined_data = zip(
         rec.scene,
         rec.gaze.sample(rec.scene.time),
-        rec.gaze_left.sample(rec.scene.time),
-        rec.gaze_right.sample(rec.scene.time),
+        rec.gaze_monocular_left.sample(rec.scene.time),
+        rec.gaze_monocular_right.sample(rec.scene.time),
         strict=True,
     )
 

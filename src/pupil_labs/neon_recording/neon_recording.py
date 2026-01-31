@@ -112,12 +112,12 @@ class NeonRecording:
         return GazeTimeseries(self)
 
     @cached_property
-    def gaze_left(self) -> GazeLeftTimeseries:
+    def gaze_monocular_left(self) -> GazeLeftTimeseries:
         """2D gaze data from the left-eye in scene-camera space"""
         return GazeLeftTimeseries(self)
 
     @cached_property
-    def gaze_right(self) -> GazeRightTimeseries:
+    def gaze_monocular_right(self) -> GazeRightTimeseries:
         """2D gaze data from the right-eye in scene-camera space"""
         return GazeRightTimeseries(self)
 
