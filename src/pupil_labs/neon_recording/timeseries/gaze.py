@@ -41,11 +41,12 @@ class GazeArray(Array[GazeRecord], GazeProps):
 
 class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps):
     name: str = "gaze"
+    eye_suffix: str = ""
 
     def _load_data_from_recording(self, recording) -> "GazeArray":
         log.debug("NeonRecording: Loading gaze data")
 
-        gaze_200hz_file = recording._rec_dir / "gaze_200hz.raw"
+        gaze_200hz_file = recording._rec_dir / f"gaze{self.eye_suffix}_200hz.raw"
         time_200hz_file = recording._rec_dir / "gaze_200hz.time"
 
         file_pairs = []
@@ -54,7 +55,10 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
             file_pairs.append((gaze_200hz_file, time_200hz_file))
         else:
             log.debug("NeonRecording: Using realtime gaze data")
-            file_pairs = find_sorted_multipart_files(recording._rec_dir, "gaze")
+            file_pairs = find_sorted_multipart_files(
+                recording._rec_dir,
+                f"gaze{self.eye_suffix}",
+            )
 
         if len(file_pairs) == 0:
             raise AttributeError("No gaze data found")
@@ -69,3 +73,15 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
         data.dtype.names = ("time", "point_x", "point_y")
         data = data.view(GazeArray)
         return data  # type: ignore
+
+
+class GazeLeftTimeseries(GazeTimeseries):
+    def __init__(self, *args, **kwargs):
+        self.eye_suffix = "_left"
+        super().__init__(*args, **kwargs)
+
+
+class GazeRightTimeseries(GazeTimeseries):
+    def __init__(self, *args, **kwargs):
+        self.eye_suffix = "_right"
+        super().__init__(*args, **kwargs)

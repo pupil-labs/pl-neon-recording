@@ -5,7 +5,7 @@ from .events import EventTimeseries
 from .eyeball import EyeballTimeseries
 from .eyelid import EyelidTimeseries
 from .fixations import FixationTimeseries
-from .gaze import GazeTimeseries
+from .gaze import GazeLeftTimeseries, GazeRightTimeseries, GazeTimeseries
 from .imu.imu_timeseries import IMUTimeseries
 from .pupil import PupilTimeseries
 from .saccades import SaccadeTimeseries
@@ -19,6 +19,8 @@ __all__ = [
     "EyeballTimeseries",
     "EyelidTimeseries",
     "FixationTimeseries",
+    "GazeLeftTimeseries",
+    "GazeRightTimeseries",
     "GazeTimeseries",
     "IMUTimeseries",
     "PupilTimeseries",

@@ -15,6 +15,8 @@ from pupil_labs.neon_recording.timeseries import (
     EyelidTimeseries,
     EyeVideoTimeseries,
     FixationTimeseries,
+    GazeLeftTimeseries,
+    GazeRightTimeseries,
     GazeTimeseries,
     IMUTimeseries,
     PupilTimeseries,
@@ -106,8 +108,18 @@ class NeonRecording:
 
     @cached_property
     def gaze(self) -> GazeTimeseries:
-        """2D gaze data in scene-camera space"""
+        """2D bincular gaze data in scene-camera space"""
         return GazeTimeseries(self)
+
+    @cached_property
+    def gaze_monocular_left(self) -> GazeLeftTimeseries:
+        """2D gaze data from the left-eye in scene-camera space"""
+        return GazeLeftTimeseries(self)
+
+    @cached_property
+    def gaze_monocular_right(self) -> GazeRightTimeseries:
+        """2D gaze data from the right-eye in scene-camera space"""
+        return GazeRightTimeseries(self)
 
     @cached_property
     def imu(self) -> IMUTimeseries:
