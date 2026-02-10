@@ -11,11 +11,12 @@ from pupil_labs.neon_recording.timeseries.array_record import Array
 def find_sorted_multipart_files(
     recording_path: Path, basename: str, extension: str = ".raw"
 ):
+    basenames_without_times = ["worn", "gaze_left", "gaze_right"]
     file_pairs = []
     for raw_file in recording_path.glob(f"{basename} ps*{extension}"):
-        if basename == "worn":
-            # The `worn` sensor doesn't have its own .time file
-            gaze_time_stem = raw_file.stem.replace("worn ", "gaze ")
+        if basename in basenames_without_times:
+            # Some sensors don't have their own .time file
+            gaze_time_stem = raw_file.stem.replace(f"{basename} ", "gaze ")
             time_file = raw_file.parent / f"{gaze_time_stem}.time"
 
         else:
