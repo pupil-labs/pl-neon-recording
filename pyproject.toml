@@ -21,6 +21,7 @@ classifiers = [
 
 dependencies = [
     "numpy",
+    "packaging>=24.2",
     "pandas>=2.2.3",
     "protobuf",
     "pupil-labs-video>=1.0.5",

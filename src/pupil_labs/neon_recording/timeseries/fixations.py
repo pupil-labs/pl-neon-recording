@@ -2,6 +2,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
+from packaging import version
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
@@ -108,4 +109,10 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             "mean_gaze_y",
         ]
         data = data.view(FixationArray)
+
+        app_version = self.recording.info["app_version"].replace("-", "+")
+        if version.parse(app_version) < version.parse("2.9.31"):
+            data["mean_gaze_x"] += self.recording.info["gaze_offset"][0]
+            data["mean_gaze_y"] -= self.recording.info["gaze_offset"][1]
+
         return data  # type: ignore
