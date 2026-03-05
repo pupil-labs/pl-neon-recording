@@ -30,7 +30,19 @@ from .calib import Calibration
 log = logging.getLogger(__name__)
 
 
+class sensor_loader(cached_property):
+    def __get__(self, instance, owner=None):  # type: ignore
+        try:
+            return super().__get__(instance, owner)
+        except Exception as e:
+            raise NeonRecording.SensorError(
+                f"error loading '{self.attrname}' stream"
+            ) from e
+
+
 class NeonRecording:
+    class SensorError(Exception): ...
+
     """Class to handle the Neon Recording data"""
 
     def __init__(self, rec_dir_in: pathlib.Path | str):
@@ -41,6 +53,7 @@ class NeonRecording:
 
         Raises:
             FileNotFoundError: If the directory does not exist or is not valid.
+            NeonRecording.SensorError: If accessing a stream that is missing
 
         """
         self._rec_dir = UPath(rec_dir_in).resolve()
@@ -106,85 +119,80 @@ class NeonRecording:
         """Device serial number"""
         return self.info.get("module_serial_number")
 
-    @cached_property
+    @sensor_loader
     def gaze(self) -> GazeTimeseries:
         """2D bincular gaze data in scene-camera space"""
         return GazeTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def gaze_monocular_left(self) -> GazeLeftTimeseries:
         """2D gaze data from the left-eye in scene-camera space"""
         return GazeLeftTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def gaze_monocular_right(self) -> GazeRightTimeseries:
         """2D gaze data from the right-eye in scene-camera space"""
         return GazeRightTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def imu(self) -> IMUTimeseries:
         """Motion and orientation data"""
         return IMUTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def pupil(self) -> PupilTimeseries:
         """Pupil diameter data"""
         return PupilTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def eyelid(self) -> EyelidTimeseries:
         """Eyelid data"""
         return EyelidTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def eyeball(self) -> EyeballTimeseries:
         """Eye state data"""
         return EyeballTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def scene(self) -> SceneVideoTimeseries:
         """Frames of video from the scene camera"""
         return SceneVideoTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def eye(self) -> EyeVideoTimeseries:
         """Frames of video from the eye cameras"""
         return EyeVideoTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def events(self) -> EventTimeseries:
         """Event annotations"""
         return EventTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def fixations(self) -> FixationTimeseries:
         """Fixations data"""
         return FixationTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def saccades(self) -> SaccadeTimeseries:
         """Saccades data"""
         return SaccadeTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def blinks(self) -> BlinkTimeseries:
         """Blink data"""
         return BlinkTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def audio(self) -> AudioTimeseries:
         """Audio from the scene video"""
         return AudioTimeseries(self)
 
-    @cached_property
+    @sensor_loader
     def worn(self) -> WornTimeseries:
         """Worn (headset on/off) data"""
         return WornTimeseries(self)
 
 
-def open(rec_dir_in: pathlib.Path | str) -> NeonRecording:  # noqa: A001
-    """Load a NeonRecording from a path"""
-    return NeonRecording(rec_dir_in)
-
-
-load = open
+load = open = NeonRecording  # noqa: A001
