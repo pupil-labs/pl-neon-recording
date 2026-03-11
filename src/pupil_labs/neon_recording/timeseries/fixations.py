@@ -110,7 +110,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
         ]
         data = data.view(FixationArray)
 
-        app_version = self.recording.info["app_version"].replace("-", "+")
+        app_version = self.recording.info["app_version"].split("-")[0]
         if version.parse(app_version) < version.parse("2.9.31"):
             data["mean_gaze_x"] += self.recording.info["gaze_offset"][0]
             data["mean_gaze_y"] -= self.recording.info["gaze_offset"][1]
