@@ -1,7 +1,10 @@
+from unittest import mock
+
 import numpy as np
 import pytest
 
 import pupil_labs.neon_recording as nr
+from pupil_labs.neon_recording import GazeTimeseries, NeonRecording
 
 from .utils import GroundTruth
 
@@ -111,3 +114,14 @@ def test_tabular_data(  # noqa: C901
     # assert np.all(sensor[indices].ts == gt.abs_ts[indices])
     # assert np.all(sensor[indices].rel_timestamps == gt.rel_ts[indices])
     # assert np.all(sensor[indices].rel_ts == gt.rel_ts[indices])
+
+
+def test_missing_stream(
+    rec: nr.NeonRecording,
+):
+    with mock.patch.object(
+        GazeTimeseries, GazeTimeseries._load_data_from_recording.__name__
+    ) as e:
+        e.side_effect = Exception
+        with pytest.raises(NeonRecording.SensorError):
+            rec.gaze  # noqa: B018
