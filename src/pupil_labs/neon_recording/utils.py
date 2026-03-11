@@ -46,7 +46,8 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
     else:
         item_data = Array(data_files, fallback_dtype=dtype)
 
-    merged = merge_arrays([time_data, item_data], flatten=True)
+    shortest = min(len(time_data), len(item_data))
+    merged = merge_arrays([time_data[:shortest], item_data[:shortest]], flatten=True)
     return merged
 
 
