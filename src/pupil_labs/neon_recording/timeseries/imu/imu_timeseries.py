@@ -2,6 +2,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
+from numpy.lib.recfunctions import merge_arrays
 
 from pupil_labs.neon_recording.constants import (
     TIMESTAMP_DTYPE,
@@ -10,7 +11,7 @@ from pupil_labs.neon_recording.constants import (
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 
-from ...utils import find_sorted_multipart_files, join_struct_arrays
+from ...utils import find_sorted_multipart_files
 from . import imu_pb2
 
 if TYPE_CHECKING:
@@ -118,7 +119,7 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
                     ])
 
             data = np.array(records, dtype=IMUTimeseries.FALLBACK_DTYPE)  # type: ignore
-            data = join_struct_arrays([time_data, data])
+            data = merge_arrays([time_data, data], flatten=True)  # type: ignore
 
         if data.dtype is not None:
             data.dtype.names = (

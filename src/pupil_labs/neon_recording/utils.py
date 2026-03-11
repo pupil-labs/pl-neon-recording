@@ -1,8 +1,7 @@
-from collections.abc import Sequence
 from pathlib import Path
 
 import numpy as np
-import numpy.typing as npt
+from numpy.lib.recfunctions import merge_arrays
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
 from pupil_labs.neon_recording.timeseries.array_record import Array
@@ -47,7 +46,7 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
     else:
         item_data = Array(data_files, fallback_dtype=dtype)
 
-    merged = join_struct_arrays([time_data, item_data])
+    merged = merge_arrays([time_data, item_data], flatten=True)
     return merged
 
 
@@ -64,13 +63,3 @@ def load_multipart_timestamps(files):
     timestamps = np.frombuffer(ts_buffer, dtype="<i8")
 
     return timestamps
-
-
-def join_struct_arrays(arrays: Sequence[npt.NDArray]):
-    newdtype = [desc for a in arrays for desc in a.dtype.descr]
-    newrecarray = np.empty(len(arrays[0]), dtype=newdtype)
-    for a in arrays:
-        assert a.dtype.names
-        for name in a.dtype.names:
-            newrecarray[name] = a[name]
-    return newrecarray
