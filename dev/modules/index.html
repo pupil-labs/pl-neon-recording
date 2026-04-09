@@ -3576,11 +3576,7 @@ of the fixation in the presence of VOR movements.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
@@ -3591,7 +3587,11 @@ of the fixation in the presence of VOR movements.</p>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
-<span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the NeonRecording object</span>
 
 <span class="sd">    Args:</span>
@@ -3835,10 +3835,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">audio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Audio from the scene video&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">AudioTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3866,10 +3866,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">blinks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlinkTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Blink data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">BlinkTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3897,10 +3897,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Event annotations&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EventTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3928,10 +3928,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eye</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeVideoTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Frames of video from the eye cameras&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyeVideoTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3959,10 +3959,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eyeball</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeballTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Eye state data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyeballTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -3990,10 +3990,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eyelid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyelidTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Eyelid data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyelidTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4021,10 +4021,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">fixations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FixationTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fixations data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">FixationTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4052,10 +4052,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D bincular gaze data in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4083,10 +4083,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze_monocular_left</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeLeftTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D gaze data from the left-eye in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeLeftTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4114,10 +4114,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze_monocular_right</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeRightTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D gaze data from the right-eye in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeRightTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4145,10 +4145,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">imu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IMUTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Motion and orientation data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">IMUTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4176,10 +4176,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pupil</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PupilTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pupil diameter data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">PupilTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4207,10 +4207,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">saccades</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SaccadeTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saccades data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SaccadeTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4238,10 +4238,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SceneVideoTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Frames of video from the scene camera&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SceneVideoTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -4269,10 +4269,10 @@ of the fixation in the presence of VOR movements.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">worn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WornTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Worn (headset on/off) data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">WornTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
