@@ -4,6 +4,7 @@ import json
 import logging
 import pathlib
 from functools import cached_property
+from typing import TypeVar, cast
 
 from upath import UPath
 
@@ -24,16 +25,19 @@ from pupil_labs.neon_recording.timeseries import (
     SceneVideoTimeseries,
     WornTimeseries,
 )
+from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 
 from .calib import Calibration
 
 log = logging.getLogger(__name__)
 
+T = TypeVar("T", bound=Timeseries)
 
-class sensor_loader(cached_property):
-    def __get__(self, instance, owner=None):  # type: ignore
+
+class sensor_loader(cached_property[T]):
+    def __get__(self, instance, owner=None) -> T:  # type: ignore
         try:
-            return super().__get__(instance, owner)
+            return cast(T, super().__get__(instance, owner))
         except Exception as e:
             raise NeonRecording.SensorError(
                 f"error loading '{self.attrname}' stream"
