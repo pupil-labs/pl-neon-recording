@@ -2,7 +2,6 @@ import logging
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
-from numpy.lib.recfunctions import merge_arrays
 
 import pupil_labs.video as plv
 from pupil_labs.neon_recording.constants import (
@@ -21,6 +20,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    join_struct_arrays,
 )
 
 if TYPE_CHECKING:
@@ -87,7 +87,7 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
         idxs = np.empty(len(np_parts_ts), dtype=AV_INDEX_DTYPE)
         idxs[AV_INDEX_FIELD_NAME] = np.arange(len(np_parts_ts))
 
-        data = merge_arrays([np_parts_ts, idxs], flatten=True)
+        data = join_struct_arrays([np_parts_ts, idxs])
         av_reader = plv.MultiReader(video_readers)
 
         BoundAVFrameClass = type(
