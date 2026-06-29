@@ -19,6 +19,12 @@ hide:
 --8<-- "examples/blinks_and_fixations.py"
 ```
 
+### CSV Export
+
+```python
+--8<-- "examples/csv_export.py"
+```
+
 ### Data Access
 
 ```python
@@ -49,10 +55,22 @@ hide:
 --8<-- "examples/gaze_overlay.py"
 ```
 
-### Imu
+### IMU
 
 ```python
 --8<-- "examples/imu.py"
+```
+
+### Interpolate Gaze Data
+
+```python
+--8<-- "examples/interpolation_compare.py"
+```
+
+### Multi-Gaze Overlay
+
+```python
+--8<-- "examples/multi_gaze_overlay.py"
 ```
 
 ### Worn
