@@ -533,6 +533,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#csv-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSV Export
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#data-access" class="md-nav__link">
     <span class="md-ellipsis">
       Data Access
@@ -580,7 +589,25 @@
           <li class="md-nav__item">
   <a href="#imu" class="md-nav__link">
     <span class="md-ellipsis">
-      Imu
+      IMU
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpolate-gaze-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interpolate Gaze Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-gaze-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Gaze Overlay
     </span>
   </a>
   
@@ -755,6 +782,332 @@
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;blinks-and-fixations.mp4&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="csv-export">CSV Export<a class="headerlink" href="#csv-export" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unproject_points</span><span class="p">(</span><span class="n">points_2d</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">,</span> <span class="n">distortion_coefs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Undistorts points according to the camera model.</span>
+
+<span class="sd">    :param pts_2d, shape: Nx2</span>
+<span class="sd">    :return: Array of unprojected 3d points, shape: Nx3</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert type to numpy arrays (OpenCV requirements)</span>
+    <span class="n">camera_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">camera_matrix</span><span class="p">)</span>
+    <span class="n">distortion_coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">distortion_coefs</span><span class="p">)</span>
+    <span class="n">points_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points_2d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Add third dimension the way cv2 wants it</span>
+    <span class="n">points_2d</span> <span class="o">=</span> <span class="n">points_2d</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Undistort 2d pixel coordinates</span>
+    <span class="n">points_2d_undist</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">points_2d</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">,</span> <span class="n">distortion_coefs</span><span class="p">)</span>
+    <span class="c1"># Unproject 2d points into 3d directions; all points. have z=1</span>
+    <span class="n">points_3d</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">convertPointsToHomogeneous</span><span class="p">(</span><span class="n">points_2d_undist</span><span class="p">)</span>
+    <span class="n">points_3d</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># normalize vector length to 1</span>
+        <span class="n">points_3d</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">points_3d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">points_3d</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cart_to_spherical</span><span class="p">(</span><span class="n">points_3d</span><span class="p">,</span> <span class="n">apply_rad2deg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">points_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points_3d</span><span class="p">)</span>
+    <span class="c1"># convert cartesian to spherical coordinates</span>
+    <span class="c1"># source: http://stackoverflow.com/questions/4116658/faster-numpy-cartesian-to-spherical-coordinate-conversion</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">points_3d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">points_3d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">points_3d</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># elevation: vertical direction</span>
+    <span class="c1">#   positive numbers point up</span>
+    <span class="c1">#   negative numbers point bottom</span>
+    <span class="n">elevation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="n">radius</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="c1"># azimuth: horizontal direction</span>
+    <span class="c1">#   positive numbers point right</span>
+    <span class="c1">#   negative numbers point left</span>
+    <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">apply_rad2deg</span><span class="p">:</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span>
+        <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">azimuth</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">radius</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">azimuth</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_ranged_index</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">left_boundaries</span><span class="p">,</span> <span class="n">right_boundaries</span><span class="p">):</span>
+    <span class="n">left_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">left_boundaries</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">right_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">right_boundaries</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">left_ids</span> <span class="o">==</span> <span class="n">right_ids</span><span class="p">,</span> <span class="n">left_ids</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_gaze</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fixations</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">fixations</span>
+
+        <span class="n">fixation_ids</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">find_ranged_index</span><span class="p">(</span>
+                <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fixations</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">fixations</span><span class="o">.</span><span class="n">stop_time</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">fixation_ids</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">blink_ids</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">find_ranged_index</span><span class="p">(</span>
+                <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+                <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">stop_time</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">blink_ids</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">spherical_coords</span> <span class="o">=</span> <span class="n">cart_to_spherical</span><span class="p">(</span>
+        <span class="n">unproject_points</span><span class="p">(</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">point</span><span class="p">,</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_camera_matrix</span><span class="p">,</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_distortion_coefficients</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">gaze</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+        <span class="s2">&quot;gaze x [px]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;gaze y [px]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;worn&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">worn</span><span class="o">.</span><span class="n">worn</span><span class="p">,</span>
+        <span class="s2">&quot;fixation id&quot;</span><span class="p">:</span> <span class="n">fixation_ids</span><span class="p">,</span>
+        <span class="s2">&quot;blink id&quot;</span><span class="p">:</span> <span class="n">blink_ids</span><span class="p">,</span>
+        <span class="s2">&quot;azimuth [deg]&quot;</span><span class="p">:</span> <span class="n">spherical_coords</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;elevation [deg]&quot;</span><span class="p">:</span> <span class="n">spherical_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">})</span>
+
+    <span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;fixation id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;fixation id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;blink id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaze</span><span class="p">[</span><span class="s2">&quot;blink id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;gaze.csv&quot;</span>
+    <span class="n">gaze</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_blinks</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">blinks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;blink id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="p">)),</span>
+        <span class="s2">&quot;start timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="s2">&quot;end timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">stop_time</span><span class="p">,</span>
+        <span class="s2">&quot;duration [ms]&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">stop_time</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">blinks</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span>
+        <span class="o">/</span> <span class="mf">1e6</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;blinks.csv&quot;</span>
+    <span class="n">blinks</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_fixations</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">fixations</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">fixations</span>
+
+    <span class="n">spherical_coords</span> <span class="o">=</span> <span class="n">cart_to_spherical</span><span class="p">(</span>
+        <span class="n">unproject_points</span><span class="p">(</span>
+            <span class="n">fixations</span><span class="o">.</span><span class="n">mean_gaze_point</span><span class="p">,</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_camera_matrix</span><span class="p">,</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_distortion_coefficients</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">fixations_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fixation id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fixations</span><span class="p">)),</span>
+        <span class="s2">&quot;start timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">fixations</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="s2">&quot;end timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">fixations</span><span class="o">.</span><span class="n">stop_time</span><span class="p">,</span>
+        <span class="s2">&quot;duration [ms]&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">fixations</span><span class="o">.</span><span class="n">stop_time</span> <span class="o">-</span> <span class="n">fixations</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">,</span>
+        <span class="s2">&quot;fixation x [px]&quot;</span><span class="p">:</span> <span class="n">fixations</span><span class="o">.</span><span class="n">mean_gaze_point</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;fixation y [px]&quot;</span><span class="p">:</span> <span class="n">fixations</span><span class="o">.</span><span class="n">mean_gaze_point</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;azimuth [deg]&quot;</span><span class="p">:</span> <span class="n">spherical_coords</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;elevation [deg]&quot;</span><span class="p">:</span> <span class="n">spherical_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;fixations.csv&quot;</span>
+    <span class="n">fixations_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_saccades</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">saccades</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">saccades</span>
+
+    <span class="n">saccades_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;saccade id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">saccades</span><span class="p">)),</span>
+        <span class="s2">&quot;start timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">saccades</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="s2">&quot;end timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">saccades</span><span class="o">.</span><span class="n">stop_time</span><span class="p">,</span>
+        <span class="s2">&quot;duration [ms]&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">saccades</span><span class="o">.</span><span class="n">stop_time</span> <span class="o">-</span> <span class="n">saccades</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">,</span>
+        <span class="s2">&quot;amplitude [deg]&quot;</span><span class="p">:</span> <span class="n">saccades</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span>
+        <span class="s2">&quot;mean velocity [px/s]&quot;</span><span class="p">:</span> <span class="n">saccades</span><span class="o">.</span><span class="n">mean_velocity</span><span class="p">,</span>
+        <span class="s2">&quot;peak velocity [px/s]&quot;</span><span class="p">:</span> <span class="n">saccades</span><span class="o">.</span><span class="n">max_velocity</span><span class="p">,</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;saccades.csv&quot;</span>
+    <span class="n">saccades_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_eyestates</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">eyeball</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eyeball</span>
+    <span class="n">pupil</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">pupil</span>
+    <span class="n">eyelid</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">eyelid</span>
+    <span class="n">eyestates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+        <span class="s2">&quot;pupil diameter left [mm]&quot;</span><span class="p">:</span> <span class="n">pupil</span><span class="o">.</span><span class="n">diameter_left</span><span class="p">,</span>
+        <span class="s2">&quot;pupil diameter right [mm]&quot;</span><span class="p">:</span> <span class="n">pupil</span><span class="o">.</span><span class="n">diameter_right</span><span class="p">,</span>
+        <span class="s2">&quot;eyeball center left x [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_left</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;eyeball center left y [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_left</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;eyeball center left z [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_left</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;eyeball center right x [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_right</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;eyeball center right y [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_right</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;eyeball center right z [mm]&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">center_right</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis left x&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_left</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis left y&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_left</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis left z&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_left</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis right x&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_right</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis right y&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_right</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;optical axis right z&quot;</span><span class="p">:</span> <span class="n">eyeball</span><span class="o">.</span><span class="n">optical_axis_right</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;eyelid angle top left [rad]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">angle_left</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;eyelid angle bottom left [rad]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">angle_left</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;eyelid aperture left [mm]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">aperture_left</span><span class="p">,</span>
+        <span class="s2">&quot;eyelid angle top right [rad]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">angle_right</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;eyelid angle bottom right [rad]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">angle_right</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;eyelid aperture right [mm]&quot;</span><span class="p">:</span> <span class="n">eyelid</span><span class="o">.</span><span class="n">aperture_right</span><span class="p">,</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;3d_eye_states.csv&quot;</span>
+    <span class="n">eyestates</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_imu</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">rotations</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+    <span class="n">eulers</span> <span class="o">=</span> <span class="n">rotations</span><span class="o">.</span><span class="n">as_euler</span><span class="p">(</span><span class="n">seq</span><span class="o">=</span><span class="s2">&quot;yxz&quot;</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">imu</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+        <span class="s2">&quot;gyro x [deg/s]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">angular_velocity</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;gyro y [deg/s]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">angular_velocity</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;gyro z [deg/s]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">angular_velocity</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;acceleration x [g]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">acceleration</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;acceleration y [g]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">acceleration</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;acceleration z [g]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">acceleration</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;roll [deg]&quot;</span><span class="p">:</span> <span class="n">eulers</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;pitch [deg]&quot;</span><span class="p">:</span> <span class="n">eulers</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;yaw [deg]&quot;</span><span class="p">:</span> <span class="n">eulers</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;quaternion w&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">rotation</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="s2">&quot;quaternion x&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">rotation</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;quaternion y&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">rotation</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;quaternion z&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">imu</span><span class="o">.</span><span class="n">rotation</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;imu.csv&quot;</span>
+    <span class="n">imu</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_events</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">event</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;recording&quot;</span><span class="p">,</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;events.csv&quot;</span>
+    <span class="n">events</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_info</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;info.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_scene_camera_calibration</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">distortion</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_distortion_coefficients</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">camera_info</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;camera_matrix&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">scene_camera_matrix</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="s2">&quot;distortion_coefficients&quot;</span><span class="p">:</span> <span class="n">distortion</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="s2">&quot;serial_number&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">serial</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;scene_camera.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">camera_info</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_world_timestamps</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;recording id&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;recording_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;timestamp [ns]&quot;</span><span class="p">:</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+    <span class="p">})</span>
+
+    <span class="n">export_file</span> <span class="o">=</span> <span class="n">export_path</span> <span class="o">/</span> <span class="s2">&quot;world_timestamps.csv&quot;</span>
+    <span class="n">events</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">export_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">export_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">func_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;gaze&quot;</span><span class="p">:</span> <span class="n">export_gaze</span><span class="p">,</span>
+        <span class="s2">&quot;blinks&quot;</span><span class="p">:</span> <span class="n">export_blinks</span><span class="p">,</span>
+        <span class="s2">&quot;fixations&quot;</span><span class="p">:</span> <span class="n">export_fixations</span><span class="p">,</span>
+        <span class="s2">&quot;saccades&quot;</span><span class="p">:</span> <span class="n">export_saccades</span><span class="p">,</span>
+        <span class="s2">&quot;eyestates&quot;</span><span class="p">:</span> <span class="n">export_eyestates</span><span class="p">,</span>
+        <span class="s2">&quot;imu&quot;</span><span class="p">:</span> <span class="n">export_imu</span><span class="p">,</span>
+        <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">export_events</span><span class="p">,</span>
+        <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">export_info</span><span class="p">,</span>
+        <span class="s2">&quot;scene-camera&quot;</span><span class="p">:</span> <span class="n">export_scene_camera_calibration</span><span class="p">,</span>
+        <span class="s2">&quot;world-timestamps&quot;</span><span class="p">:</span> <span class="n">export_world_timestamps</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="s2">&quot;--help&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span>
+        <span class="n">arg_list</span> <span class="o">=</span> <span class="s2">&quot;[--help] [--all] &quot;</span>
+        <span class="n">arg_list</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;[--</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">]&quot;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">func_map</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage: python csv_export.py path/to/recording/folder </span><span class="si">{</span><span class="n">arg_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">recording_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_path</span><span class="p">)</span>
+
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H-%M-%S&quot;</span><span class="p">)</span>
+    <span class="n">safe_timestamp</span> <span class="o">=</span> <span class="n">timestamp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+    <span class="n">export_path</span> <span class="o">=</span> <span class="n">recording_path</span> <span class="o">/</span> <span class="s2">&quot;exports&quot;</span> <span class="o">/</span> <span class="n">safe_timestamp</span>
+    <span class="n">export_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;--all&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">func_map</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">export_func</span> <span class="ow">in</span> <span class="n">func_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">export_func</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not export </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="data-access">Data Access<a class="headerlink" href="#data-access" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1193,7 +1546,7 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaze-overlay-output-video.mp4&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="imu">Imu<a class="headerlink" href="#imu" title="Permanent link">&para;</a></h3>
+<h3 id="imu">IMU<a class="headerlink" href="#imu" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
@@ -1275,6 +1628,139 @@
         <span class="k">break</span>
 
 <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="interpolate-gaze-data">Interpolate Gaze Data<a class="headerlink" href="#interpolate-gaze-data" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.video</span><span class="w"> </span><span class="kn">import</span> <span class="n">Writer</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Open a recording</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">Writer</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">)</span>
+    <span class="n">video_start_time</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># get closest gaze data to scene frame timestamps</span>
+    <span class="n">matched_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="c1"># interpolate gaze data to scene frame timestamps</span>
+    <span class="n">interpolated_gazes</span> <span class="o">=</span> <span class="n">recording</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="c1"># visualize both</span>
+    <span class="n">scene_gaze_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">matched_gazes</span><span class="p">,</span> <span class="n">interpolated_gazes</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">matched_gaze</span><span class="p">,</span> <span class="n">interpolated_gaze</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="n">scene_gaze_pairs</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">recording</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="c1"># draw the nearest-time gaze sample in red</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+            <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span><span class="p">,</span>
+            <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">matched_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="mi">50</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+            <span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># draw the interpolated gaze sample in blue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span>
+            <span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span>
+                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">interpolated_gaze</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+                <span class="mi">50</span><span class="p">,</span>
+                <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">video_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">video_start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">video_time</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Gaze sample comparison&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
+
+    <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;interpolation-compare.mp4&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="multi-gaze-overlay">Multi-Gaze Overlay<a class="headerlink" href="#multi-gaze-overlay" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="c1"># Workaround for https://github.com/opencv/opencv/issues/21952</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;cv/av bug&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pupil_labs.neon_recording</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nr</span>  <span class="c1"># noqa: E402</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pupil_labs.video</span><span class="w"> </span><span class="kn">import</span> <span class="n">Writer</span>  <span class="c1"># noqa: E402</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_overlaid_video</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">,</span> <span class="n">output_video_path</span><span class="p">):</span>
+    <span class="n">rec</span> <span class="o">=</span> <span class="n">nr</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">recording_dir</span><span class="p">)</span>
+
+    <span class="n">combined_data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
+        <span class="n">rec</span><span class="o">.</span><span class="n">gaze</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+        <span class="n">rec</span><span class="o">.</span><span class="n">gaze_monocular_left</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+        <span class="n">rec</span><span class="o">.</span><span class="n">gaze_monocular_right</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">video_writer</span> <span class="o">=</span> <span class="n">Writer</span><span class="p">(</span><span class="n">output_video_path</span><span class="p">)</span>
+    <span class="n">video_start_time</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">gaze_colors</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">scene_frame</span><span class="p">,</span> <span class="n">left_gaze</span><span class="p">,</span> <span class="n">right_gaze</span><span class="p">,</span> <span class="n">binocular_gaze</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="n">combined_data</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="c1"># Prepare the next frame</span>
+        <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">scene_frame</span><span class="o">.</span><span class="n">bgr</span>
+
+        <span class="k">for</span> <span class="n">gaze_datum</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">binocular_gaze</span><span class="p">,</span> <span class="n">left_gaze</span><span class="p">,</span> <span class="n">right_gaze</span><span class="p">],</span> <span class="n">gaze_colors</span>
+        <span class="p">):</span>
+            <span class="n">frame_pixels</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+                <span class="n">frame_pixels</span><span class="p">,</span>
+                <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+                <span class="mi">50</span><span class="p">,</span>
+                <span class="n">color</span><span class="p">,</span>
+                <span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">video_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">scene_frame</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">video_start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+        <span class="n">video_writer</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">frame_pixels</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">video_time</span><span class="p">)</span>
+
+        <span class="c1"># Render current frame and mark start time</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="n">frame_pixels</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+
+    <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">make_overlaid_video</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaze-overlay-output-video.mp4&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="worn">Worn<a class="headerlink" href="#worn" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
