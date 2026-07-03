@@ -1,5 +1,6 @@
 """Neon Recording"""
 
+import gc
 import json
 import logging
 import pathlib
@@ -68,6 +69,22 @@ class NeonRecording:
 
     def __repr__(self):
         return f"NeonRecording({self._rec_dir})"
+
+    def __enter__(self) -> "NeonRecording":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.close()
+
+    def close(self) -> None:
+        # Using self.scene or even hasattr(self, 'scene') triggers the property getter
+        for value in self.__dict__.values():
+            if isinstance(value, Timeseries):
+                close = getattr(value, "close", None)
+                if callable(close):
+                    close()
+
+        gc.collect()
 
     @property
     def id(self) -> str | None:
