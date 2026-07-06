@@ -130,3 +130,6 @@ print(
     "closest_gaze_to_scene_at_one_fps_times",
     (closest_gaze_to_scene_at_one_fps.time - recording.start_time) / 1e9,
 )
+
+# Close the recording when done to free up resources
+recording.close()

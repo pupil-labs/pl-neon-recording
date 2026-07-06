@@ -322,3 +322,5 @@ if __name__ == "__main__":
                 export_func(recording, export_path)
             except AttributeError as err:
                 print(f"Could not export {stream_name}: {err}", file=sys.stderr)
+
+    recording.close()

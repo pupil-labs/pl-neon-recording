@@ -60,6 +60,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=None):
 
     cv2.destroyAllWindows()
     video_writer.close()
+    recording.close()
 
 
 if __name__ == "__main__":

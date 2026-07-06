@@ -61,6 +61,8 @@ def find_clap(recording_dir, window_size_seconds=0.1, first_n_seconds=10):
         f"{(loudest_time - recording.audio.time[0]) / 1e9:0.3f}s"
     )
 
+    recording.close()
+
 
 if __name__ == "__main__":
     find_clap(sys.argv[1])

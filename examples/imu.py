@@ -79,3 +79,4 @@ for row in tqdm(timestamped_eulers):
         break
 
 cv2.destroyAllWindows()
+recording.close()
