@@ -701,6 +701,8 @@
         <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s2"> :&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gaze_datum</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+
+<span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="blinks-and-fixations">Blinks And Fixations<a class="headerlink" href="#blinks-and-fixations" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -778,6 +780,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1108,6 +1111,8 @@
                 <span class="n">export_func</span><span class="p">(</span><span class="n">recording</span><span class="p">,</span> <span class="n">export_path</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not export </span><span class="si">{</span><span class="n">stream_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="data-access">Data Access<a class="headerlink" href="#data-access" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1242,6 +1247,9 @@
     <span class="s2">&quot;closest_gaze_to_scene_at_one_fps_times&quot;</span><span class="p">,</span>
     <span class="p">(</span><span class="n">closest_gaze_to_scene_at_one_fps</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">recording</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="c1"># Close the recording when done to free up resources</span>
+<span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="eye-overlay">Eye Overlay<a class="headerlink" href="#eye-overlay" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1324,6 +1332,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1423,6 +1432,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1492,6 +1502,8 @@
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">loudest_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">recording</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2">s&quot;</span>
     <span class="p">)</span>
 
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">find_clap</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -1541,6 +1553,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">rec</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1628,6 +1641,7 @@
         <span class="k">break</span>
 
 <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+<span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="interpolate-gaze-data">Interpolate Gaze Data<a class="headerlink" href="#interpolate-gaze-data" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1692,6 +1706,7 @@
 
     <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
     <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1757,6 +1772,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">rec</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -1820,6 +1836,7 @@
         <span class="n">cv2</span><span class="o">.</span><span class="n">pollKey</span><span class="p">()</span>
 
     <span class="n">video_writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
