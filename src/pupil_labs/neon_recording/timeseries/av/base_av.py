@@ -53,6 +53,10 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
     kind: AVTimeseriesKind
     base_name: str
 
+    def close(self) -> None:
+        if hasattr(self._data, "multi_video_reader"):
+            self._data.multi_video_reader.close()
+
     def _load_data_from_recording(
         self,
         recording: "NeonRecording",

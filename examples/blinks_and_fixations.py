@@ -73,6 +73,7 @@ def make_overlaid_video(recording_dir, output_video_path):
         cv2.pollKey()
 
     video_writer.close()
+    recording.close()
 
 
 if __name__ == "__main__":

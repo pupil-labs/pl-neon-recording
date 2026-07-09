@@ -55,6 +55,7 @@ def make_overlaid_video(recording_dir, output_video_path, fps=30):
         cv2.pollKey()
 
     video_writer.release()
+    recording.close()
 
 
 if __name__ == "__main__":

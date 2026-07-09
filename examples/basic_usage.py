@@ -26,3 +26,5 @@ for gaze_datum in subsample:
         f"\t{gaze_datum.time} :",
         f"({gaze_datum.point[0]:0.2f}, {gaze_datum.point[1]:0.2f})",
     )
+
+recording.close()
