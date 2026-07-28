@@ -84,8 +84,6 @@ class NeonRecording:
                 if callable(close):
                     close()
 
-        gc.collect()
-
     @property
     def id(self) -> str | None:
         """UUID of the recording"""
