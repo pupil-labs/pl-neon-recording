@@ -34,7 +34,8 @@ def load_multipart_data_time_pairs(file_pairs, dtype):
 
     time_data = Array(ts_files, TIMESTAMP_DTYPE)  # type: ignore
     if not len(time_data):
-        return np.array([], dtype=TIMESTAMP_DTYPE)
+        return_dtype = np.dtype(TIMESTAMP_DTYPE.descr + dtype.descr)
+        return np.array([], dtype=return_dtype)
 
     if dtype == "str":
         data_bytes = b""
