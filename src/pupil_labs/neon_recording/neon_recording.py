@@ -142,17 +142,17 @@ class NeonRecording:
 
     @sensor_loader
     def gaze(self) -> GazeTimeseries:
-        """2D bincular gaze data in scene-camera space"""
+        """2D binocular gaze data in scene-camera space"""
         return GazeTimeseries(self)
 
     @sensor_loader
     def gaze_monocular_left(self) -> GazeLeftTimeseries:
-        """2D gaze data from the left-eye in scene-camera space"""
+        """2D gaze data from the left eye in scene-camera space"""
         return GazeLeftTimeseries(self)
 
     @sensor_loader
     def gaze_monocular_right(self) -> GazeRightTimeseries:
-        """2D gaze data from the right-eye in scene-camera space"""
+        """2D gaze data from the right eye in scene-camera space"""
         return GazeRightTimeseries(self)
 
     @sensor_loader

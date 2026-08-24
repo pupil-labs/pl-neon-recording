@@ -40,6 +40,8 @@ class GazeArray(Array[GazeRecord], GazeProps):
 
 
 class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps):
+    """2D binocular gaze data in scene-camera space"""
+
     name: str = "gaze"
     eye_suffix: str = ""
 
@@ -76,12 +78,16 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
 
 
 class GazeLeftTimeseries(GazeTimeseries):
+    """2D gaze data from the left eye in scene-camera space"""
+
     def __init__(self, *args, **kwargs):
         self.eye_suffix = "_left"
         super().__init__(*args, **kwargs)
 
 
 class GazeRightTimeseries(GazeTimeseries):
+    """2D gaze data from the right eye in scene-camera space"""
+
     def __init__(self, *args, **kwargs):
         self.eye_suffix = "_right"
         super().__init__(*args, **kwargs)
