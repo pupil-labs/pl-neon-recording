@@ -20,8 +20,8 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     join_struct_arrays,
-    sort_timestamps,
 )
 
 if TYPE_CHECKING:
@@ -93,7 +93,7 @@ class BaseAVTimeseries(Timeseries[Array[BaseAVFrame], BaseAVFrame]):
         idxs[AV_INDEX_FIELD_NAME] = np.arange(len(np_parts_ts))
 
         data = join_struct_arrays([np_parts_ts, idxs])
-        sort_timestamps(data, self.name)
+        data = fix_timestamps(data, self.name)
         av_reader = plv.MultiReader(video_readers)
 
         BoundAVFrameClass = type(

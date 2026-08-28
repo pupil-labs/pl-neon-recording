@@ -40,12 +40,12 @@ def test_sort_timestamps_out_of_order(caplog, mock_timeseries):
     )
 
 
-def test_sort_timestamps_custom_key(caplog, mock_timeseries):
+def test_sort_timestamps_custom_column(caplog, mock_timeseries):
     caplog.set_level(logging.WARNING)
     ts = mock_timeseries(ts_data=[3, 1, 2, 4, 5], x_data=[1, 2, 3, 4, 5])
     original_ts = ts.data["time"].copy()
     original_x = ts.data["x"].copy()
-    sort_timestamps(ts.data, "mock", key="x")
+    sort_timestamps(ts.data, "mock", column="x")
 
     # NOTE: x column is sorted so no changes should happen
     assert np.allclose(ts.data["time"], original_ts), (

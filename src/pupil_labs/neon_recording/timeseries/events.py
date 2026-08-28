@@ -9,8 +9,8 @@ import numpy.typing as npt
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
+    fix_timestamps,
     load_multipart_data_time_pairs,
-    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
         data.dtype.names = [
             "event" if name == "text" else name for name in data.dtype.names
         ]
-        sort_timestamps(data, self.name)
+        data = fix_timestamps(data, self.name)
         data = data.view(EventArray)
 
         return data  # type: ignore

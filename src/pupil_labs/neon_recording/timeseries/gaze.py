@@ -16,8 +16,8 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
-    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
             ]),
         )
         data.dtype.names = ("time", "point_x", "point_y")
-        sort_timestamps(data, self.name)
+        data = fix_timestamps(data, self.name)
         data = data.view(GazeArray)
         return data  # type: ignore
 

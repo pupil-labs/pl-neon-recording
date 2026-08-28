@@ -10,7 +10,7 @@ from pupil_labs.neon_recording.constants import (
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 
-from ...utils import find_sorted_multipart_files, join_struct_arrays, sort_timestamps
+from ...utils import find_sorted_multipart_files, fix_timestamps, join_struct_arrays
 from . import imu_pb2
 
 if TYPE_CHECKING:
@@ -134,7 +134,7 @@ class IMUTimeseries(Timeseries[ImuArray, ImuRecord], ImuProps):
                 "quaternion_y",
                 "quaternion_z",
             )
-            sort_timestamps(data, self.name)
+            data = fix_timestamps(data, self.name)
 
         data = data.view(ImuArray)
 

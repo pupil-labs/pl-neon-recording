@@ -10,8 +10,8 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
-    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -102,6 +102,6 @@ class EyelidTimeseries(
             "angle_lower_right",
             "aperture_right",
         )
-        sort_timestamps(data, self.name)
+        data = fix_timestamps(data, self.name)
         data = data.view(EyelidArray)
         return data  # type: ignore
