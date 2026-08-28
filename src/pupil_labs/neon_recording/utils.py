@@ -31,7 +31,7 @@ def find_sorted_multipart_files(
     return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
 
 
-def load_multipart_data_time_pairs(file_pairs, dtype, kind):
+def load_multipart_data_time_pairs(file_pairs, dtype):
     ts_files = [time_file for _, time_file in file_pairs]
     data_files = [data_file for data_file, _ in file_pairs]
 

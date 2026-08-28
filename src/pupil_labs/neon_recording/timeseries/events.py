@@ -50,7 +50,7 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
         if len(file_pairs) == 0:
             raise AttributeError("No event data found")
 
-        data = load_multipart_data_time_pairs(file_pairs, "str", self.name)
+        data = load_multipart_data_time_pairs(file_pairs, "str")
         data.dtype.names = [
             "event" if name == "text" else name for name in data.dtype.names
         ]

@@ -53,9 +53,7 @@ class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
         if len(file_pairs) == 0:
             raise AttributeError("No worn data found")
 
-        data = load_multipart_data_time_pairs(
-            file_pairs, np.dtype([("worn", "u1")]), self.name
-        )
+        data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
         sort_timestamps(data, self.name)
         data = data.view(WornArray)
         return data  # type: ignore

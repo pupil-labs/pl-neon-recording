@@ -72,7 +72,6 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
                 ("x", "float32"),
                 ("y", "float32"),
             ]),
-            self.name,
         )
         data.dtype.names = ("time", "point_x", "point_y")
         sort_timestamps(data, self.name)

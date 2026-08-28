@@ -51,7 +51,7 @@ class PupilTimeseries(InterpolatableTimeseries[PupilArray, PupilRecord], PupilPr
 
         data = load_multipart_data_time_pairs(
             file_pairs,
-            np.dtype([
+            dtype=np.dtype([
                 ("pupil_diameter_left_mm", "float32"),
                 ("eyeball_center_left_x", "float32"),
                 ("eyeball_center_left_y", "float32"),
@@ -67,7 +67,6 @@ class PupilTimeseries(InterpolatableTimeseries[PupilArray, PupilRecord], PupilPr
                 ("optical_axis_right_y", "float32"),
                 ("optical_axis_right_z", "float32"),
             ]),
-            self.name,
         )
         data = data[
             [

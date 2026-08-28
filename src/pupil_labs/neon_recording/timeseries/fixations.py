@@ -85,7 +85,6 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
                 ("mean_velocity", "float32"),
                 ("max_velocity", "float32"),
             ]),
-            self.name,
         )
         data = data[data["event_type"] == 1]
         data = data[
