@@ -58,7 +58,6 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
                 ("start_timestamp_ns", "int64"),
                 ("end_timestamp_ns", "int64"),
             ]),
-            self.name,
         )
         data = data[["time", "start_timestamp_ns", "end_timestamp_ns"]]
         data.dtype.names = ("time", "start_time", "stop_time")

@@ -109,7 +109,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             "mean_gaze_x",
             "mean_gaze_y",
         ]
-        sort_timestamps(data, self.name, "start_time")
+        sort_timestamps(data, self.name, key="start_time")
         data = data.view(FixationArray)
 
         app_version = self.recording.info["app_version"].split("-")[0]

@@ -92,7 +92,6 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
                 ("mean_velocity", "float32"),
                 ("max_velocity", "float32"),
             ]),
-            self.name,
         )
         data = data[data["event_type"] == 0]
         data = data[
@@ -119,6 +118,6 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
             "mean_velocity",
             "max_velocity",
         )
-        sort_timestamps(data, self.name, "start_time")
+        sort_timestamps(data, self.name, key="start_time")
         data = data.view(SaccadeArray)
         return data  # type: ignore
