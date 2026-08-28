@@ -8,7 +8,10 @@ import numpy.typing as npt
 
 from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fields
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
-from pupil_labs.neon_recording.utils import load_multipart_data_time_pairs
+from pupil_labs.neon_recording.utils import (
+    load_multipart_data_time_pairs,
+    sort_timestamps,
+)
 
 log = logging.getLogger(__name__)
 
@@ -47,12 +50,12 @@ class EventTimeseries(Timeseries[EventArray, EventRecord], EventProps):
         if len(file_pairs) == 0:
             raise AttributeError("No event data found")
 
-        data = load_multipart_data_time_pairs(file_pairs, "str")
+        data = load_multipart_data_time_pairs(file_pairs, "str", self.name)
         data.dtype.names = [
             "event" if name == "text" else name for name in data.dtype.names
         ]
+        sort_timestamps(data, self.name)
         data = data.view(EventArray)
-        data.sort(order="time")
 
         return data  # type: ignore
 

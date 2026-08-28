@@ -9,6 +9,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
+    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -84,6 +85,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
                 ("mean_velocity", "float32"),
                 ("max_velocity", "float32"),
             ]),
+            self.name,
         )
         data = data[data["event_type"] == 1]
         data = data[
@@ -108,6 +110,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             "mean_gaze_x",
             "mean_gaze_y",
         ]
+        sort_timestamps(data, self.name, "start_time")
         data = data.view(FixationArray)
 
         app_version = self.recording.info["app_version"].split("-")[0]

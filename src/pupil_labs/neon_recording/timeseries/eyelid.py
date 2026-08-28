@@ -11,6 +11,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
+    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -64,7 +65,7 @@ class EyelidTimeseries(
 
         data = load_multipart_data_time_pairs(
             file_pairs,
-            dtype=np.dtype([
+            np.dtype([
                 ("pupil_diameter_left_mm", "float32"),
                 ("eyeball_center_left_x", "float32"),
                 ("eyeball_center_left_y", "float32"),
@@ -80,6 +81,7 @@ class EyelidTimeseries(
                 ("optical_axis_right_y", "float32"),
                 ("optical_axis_right_z", "float32"),
             ]),
+            self.name,
         )
         data = data[
             [
@@ -101,5 +103,6 @@ class EyelidTimeseries(
             "angle_lower_right",
             "aperture_right",
         )
+        sort_timestamps(data, self.name)
         data = data.view(EyelidArray)
         return data  # type: ignore

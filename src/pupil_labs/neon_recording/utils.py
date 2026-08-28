@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -6,6 +7,8 @@ import numpy.typing as npt
 
 from pupil_labs.neon_recording.constants import TIMESTAMP_DTYPE
 from pupil_labs.neon_recording.timeseries.array_record import Array
+
+log = logging.getLogger(__name__)
 
 
 def find_sorted_multipart_files(
@@ -28,7 +31,7 @@ def find_sorted_multipart_files(
     return sorted(file_pairs, key=lambda pair: int(pair[0].stem[len(basename) + 3 :]))
 
 
-def load_multipart_data_time_pairs(file_pairs, dtype):
+def load_multipart_data_time_pairs(file_pairs, dtype, kind):
     ts_files = [time_file for _, time_file in file_pairs]
     data_files = [data_file for data_file, _ in file_pairs]
 
@@ -75,3 +78,23 @@ def join_struct_arrays(arrays: Sequence[npt.NDArray]):
         for name in a.dtype.names:
             newrecarray[name] = a[name]
     return newrecarray
+
+
+def sort_timestamps(array: npt.NDArray, kind: str, key: str = "time"):
+    values = array[key]
+    if values.size < 2:
+        return
+
+    # NOTE: checking for strictly increasing timestamps below
+    previous_max = np.maximum.accumulate(values[:-1])
+    out_of_order = np.flatnonzero(np.r_[False, values[1:] <= previous_max])
+    if not out_of_order.size:
+        return
+
+    num_out_of_order = len(out_of_order)
+    num_total = len(array)
+    log.warning(
+        f"{num_out_of_order} out of {num_total} timestamps appear in a "
+        f"non-increasing order in the `{kind}` timeseries, sorting to fix this"
+    )
+    array.sort(order=key)

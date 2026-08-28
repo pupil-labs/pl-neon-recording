@@ -8,6 +8,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
+    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -91,6 +92,7 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
                 ("mean_velocity", "float32"),
                 ("max_velocity", "float32"),
             ]),
+            self.name,
         )
         data = data[data["event_type"] == 0]
         data = data[
@@ -117,5 +119,6 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
             "mean_velocity",
             "max_velocity",
         )
+        sort_timestamps(data, self.name, "start_time")
         data = data.view(SaccadeArray)
         return data  # type: ignore

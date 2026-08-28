@@ -12,6 +12,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
     load_multipart_data_time_pairs,
+    sort_timestamps,
 )
 
 log = logging.getLogger(__name__)
@@ -57,8 +58,10 @@ class BlinkTimeseries(Timeseries[BlinkArray, BlinkRecord], BlinkProps):
                 ("start_timestamp_ns", "int64"),
                 ("end_timestamp_ns", "int64"),
             ]),
+            self.name,
         )
         data = data[["time", "start_timestamp_ns", "end_timestamp_ns"]]
         data.dtype.names = ("time", "start_time", "stop_time")
+        sort_timestamps(data, self.name)
         data = data.view(BlinkArray)
         return data  # type: ignore
