@@ -16,6 +16,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
 )
 
@@ -73,12 +74,15 @@ class GazeTimeseries(InterpolatableTimeseries[GazeArray, GazeRecord], GazeProps)
             ]),
         )
         data.dtype.names = ("time", "point_x", "point_y")
+        data = fix_timestamps(data, self.name)
         data = data.view(GazeArray)
         return data  # type: ignore
 
 
 class GazeLeftTimeseries(GazeTimeseries):
     """2D gaze data from the left eye in scene-camera space"""
+
+    name: str = "gaze_monocular_left"
 
     def __init__(self, *args, **kwargs):
         self.eye_suffix = "_left"
@@ -87,6 +91,8 @@ class GazeLeftTimeseries(GazeTimeseries):
 
 class GazeRightTimeseries(GazeTimeseries):
     """2D gaze data from the right eye in scene-camera space"""
+
+    name: str = "gaze_monocular_right"
 
     def __init__(self, *args, **kwargs):
         self.eye_suffix = "_right"

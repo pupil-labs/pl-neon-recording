@@ -10,6 +10,7 @@ from pupil_labs.neon_recording.timeseries.timeseries import (
 )
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
 )
 
@@ -123,5 +124,6 @@ class EyeballTimeseries(
             "optical_axis_right_y",
             "optical_axis_right_z",
         )
+        data = fix_timestamps(data, self.name)
         data = data.view(EyeballArray)
         return data  # type: ignore

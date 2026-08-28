@@ -7,6 +7,7 @@ from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fie
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
 )
 
@@ -117,5 +118,6 @@ class SaccadeTimeseries(Timeseries[SaccadeArray, SaccadeRecord], SaccadeProps):
             "mean_velocity",
             "max_velocity",
         )
+        data = fix_timestamps(data, self.name, column="start_time")
         data = data.view(SaccadeArray)
         return data  # type: ignore

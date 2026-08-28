@@ -7,6 +7,7 @@ from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fie
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries, TimeseriesProps
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
 )
 
@@ -53,5 +54,6 @@ class WornTimeseries(Timeseries[WornArray, WornRecord], WornProps):
             raise AttributeError("No worn data found")
 
         data = load_multipart_data_time_pairs(file_pairs, np.dtype([("worn", "u1")]))
+        data = fix_timestamps(data, self.name)
         data = data.view(WornArray)
         return data  # type: ignore

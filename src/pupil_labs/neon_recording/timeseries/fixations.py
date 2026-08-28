@@ -8,6 +8,7 @@ from pupil_labs.neon_recording.timeseries.array_record import Array, Record, fie
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
 from pupil_labs.neon_recording.utils import (
     find_sorted_multipart_files,
+    fix_timestamps,
     load_multipart_data_time_pairs,
 )
 
@@ -108,6 +109,7 @@ class FixationTimeseries(Timeseries[FixationArray, FixationRecord], FixationProp
             "mean_gaze_x",
             "mean_gaze_y",
         ]
+        data = fix_timestamps(data, self.name, column="start_time")
         data = data.view(FixationArray)
 
         app_version = self.recording.info["app_version"].split("-")[0]
