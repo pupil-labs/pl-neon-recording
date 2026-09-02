@@ -1076,7 +1076,7 @@
 
 
 <a href="#pupil_labs.neon_recording.NeonRecording" class="headerlink" title="Permanent link">&para;</a></h1>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeonRecording</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n">recover</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeonRecording</span><span class="p">(</span><span class="n">rec_dir_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -1092,16 +1092,6 @@
           –
           <div class="doc-md-description">
             <p>Path to the recording directory.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>recover</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | None</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Whether the recovery tool should be run before loading the data.</p>
           </div>
         </li>
     </ul>
@@ -1374,21 +1364,11 @@
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recover</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dir_in</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the NeonRecording object</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        rec_dir_in: Path to the recording directory.</span>
-<span class="sd">        recover: Whether the recovery tool should be run before loading the data.</span>
-<span class="sd">        By default (``None``), the tool is run when loading the recording for the.</span>
-<span class="sd">        first time. Provide ``True`` or ``False`` to explicitly enable or disable</span>
-<span class="sd">        the recovery.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        FileNotFoundError: If the directory does not exist or is not valid.</span>
@@ -1400,8 +1380,6 @@
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Directory not found or not valid: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-
-    <span class="n">run_recovery_tool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec_dir</span><span class="p">,</span> <span class="n">recover</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1630,10 +1608,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">audio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Audio from the scene video&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">AudioTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1661,10 +1639,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">blinks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlinkTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Blink data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">BlinkTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1692,10 +1670,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Event annotations&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EventTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1723,10 +1701,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eye</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeVideoTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Frames of video from the eye cameras&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyeVideoTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1754,10 +1732,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eyeball</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyeballTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Eye state data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyeballTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1785,10 +1763,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">eyelid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EyelidTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Eyelid data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">EyelidTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1816,10 +1794,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">fixations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FixationTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fixations data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">FixationTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1847,10 +1825,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D binocular gaze data in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1878,10 +1856,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze_monocular_left</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeLeftTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D gaze data from the left eye in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeLeftTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1909,10 +1887,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaze_monocular_right</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GazeRightTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;2D gaze data from the right eye in scene-camera space&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">GazeRightTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1940,10 +1918,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">imu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IMUTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Motion and orientation data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">IMUTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1971,10 +1949,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pupil</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PupilTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pupil diameter data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">PupilTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -2002,10 +1980,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">saccades</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SaccadeTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saccades data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SaccadeTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -2033,10 +2011,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SceneVideoTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Frames of video from the scene camera&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SceneVideoTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -2064,10 +2042,10 @@
 
             <details class="quote">
               <summary>Source code in <code>src/pupil_labs/neon_recording/neon_recording.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@sensor_loader</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">worn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WornTimeseries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Worn (headset on/off) data&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">WornTimeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
