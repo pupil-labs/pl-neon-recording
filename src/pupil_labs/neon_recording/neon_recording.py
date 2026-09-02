@@ -9,6 +9,8 @@ from typing import TypeVar, cast
 
 from upath import UPath
 
+from pupil_labs.neon_recording.calib import Calibration
+from pupil_labs.neon_recording.recover import run_recovery_tool
 from pupil_labs.neon_recording.timeseries import (
     AudioTimeseries,
     BlinkTimeseries,
@@ -27,8 +29,6 @@ from pupil_labs.neon_recording.timeseries import (
     WornTimeseries,
 )
 from pupil_labs.neon_recording.timeseries.timeseries import Timeseries
-
-from .calib import Calibration
 
 log = logging.getLogger(__name__)
 
@@ -50,11 +50,15 @@ class NeonRecording:
 
     """Class to handle the Neon Recording data"""
 
-    def __init__(self, rec_dir_in: pathlib.Path | str):
+    def __init__(self, rec_dir_in: pathlib.Path | str, recover: bool | None = None):
         """Initialize the NeonRecording object
 
         Args:
             rec_dir_in: Path to the recording directory.
+            recover: Whether the recovery tool should be run before loading the data.
+            By default (``None``), the tool is run when loading the recording for the.
+            first time. Provide ``True`` or ``False`` to explicitly enable or disable
+            the recovery.
 
         Raises:
             FileNotFoundError: If the directory does not exist or is not valid.
@@ -66,6 +70,8 @@ class NeonRecording:
             raise FileNotFoundError(
                 f"Directory not found or not valid: {self._rec_dir}"
             )
+
+        run_recovery_tool(self._rec_dir, recover)
 
     def __repr__(self):
         return f"NeonRecording({self._rec_dir})"
