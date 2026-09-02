@@ -23,6 +23,7 @@ dependencies = [
     "numpy",
     "packaging>=24.2",
     "pandas>=2.2.3",
+    "pl-recover-recording",
     "protobuf",
     "pupil-labs-video>=1.0.5",
     "universal_pathlib",
@@ -94,6 +95,9 @@ source = "uv-dynamic-versioning"
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
+
+[tool.uv.sources]
+pl-recover-recording = { git = "https://github.com/pupil-labs/pl-recover-recording.git" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pupil_labs"]
