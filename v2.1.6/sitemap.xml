@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/contributing/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/license/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/api/calibration/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/api/recording/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/api/timeseries/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://pupil-labs.github.io/pl-neon-recording/v2.1.6/coverage/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+</urlset>
